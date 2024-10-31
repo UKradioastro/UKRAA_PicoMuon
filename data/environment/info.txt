@@ -1,0 +1,29 @@
+Calibrated N15weather station data from pywws.
+
+Each file has data every 5 minutes
+
+comma (,) separates the data columns
+
+data format
+
+Column	data
+1	idx		WANT THIS
+2	delay
+3	hum_in
+4	temp_in
+5	hum_out
+6	temp_out	WANT THIS
+7	abs_pressure
+8	rel_pressure	WANT THIS
+9	wind_ave
+10	wind_gust
+11	wind_dir
+12	rain
+13	status
+14	illuminance
+15	uv
+
+So when plotting in gnuplot
+x axis = column 1
+y axis = column 6 for temperature
+y axis = column 8 for pressure
