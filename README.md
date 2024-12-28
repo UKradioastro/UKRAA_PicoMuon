@@ -271,5 +271,42 @@ We need to add some dependencies to the RPi.
 
 1. pandas
 
+Open a terminal window and type "sudo apt install python3-pandas and hit enter.  You will be asked to type "y" to proceed.  This will install pandas and other dependencies related to pandas.
+
+![img_30](images/RPi_imager_30.PNG)
+
+2. gnuplot
+
+Open the application menu (Raspberry) and select "Preferences" and "Add/Remove Software".
+
+![img_31](images/RPi_imager_31.PNG)
+
+From the "Add/Remove Software window type "gnuplot" into the search bar and hit enter.  When the available packages have been found select the packages in the following image and select "Apply".
+
+![img_32](images/RPi_imager_32.PNG)
+
+You will be asked to enter the pi password.  Enter your pi password and select "Authenticate".  This will then install the gnuplot package and any dependencies required.
+
+![img_33](images/RPi_imager_33.PNG)
+
+Select OK to close the window.
+
+### Set upo file structure on the RPi
+
+We need to add some dependencies to the RPi.
+
+1. make directories
+Type "mkdir UKRAA_muons" and press enter.
+
+![img_34](images/RPi_imager_34.PNG)
+
+2. move into newly created directory
+Type "cd UKRAA_muons" and press enter.
+
+![img_35](images/RPi_imager_35.PNG)
+
+3. get files from Git
+
+
 
 
