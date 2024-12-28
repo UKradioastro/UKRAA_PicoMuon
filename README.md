@@ -236,7 +236,7 @@ VNC server will now be enabled, hit enter.
 
 ![img_23](images/RPi_imager_23.PNG)
 
-Finish with the Configuration Tool by selectinf "Finish" and hit enter.
+Finish with the Configuration Tool by selecting "Finish" and hit enter.
 
 ![img_24](images/RPi_imager_24.PNG)
 
