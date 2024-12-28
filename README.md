@@ -162,6 +162,7 @@ On the "GENERAL" page...
 
 6. Select "OPTIONS"
 * Keep defaults
+
 ![img_9](images/RPi_imager_9.PNG)
 
 7. Select "SAVE"
