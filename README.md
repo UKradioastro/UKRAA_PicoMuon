@@ -244,3 +244,32 @@ Reboot the RPi, type "sudo reboot" and hit enter.  This will close the PuTTY con
 ![img_25](images/RPi_imager_25.PNG)
 
 
+### Headless access to RPi via VNC
+
+Using a VNC program like RealVNC (https://www.realvnc.com/en/), connect to your RPi...
+
+Create a new connections and enter the hostname into the VNC Server box, add freindly name in the Name box and select okay.
+
+![img_26](images/RPi_imager_26.PNG)
+
+Open this VNC connection to your RPi, you will get a "VNC server not recognised" window from RealVNC. Select "Continue"
+
+![img_27](images/RPi_imager_27.PNG)
+
+You will now get an "Authentication" window from RealVNC, enter user and password details and select remember password to make it easier to login in future.
+
+![img_28](images/RPi_imager_28.PNG)
+
+You are now remotely accessing your RPi...
+
+![img_29](images/RPi_imager_29.PNG)
+
+
+### Add additional software to your RPi
+
+We need to add some dependencies to the RPi.
+
+1. pandas
+
+
+
