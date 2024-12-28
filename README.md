@@ -228,7 +228,7 @@ Now navigate down to "I3 VNC" and select
 
 ![img_21](images/RPi_imager_21.PNG)
 
-Select <Yes> to enable the VNC Server and hit enter.  
+Select "Yes" to enable the VNC Server and hit enter.  
 
 ![img_22](images/RPi_imager_22.PNG)
 
@@ -236,7 +236,7 @@ VNC server will now be enabled, hit enter.
 
 ![img_23](images/RPi_imager_23.PNG)
 
-Finish with the Configuration Tool by selectinf <Finish> and hit enter.
+Finish with the Configuration Tool by selectinf "Finish" and hit enter.
 
 ![img_24](images/RPi_imager_24.PNG)
 
