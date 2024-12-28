@@ -107,6 +107,8 @@ I run "GetDataRawACM0.py" as a service
 
 I run the other python scripts from cron
 
-### To do
+## Set-up instructions
 
-Instructions on initial set-up.
+### Raspberry Pi OS
+
+Download Raspberry Pi Imager for your operating system![img](images/RPI_OS.PNG)
