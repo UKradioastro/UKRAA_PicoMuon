@@ -292,7 +292,7 @@ You will be asked to enter the pi password.  Enter your pi password and select "
 
 Select OK to close the window.
 
-### Set upo file structure on the RPi
+### Set up file structure on the RPi
 
 We need to add some dependencies to the RPi.
 
@@ -306,7 +306,7 @@ Type "cd UKRAA_muons" and press enter.
 
 ![img_35](images/RPi_imager_35.PNG)
 
-3. get files from Git
+### Get code from github
 
 
 
