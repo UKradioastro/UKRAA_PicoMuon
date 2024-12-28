@@ -111,4 +111,21 @@ I run the other python scripts from cron
 
 ### Raspberry Pi OS
 
-Download Raspberry Pi Imager for your operating system![img](images/RPI_OS.PNG)
+Download Raspberry Pi Imager for your operating system.
+
+
+![img_0](images/RPI_OS.PNG)
+
+Run Raspberry Pi Imager.
+
+
+![img_1](images/RPi_imager_1.PNG)
+
+Select "CHOOSE DEVICE" and then select your Raspberry Pi device.
+
+![img_2](images/RPi_imager_2.PNG)
+
+Select "CHOOSE OS" and then select "Raspberry Pi OS (64bit)".
+
+![img_3](images/RPi_imager_3.PNG)
+
