@@ -7,7 +7,7 @@ I have written this software to suit my set-up, feel free use as you see fit.
 
 The software needed to run will depend on what you intend.  You will need the following:
 
-* Essential: [Python] 3 (https://www.python.org/)
+* Essential: [Python 3] (https://www.python.org/)
 * Optional: [Pandas] for neutron data (https://pandas.pydata.org/)
 * Optional: [gnuplot] for graphing processed data (http://www.gnuplot.info/)
 
@@ -143,7 +143,7 @@ You are presented with a "Use OS customisation?" window, select "EDIT SETTINGS".
 
 On the "GENERAL" page...
 
-1. Set hostname - set to whatever you want
+1. Set hostname - set to whatever you want - but write it down, we will need it latter!
 2. Set username and password 
 * Keep username as "pi"
 * set your own password
@@ -179,6 +179,40 @@ The operating system will now be written to the microSD card
 ![img_12](images/RPi_imager_12.PNG)
 
 and then verified, this take a bit of time...
+
+![img_13](images/RPi_imager_13.PNG)
+
+When finished, you can remove the microSD card and select "CONTINUE" and close the Raspberry Pi Imager.
+
+![img_14](images/RPi_imager_14.PNG).
+
+
+### RPi4 configuration
+
+Put the microSD card you have just created into your RPi4, connect the RPi to your LAN if necessary,  insert the power cable and turn on.
+
+Using PuTTY (https://www.putty.org/)
+
+In Host Name (or IP address), type the host name of your RPi that you wrote down earlier... and select open.
+
+![img_15](images/RPi_imager_15.PNG)
+
+
+You will be presented with a PuTTY Security Alert - select "Accept".  You will now have a PuTTY terminal window.
+
+![img_16](images/RPi_imager_16.PNG)
+
+Login as "pi" and enter your password
+
+Now type "sudo apt update" and hit enter.  This will update the RPi OS
+
+![img_17](images/RPi_imager_17.PNG)
+
+Now type "sudo apt upgrade" and hit enter.  This will update any preinstalled software packages.
+You will be asked to type "y" to proceed.
+
+![img_18](images/RPi_imager_18.PNG)
+
 
 
 
