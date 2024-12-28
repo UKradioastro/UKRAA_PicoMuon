@@ -5,38 +5,23 @@ import os
 # local library that generates the html strings to download NEST data
 import nest
 
-#now = dt.datetime.now()
-#print(now)
-
-#today = dt.date.today()
-#print(today)
-
+# get yesterday variable
 yesterday = dt.date.today() - dt.timedelta(days = 1)
-#print(yesterday)
 
-#year = dt.date.today().year
-#print(year)
-
-#month=dt.date.today().month
-#print(month)
-
-#day = dt.date.today().day
-#print(day)
-
+# year
 yesterdayYear = yesterday.year
-#print(yesterdayYear)
 
+#month
 yesterdayMonth=yesterday.month
-#print(yesterdayMonth)
 
+# day
 yesterdayDay = yesterday.day
-#print(yesterdayDay)
 
+# create path to save data
 path = '/home/pi/UKRAA_muons/data/neutrons/'\
        + dt.datetime.strftime(dt.date.today() - dt.timedelta(days = 1), '%Y')\
        + '/'\
        + dt.datetime.strftime(dt.date.today() - dt.timedelta(days = 1), '%Y-%m')
-#print(path)
 
 # Check if the specific path exists or not
 pathExist = os.path.exists(path)
@@ -45,6 +30,7 @@ if not pathExist:
     os.makedirs(path)
     print('New directory created')
 
+# create file for yesterdays data
 outfile = '/home/pi/UKRAA_muons/data/neutrons/'\
           + dt.datetime.strftime(dt.date.today() - dt.timedelta(days = 1), '%Y')\
           + '/'\
@@ -52,7 +38,6 @@ outfile = '/home/pi/UKRAA_muons/data/neutrons/'\
           + '/'\
           + dt.datetime.strftime(dt.date.today() - dt.timedelta(days = 1), '%Y-%m-%d')\
           + '.txt'
-#print(outfile)
 
 # Start date/time for data to be extraction - should be start of day yesterday, i.e. 00:00:00
 start   = dt.datetime(yesterdayYear, yesterdayMonth, yesterdayDay, 0, 0, 0)
@@ -68,8 +53,6 @@ data    = ["p", "u", "c", "e"]  # download pressure, uncorrected, corrected (for
 
 # Create download string to access NMDB NEST data files
 download = nest.single(station, table, data, start, end)
-# the download string for the data we selected
-#print(download)
 
 names = data.copy()  # keep the original columns, work only with a copy
 
