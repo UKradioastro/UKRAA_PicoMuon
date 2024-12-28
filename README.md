@@ -213,6 +213,34 @@ You will be asked to type "y" to proceed.
 
 ![img_18](images/RPi_imager_18.PNG)
 
+You may be advised that you can remove "no longer required" packages.  You can type "sudo apt autoremove" to do this. Again, you will be asked to type "y" to proceed.
 
+![img_19](images/RPi_imager_19.PNG)
+
+We can now set up VNC to access the RPi from our desktop PC.
+
+Type "sudo raspi-config" and hit enter.  We will be presented with the RPi configuration tool.  Select "3 Interface Options".
+
+![img_20](images/RPi_imager_20.PNG)
+
+Now navigate down to "I3 VNC" and select
+
+![img_21](images/RPi_imager_21.PNG)
+
+Select "<Yes>" to enable the VNC Server and hit enter.  
+
+![img_22](images/RPi_imager_22.PNG)
+
+VNC server will now be enabled, hit enter.
+
+![img_23](images/RPi_imager_23.PNG)
+
+Finish with the Configuration Tool by selectinf "<Finish>" and hit enter.
+
+![img_24](images/RPi_imager_24.PNG)
+
+Reboot the RPi, type "sudo reboot" and hit enter.  This will close the PuTTY connection.  You can close the Putty window.
+
+![img_25](images/RPi_imager_25.PNG)
 
 
