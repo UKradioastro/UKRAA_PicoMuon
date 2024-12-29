@@ -387,9 +387,12 @@ This can be done after midnight automatically using CRON.
 2. Type "sudo crontab -e" and press enter - this will open crontab text editor.  The first time it will ask what editor you prefer - I prefer nano.
 
 ![img_50](images/RPi_imager_50.PNG)
+
 3. Scroll to bottom and type the following...
+
 ![img_51](images/RPi_imager_51.PNG)
-4. Save (Ctrl + s) and exit (Ctrl + x)
+
+4. Save (Ctrl + s) and exit (Ctrl + x).
 5. If this went well you will see "crontab: installing new crontab" on the terminal window.
 
 This should now process and graph yesterdays data from the detector overnight.
