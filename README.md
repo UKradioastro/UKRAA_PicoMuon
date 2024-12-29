@@ -321,3 +321,49 @@ From the open file manager navigate to /home/pi directory and you will see a new
 
 Change the name of the folder to "UKRAA_muons" and select "OK".
 
+![img_43](images/RPi_imager_43.PNG)
+
+Scripts and folder structure should now be in place to run the code.
+
+
+### Where is my detector?.
+
+Plug your detector into any of the RPI USB ports - I normally use the blue ports (USB3).
+
+Open a terminal window and type "ls /dev/tty*" and press return.
+![img_48](images/RPi_imager_48.PNG)
+
+You are looking for /dev/ttyACM0 - this will be on the RHS of the screen above.
+
+This is the USB address for your attached detector - if you have more than one detector attached you may see /dev/ttyACM1 etc.
+
+If you do not see /dev/ttyACM0, then unplug and plug the detector back in and try again.
+
+As long as we see /dev/ttyACM0 then we do not have to make any changes to the python scripts, because they are looking for ACM0.
+
+### Running the code to get data from the detector.
+
+It is an easy process to set up services to run the code, check it is running and restart the code if it stps.
+
+To do this we need to create the service, then enable the service.
+
+1. Open terminal window
+2. Type "sudo nano /etc/systemd/system/muon_ACM0.service" - this will open nano text editor.
+3. Type in the following text...
+![img_44](images/RPi_imager_44.PNG)
+4. Save (Ctrl + s) and exit (Ctrl + x)
+5. Type "sudo chmod 644 /etc/systemd/system/muon_ACM0.service" to change permissions of your created service file and press enter.
+![img_45](images/RPi_imager_45.PNG)
+6. Type "sudo systemctl daemon-reload" to reload services.
+![img_46](images/RPi_imager_46.PNG)
+7. Type "sudo systemctl enable muon_ACM0.service" to enable your new service.
+![img_47](images/RPi_imager_47.PNG)
+
+To check status of your service type:
+"sudo systemctl status muon_ACM0.service"
+
+To start your service type:
+"sudo systemctl start muon_ACM0.service"
+
+To stop your service type:
+"sudo systemctl stop muon_ACM0.service"
