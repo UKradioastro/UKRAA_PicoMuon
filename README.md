@@ -348,7 +348,7 @@ It is an easy process to set up services to run the code, check it is running an
 To do this we need to create the service, then enable the service.
 
 1. Open terminal window
-2. Type "sudo nano /etc/systemd/system/muon_ACM0.service" - this will open nano text editor.
+2. Type "sudo nano /etc/systemd/system/muon_ACM0.service" and press enter - this will open nano text editor.
 3. Type in the following text...
 ![img_44](images/RPi_imager_44.PNG)
 4. Save (Ctrl + s) and exit (Ctrl + x)
@@ -359,11 +359,48 @@ To do this we need to create the service, then enable the service.
 7. Type "sudo systemctl enable muon_ACM0.service" to enable your new service.
 ![img_47](images/RPi_imager_47.PNG)
 
+The service you have set will automatically start whenever the RPi is started or rebooted.
+
 To check status of your service type:
 "sudo systemctl status muon_ACM0.service"
+
+We expect to see...
+![img_49](images/RPi_imager_49.PNG)
+
+If we dont see green "enabled" and "active", then we have a typo in the muon_ACM0.service file.
 
 To start your service type:
 "sudo systemctl start muon_ACM0.service"
 
 To stop your service type:
 "sudo systemctl stop muon_ACM0.service"
+
+
+### Running the code to get process and plot the data from the detector.
+
+The data will be processed to get counts per minute and the frequency of the adc values for the previous day.
+
+A request will be made to NEST to get the previous days recorded neutron count, this data will be overlayed onto the counts per minute graphs.
+
+Three plots will be created:
+* counts per minute
+* frequency of cunts per minute
+* frequency of ADC values recorded
+
+This can be done after midnight automatically using CRON.
+
+1. Open terminal window
+2. Type "sudo crontab -e" and press enter - this will open crontab text editor.  The first time it will ask what editor you prefer - I prefer nano.
+![img_50](images/RPi_imager_50.PNG)
+3. Scroll to bottom and type the following...
+![img_51](images/RPi_imager_51.PNG)
+4. Save (Ctrl + s) and exit (Ctrl + x)
+5. If this went well you will see "crontab: installing new crontab" on the terminal window.
+
+This should now process and graph yesterdays data from the detector overnight.
+
+Plots will appear in the "plots" folder and the "temp" folder.
+
+The "plots" folder hold plots for each day in year/month folder.
+
+The "temp" folder only holds plots for yesterday, updated each day, for pushing to a website/etc.
