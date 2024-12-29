@@ -203,8 +203,7 @@ Now type "sudo apt update" and hit enter.  This will update the RPi OS
 
 ![img_17](images/RPi_imager_17.PNG)
 
-Now type "sudo apt upgrade" and hit enter.  This will update any preinstalled software packages.
-You will be asked to type "y" to proceed.
+Now type "sudo apt upgrade" and hit enter.  This will update any preinstalled software packages.  You will be asked to type "y" to proceed.
 
 ![img_18](images/RPi_imager_18.PNG)
 
@@ -214,11 +213,12 @@ You may be advised that you can remove "no longer required" packages.  You can t
 
 We can now set up VNC to access the RPi from our desktop PC.
 
-Type "sudo raspi-config" and hit enter.  We will be presented with the RPi configuration tool.  Select "3 Interface Options".
+Type "sudo raspi-config" and hit enter.  We will be presented with the RPi configuration tool.  
+Select "3 Interface Options" and press return.
 
 ![img_20](images/RPi_imager_20.PNG)
 
-Now navigate down to "I3 VNC" and select
+Now navigate down to "I3 VNC" and press return.
 
 ![img_21](images/RPi_imager_21.PNG)
 
@@ -370,7 +370,7 @@ To stop your service type:
 "sudo systemctl stop muon_ACM0.service"
 
 
-### Running the code to get process and plot the data from the detector.
+### Running the code to process and plot the data from the detector.
 
 The data will be processed to get counts per minute and the frequency of the adc values for the previous day.
 
@@ -385,6 +385,7 @@ This can be done after midnight automatically using CRON.
 
 1. Open terminal window
 2. Type "sudo crontab -e" and press enter - this will open crontab text editor.  The first time it will ask what editor you prefer - I prefer nano.
+
 ![img_50](images/RPi_imager_50.PNG)
 3. Scroll to bottom and type the following...
 ![img_51](images/RPi_imager_51.PNG)
