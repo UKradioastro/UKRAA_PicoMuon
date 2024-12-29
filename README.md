@@ -91,21 +91,15 @@ The software needed to run will depend on what you intend.  You will need the fo
 
 ## Using the code
 
-The code assumes that you the UKRAA PicoMuon detector is connected to the RPi4/5 via USB and that it is /dev/ttyACM0 - you can check this by using "ls /dev/tty*" in a terminal window on the RPi4/5 and reviewing the response.  If different then ocurances of '/dev/ttyACM0' in GetDataRaw.py will need to be changed.
+The code assumes that you the UKRAA PicoMuon detector is connected to the RPi4/5 via USB and that it is /dev/ttyACM0 - you can check this by using "ls /dev/tty*" in a terminal window on the RPi4/5 and reviewing the response.
 
 The code assumes user is "pi", if "pi" is not the user then need to change '/home/pi' to '/home/user' in the python and gnuplot scripts to whatever your username is.
 
+The code assumes one detector connected to RPi USB and will be "/dev/ttyACM0", if there are other devices connected to the RPi and your detector is not "/dev/ttyACM0" then  then need to change '/dev/ttyACM0' to '/dev/ttyACMx' in the GetDataRaw.py python script.
 
-The code assumes directory structure '/home/pi/UKRAA_muons/';
-* ~ $ mkdir UKRAA_muons
-* ~ $ cd UKRAA_muons
-* ~/UKRAA_muons $ mkdir data plots scripts temp
-* copy scripts from github to scripts folder
-* modify as necessary
+"GetDataRawACM0.py" is run as a service
 
-I run "GetDataRawACM0.py" as a service
-
-I run the other python scripts from cron
+Other scripts (Python and gnuplot) are run from cron
 
 ## Set-up instructions
 
