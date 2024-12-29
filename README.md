@@ -292,22 +292,32 @@ You will be asked to enter the pi password.  Enter your pi password and select "
 
 Select OK to close the window.
 
-### Set up file structure on the RPi
-
-We need to add some dependencies to the RPi.
-
-1. make directories
-Type "mkdir UKRAA_muons" and press enter.
-
-![img_34](images/RPi_imager_34.PNG)
-
-2. move into newly created directory
-Type "cd UKRAA_muons" and press enter.
-
-![img_35](images/RPi_imager_35.PNG)
 
 ### Get code from github
 
+Open the web browser on the RPi. In the address bar type "https://github.com/UKradioastro/PicoMuon_Python_code" and press enter.
 
+![img_37](images/RPi_imager_37.PNG)
 
+Select the "<> Code" tab and then select "Download ZIP".  This will download all the necessary code/files for the Python code.  Close the web browser.
+
+![img_38](images/RPi_imager_38.PNG)
+
+Open file manager and navigate to the "Downloads" folder - you should see a zip folder of the downloaded files.
+
+![img_39](images/RPi_imager_39.PNG)
+
+Double click on the zip folder to bring up the extraction tool. Select the "extract files" to extract all the files in the zip folder.
+
+![img_40](images/RPi_imager_40.PNG)
+
+You will be asked where you want the files to be extracted to - change the selection to the pi home directory."  Close the extraction tool when finished.
+
+![img_41](images/RPi_imager_41.PNG)
+
+From the open file manager navigate to /home/pi directory and you will see a new folder "PicoMuon_Python_code-main".  Select this folder and right-click mouse and select "Rename".
+
+![img_42](images/RPi_imager_42.PNG)
+
+Change the name of the folder to "UKRAA_muons" and select "OK".
 
