@@ -404,12 +404,80 @@ The "plots" folder hold plots for each day in year/month folder.
 The "temp" folder only holds plots for yesterday, updated each day, for pushing to a website/etc.
 
 
-### Creating simple home intranet web server on your RPi to view your results on your smart phome.
+### Creating simple home intranet web server on your RPi.
 
 We can create a simple web server on our RPi to be able to view our detector results on our smart phone when connected to our home metwork.
 
 To set up the web server on the RPi, follow the instruction from "tom's HARDWARE" (https://www.tomshardware.com/news/raspberry-pi-web-server,40174.html).  Only need to do first section - upto 9. Build your website.
 
 
+### Creating simple website for you PicoMuon plots to view your results on your smart phome.
 
+Once you have completed building your RPi web server, we need to move some files over to the /var/www/html folder, these are all located in the WWW folder from your downloaded git zip file - as shown below.
+
+
+```
+└── 📁WWW
+    └── 📁images
+        └── AndrewBanner.jpg
+        └── Cosmic_muons.jpg
+        └── favicon.ico
+        └── PicoMuon_1.png
+        └── PicoMuon_2.png
+        └── PicoMuon_3.png
+    └── 📁temp
+        └── ACM0_B-Adc.png
+        └── ACM0_B-Cpm.png
+        └── ACM0_B-Freq.png
+        └── ACM0_C-Adc.png
+        └── ACM0_C-Cpm.png
+        └── ACM0_C-Freq.png
+        └── ACM0_T-Adc.png
+        └── ACM0_T-Cpm.png
+        └── ACM0_T-Freq.png
+    └── index.html
+```
+
+1. Open terminal window
+2. Type "cd UKRAA_muons/WWW/" and press enter - this will take you to the files in the WWW folder.  
+
+![img_52](images/RPi_imager_52.PNG)
+
+3. We can check we are in the coorect location by typing "ls -l" and press enter, we should see the following...
+
+![img_53](images/RPi_imager_53.PNG)
+
+4. We now need to copy the files and folders from WWW to /var/www/html.
+
+5. Type "sudo cp index.html /var/www/html/index.html" and press enter.
+
+![img_54](images/RPi_imager_54.PNG)
+
+6. Type "sudo cp -r images /var/www/html/" and press enter.
+
+![img_56](images/RPi_imager_56.PNG)
+
+7. Type "sudo cp -r temp /var/www/html/" and press enter.
+
+![img_57](images/RPi_imager_57.PNG)
+
+8. File manager, you can check that the file/folders have been copied correctly by navigating to /var/www/html and you should see the folowing.
+
+![img_58](images/RPi_imager_58.PNG)
+
+9. You should now be able to access the webpage from your smart phone.  On your smart phone open your preferred web application (Safari, chrome, etc..). In the search bar type "http://rpi4-ukraa.local" and press enter - should access the web page.
+
+![img_59](images/RPi_imager_59.PNG)
+
+
+
+
+
+This should now process and graph yesterdays data from the detector overnight.
+
+Plots will appear in the "plots" folder and the "temp" folder.
+
+The "plots" folder hold plots for each day in year/month folder.
+
+The "temp" folder only holds plots for yesterday, updated each day, for pushing to a website/etc.
 
