@@ -470,14 +470,19 @@ Once you have completed building your RPi web server, we need to move some files
 ![img_59](images/RPi_imager_59.PNG)
 
 
+### Get daily plots to your website.
 
+The data on the website is static - we need to push the daily plots to the website so that they can be updated and viewed.
 
+This can be done after the plots are completed automatically using CRON.
 
-This should now process and graph yesterdays data from the detector overnight.
+1. Open terminal window
+2. Type "sudo crontab -e" and press enter - this will open crontab text editor.  
+3. Scroll to bottom and type the following...
 
-Plots will appear in the "plots" folder and the "temp" folder.
+![img_60](images/RPi_imager_60.PNG)
 
-The "plots" folder hold plots for each day in year/month folder.
+4. Save (Ctrl + s) and exit (Ctrl + x).
+5. If this went well you will see "crontab: installing new crontab" on the terminal window.
 
-The "temp" folder only holds plots for yesterday, updated each day, for pushing to a website/etc.
-
+This should copy yesterdays plots at 8.00am each morning to the website for viewing.
