@@ -7,9 +7,9 @@ I have written this software to suit my set-up, feel free use as you see fit.
 
 The software needed to run will depend on what you intend.  You will need the following:
 
-* Essential: [Python 3] (https://www.python.org/)
-* Optional: [Pandas] for neutron data (https://pandas.pydata.org/)
-* Optional: [gnuplot] for graphing processed data (http://www.gnuplot.info/)
+* Essential: [Python 3](https://www.python.org/)
+* Optional: [Pandas](https://pandas.pydata.org/) for neutron data 
+* Optional: [gnuplot](http://www.gnuplot.info/) for graphing processed data 
 
 ## File structure
 
