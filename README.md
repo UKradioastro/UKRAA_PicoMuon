@@ -402,3 +402,14 @@ Plots will appear in the "plots" folder and the "temp" folder.
 The "plots" folder hold plots for each day in year/month folder.
 
 The "temp" folder only holds plots for yesterday, updated each day, for pushing to a website/etc.
+
+
+### Creating simple home intranet web server on your RPi to view your results on your smart phome.
+
+We can create a simple web server on our RPi to be able to view our detector results on our smart phone when connected to our home metwork.
+
+To set up the web server on the RPi, follow the instruction from "tom's HARDWARE" (https://www.tomshardware.com/news/raspberry-pi-web-server,40174.html).  Only need to do first section - upto 9. Build your website.
+
+
+
+
