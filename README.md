@@ -404,7 +404,7 @@ Three plots will be created:
 * frequency of counts per minute
 * frequency of ADC values recorded
 
-This can be done after midnight automatically using CRON.
+This can be done after midnight automatically using CRON because the processing of the cpm takes about 6 hours and the processing of the adc values takes about 1 hour on a RPi4.  It takes less time to run these two processes on a RPi5.
 
 1. Open terminal window
 2. Type "sudo crontab -e" and press enter - this will open crontab text editor.  The first time it will ask what editor you prefer - I prefer nano.
@@ -501,7 +501,7 @@ This can be done after the plots are completed automatically using CRON.
 
 1. Open terminal window
 2. Type "sudo crontab -e" and press enter - this will open crontab text editor.  
-3. Scroll to bottom and type the following...
+3. Scroll to bottom and type the following after what you had previously typed in above...
 
 ![img_60](images/RPi_imager_60.PNG)
 
