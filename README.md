@@ -89,6 +89,29 @@ The software needed to run will depend on what you intend.  You will need the fo
     └── ACM0_T-Freq.png
 ```
 
+### website
+```
+└── 📁WWW
+    └── 📁images
+        └── AndrewBanner.jpg
+        └── Cosmic_muons.jpg
+        └── favicon.ico
+        └── PicoMuon_1.png
+        └── PicoMuon_2.png
+        └── PicoMuon_3.png
+    └── 📁temp
+        └── ACM0_B-Adc.png
+        └── ACM0_B-Cpm.png
+        └── ACM0_B-Freq.png
+        └── ACM0_C-Adc.png
+        └── ACM0_C-Cpm.png
+        └── ACM0_C-Freq.png
+        └── ACM0_T-Adc.png
+        └── ACM0_T-Cpm.png
+        └── ACM0_T-Freq.png
+    └── index.html
+```
+
 ## Using the code
 
 The code assumes that you the UKRAA PicoMuon detector is connected to the RPi4/5 via USB and that it is /dev/ttyACM0 - you can check this by using "ls /dev/tty*" in a terminal window on the RPi4/5 and reviewing the response.
