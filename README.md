@@ -378,7 +378,7 @@ A request will be made to NEST to get the previous days recorded neutron count, 
 
 Three plots will be created:
 * counts per minute
-* frequency of cunts per minute
+* frequency of counts per minute
 * frequency of ADC values recorded
 
 This can be done after midnight automatically using CRON.
