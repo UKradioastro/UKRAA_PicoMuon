@@ -89,7 +89,7 @@ set ytics textcolor rgb "#A020F0"
 # X-axis label and ranges
 set xlabel "Event detector adc value" 
 set xlabel textcolor rgb "#000000" norotate
-set xrange [0.0:4096.0] noreverse nowriteback
+set xrange [0.0:1024.0] noreverse nowriteback
 
 # Y-axis labels and ranges
 set ylabel "Frequency of event detector adc value" 
