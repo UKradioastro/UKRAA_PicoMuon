@@ -390,19 +390,19 @@ sudo reboot
 
 Using a VNC program like RealVNC (https://www.realvnc.com/en/), connect to your RPi...
 
-Create a new connections and enter the hostname into the VNC Server box, add freindly name in the Name box and select okay.
+1. Create a new connections and enter the hostname into the VNC Server box, add freindly name in the Name box and select okay.
 
 ![img_26](images/RPi_imager_26.PNG)
 
-Open this VNC connection to your RPi, you will get a **VNC server not recognised** window from RealVNC. Select **Continue**
+2. Open this VNC connection to your RPi, you will get a **VNC server not recognised** window from RealVNC. Select **Continue**
 
 ![img_27](images/RPi_imager_27.PNG)
 
-You will now get an **Authentication** window from RealVNC, enter user and password details and select remember password to make it easier to login in future.
+3. You will now get an **Authentication** window from RealVNC, enter your **Username** and **Password** details and select **Remember password** to make it easier to login in future.
 
 ![img_28](images/RPi_imager_28.PNG)
 
-You are now remotely accessing your RPi...
+4. You are now remotely accessing your RPi from your desktop PC...
 
 ![img_29](images/RPi_imager_29.PNG)
 
@@ -415,31 +415,30 @@ You are now remotely accessing your RPi...
 
 We need to add some dependencies to the RPi.
 
-1. pandas
-
-Open a terminal window and type 
+**pandas**
+1. Open a terminal window and type the command below and hit enter.  You will be asked to type **y** to proceed.  This will install pandas and other dependencies related to pandas.
 ```
 sudo apt install python3-pandas
 ```
-and hit enter.  You will be asked to type **y** to proceed.  This will install pandas and other dependencies related to pandas.
+
 
 ![img_30](images/RPi_imager_30.PNG)
 
-2. gnuplot
+**gnuplot**
 
-Open the application menu (Raspberry) and select **Preferences** and **Add/Remove Software**.
+1. Open the application menu (Raspberry logo) and select **Preferences** and **Add/Remove Software**.
 
 ![img_31](images/RPi_imager_31.PNG)
 
-From the **Add/Remove Software window type **gnuplot** into the search bar and hit enter.  When the available packages have been found select the packages in the following image and select **Apply**.
+2. From the **Add/Remove Software** search window type **gnuplot** into the search bar and hit enter.  When the available packages have been found, select the packages in the following image and select **Apply**.
 
 ![img_32](images/RPi_imager_32.PNG)
 
-You will be asked to enter the pi password.  Enter your pi password and select **Authenticate**.  This will then install the gnuplot package and any dependencies required.
+3. You will be asked to enter the pi **password**.  Enter your pi **password** and select **Authenticate**.  This will then install the gnuplot package and any dependencies required.
 
 ![img_33](images/RPi_imager_33.PNG)
 
-Select OK to close the window.
+4. Select OK to close the window.
 
 
 ---
@@ -448,39 +447,38 @@ Select OK to close the window.
 <!-- =============================================================================== --> 
 ### Get code from github
 
-Open the web browser on the RPi. In the address bar type 
+1. Open the web browser on the RPi. In the address bar type the following command and press enter.
 ```
 https://github.com/UKradioastro/PicoMuon_Python_code
 ```
-and press enter.
 
 ![img_37](images/RPi_imager_37.PNG)
 
-Select the **<> Code** tab and then select **Download ZIP**.  This will download all the necessary code/files for the Python code.  Close the web browser.
+2. Select the **<> Code** tab and then select **Download ZIP**.  This will download all the necessary code/files for the Python code.  Close the web browser.
 
 ![img_38](images/RPi_imager_38.PNG)
 
-Open file manager and navigate to the **Downloads** folder - you should see a zip folder of the downloaded files.
+3. Open file manager and navigate to the **Downloads** folder - you should see a zip folder of the downloaded files.
 
 ![img_39](images/RPi_imager_39.PNG)
 
-Double click on the zip folder to bring up the extraction tool. Select the **extract files** to extract all the files in the zip folder.
+4. Double click on the zip folder to bring up the extraction tool. Select the **extract files** to extract all the files in the zip folder.
 
 ![img_40](images/RPi_imager_40.PNG)
 
-You will be asked where you want the files to be extracted to - change the selection to the pi home directory.**  Close the extraction tool when finished.
+5. You will be asked where you want the files to be extracted to - change the selection to the pi home directory - **/home/pi**.  Close the extraction tool when finished.
 
 ![img_41](images/RPi_imager_41.PNG)
 
-From the open file manager navigate to /home/pi directory and you will see a new folder **PicoMuon_Python_code-main**.  Select this folder and right-click mouse and select **Rename**.
+6. From the open file manager navigate to **/home/pi** directory and you will see a new folder **PicoMuon_Python_code-main**.  Select this folder and right-click mouse and select **Rename**.
 
 ![img_42](images/RPi_imager_42.PNG)
 
-Change the name of the folder to **UKRAA_muons** and select **OK**.
+7. Change the name of the folder to **UKRAA_muons** and select **OK**.
 
 ![img_43](images/RPi_imager_43.PNG)
 
-Scripts and folder structure should now be in place to run the code.
+8. Scripts and folder structure should now be in place to run the code.
 
 
 ---
