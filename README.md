@@ -1,5 +1,5 @@
 <div align=center>
-<img src="images/UKRAA_Logo_Black.svg" width="400" height="400"/>
+<img src=**images/UKRAA_Logo_Black.svg** width=**400** height=**400**/>
 </div>
 
 
@@ -156,13 +156,13 @@ The software needed to run will depend on what you intend.  You will need the fo
 <!-- =============================================================================== --> 
 ## Using the code
 
-The code assumes that you the UKRAA PicoMuon detector is connected to the RPi4/5 via USB and that it is /dev/ttyACM0 - you can check this by using "ls /dev/tty*" in a terminal window on the RPi4/5 and reviewing the response.
+The code assumes that you the UKRAA PicoMuon detector is connected to the RPi4/5 via USB and that it is /dev/ttyACM0 - you can check this by using **ls /dev/tty*** in a terminal window on the RPi4/5 and reviewing the response.
 
-The code assumes user is "pi", if "pi" is not the user then need to change '/home/pi' to '/home/user' in the python and gnuplot scripts to whatever your username is.
+The code assumes user is **pi**, if **pi** is not the user then need to change '/home/pi' to '/home/user' in the python and gnuplot scripts to whatever your username is.
 
-The code assumes one detector connected to RPi USB and will be "/dev/ttyACM0", if there are other devices connected to the RPi and your detector is not "/dev/ttyACM0" then  then need to change '/dev/ttyACM0' to '/dev/ttyACMx' in the GetDataRaw.py python script.
+The code assumes one detector connected to RPi USB and will be **/dev/ttyACM0**, if there are other devices connected to the RPi and your detector is not **/dev/ttyACM0** then  then need to change '/dev/ttyACM0' to '/dev/ttyACMx' in the GetDataRaw.py python script.
 
-"GetDataRawACM0.py" is run as a service
+**GetDataRawACM0.py** is run as a service
 
 Other scripts (Python and gnuplot) are run from cron
 
@@ -187,32 +187,32 @@ Web link https://www.raspberrypi.com/software/
 
 ![img_1](images/RPi_imager_1.PNG)
 
-3. Select "CHOOSE DEVICE" and then select your Raspberry Pi device.
+3. Select **CHOOSE DEVICE** and then select your Raspberry Pi device.
 
 ![img_2](images/RPi_imager_2.PNG)
 
-4. Select "CHOOSE OS" and then select "Raspberry Pi OS (64bit)".
+4. Select **CHOOSE OS** and then select **Raspberry Pi OS (64bit)**.
 
 ![img_3](images/RPi_imager_3.PNG)
 
-5. Select "CHOOSE STORAGE" and select your microSD card for your RPi.
+5. Select **CHOOSE STORAGE** and select your microSD card for your RPi.
 
 ![img_4](images/RPi_imager_4.PNG)
 
-6. Select "NEXT"
+6. Select **NEXT**
 
 ![img_5](images/RPi_imager_5.PNG)
 
-7. You are presented with a "Use OS customisation?" window, select "EDIT SETTINGS".
+7. You are presented with a **Use OS customisation?** window, select **EDIT SETTINGS**.
 
 ![img_6](images/RPi_imager_6.PNG)
 
 
-8. On the "GENERAL" page...
+8. On the **GENERAL** page...
 
 1. Set hostname - set to whatever you want - but write it down, we will need it latter!
 2. Set username and password 
-* Keep username as "pi"
+* Keep username as **pi**
 * set your own password
 3. Configure wireless LAN
 * if you wish to use you RPi wirelessly
@@ -222,23 +222,23 @@ Web link https://www.raspberrypi.com/software/
 
 ![img_7](images/RPi_imager_7.PNG)
 
-5. Select "SERVICES"
+5. Select **SERVICES**
 * Keep defaults
 
 ![img_8](images/RPi_imager_8.PNG)
 
-6. Select "OPTIONS"
+6. Select **OPTIONS**
 * Keep defaults
 
 ![img_9](images/RPi_imager_9.PNG)
 
-7. Select "SAVE"
+7. Select **SAVE**
 
-9. Now apply the customised OS settings by selecting "YES".
+9. Now apply the customised OS settings by selecting **YES**.
 
 ![img_10](images/RPi_imager_10.PNG)
 
-10. You will be asked if you wish to proceed, select "YES".
+10. You will be asked if you wish to proceed, select **YES**.
 
 ![img_11](images/RPi_imager_11.PNG)
 
@@ -250,7 +250,7 @@ Web link https://www.raspberrypi.com/software/
 
 ![img_13](images/RPi_imager_13.PNG)
 
-13. When finished, you can remove the microSD card and select "CONTINUE" and close the Raspberry Pi Imager.
+13. When finished, you can remove the microSD card and select **CONTINUE** and close the Raspberry Pi Imager.
 
 ![img_14](images/RPi_imager_14.PNG).
 
@@ -270,36 +270,36 @@ In Host Name (or IP address), type the host name of your RPi that you wrote down
 ![img_15](images/RPi_imager_15.PNG)
 
 
-You will be presented with a PuTTY Security Alert - select "Accept".  You will now have a PuTTY terminal window.
+You will be presented with a PuTTY Security Alert - select **Accept**.  You will now have a PuTTY terminal window.
 
 ![img_16](images/RPi_imager_16.PNG)
 
-Login as "pi" and enter your password
+Login as **pi** and enter your password
 
-Now type "sudo apt update" and hit enter.  This will update the RPi OS
+Now type **sudo apt update** and hit enter.  This will update the RPi OS
 
 ![img_17](images/RPi_imager_17.PNG)
 
-Now type "sudo apt upgrade" and hit enter.  This will update any preinstalled software packages.  You will be asked to type "y" to proceed.
+Now type **sudo apt upgrade** and hit enter.  This will update any preinstalled software packages.  You will be asked to type **y** to proceed.
 
 ![img_18](images/RPi_imager_18.PNG)
 
-You may be advised that you can remove "no longer required" packages.  You can type "sudo apt autoremove" to do this. Again, you will be asked to type "y" to proceed.
+You may be advised that you can remove **no longer required** packages.  You can type **sudo apt autoremove** to do this. Again, you will be asked to type **y** to proceed.
 
 ![img_19](images/RPi_imager_19.PNG)
 
 We can now set up VNC to access the RPi from our desktop PC.
 
-Type "sudo raspi-config" and hit enter.  We will be presented with the RPi configuration tool.  
-Select "3 Interface Options" and press return.
+Type **sudo raspi-config** and hit enter.  We will be presented with the RPi configuration tool.  
+Select **3 Interface Options** and press return.
 
 ![img_20](images/RPi_imager_20.PNG)
 
-Now navigate down to "I3 VNC" and press return.
+Now navigate down to **I3 VNC** and press return.
 
 ![img_21](images/RPi_imager_21.PNG)
 
-Select "Yes" to enable the VNC Server and hit enter.  
+Select **Yes** to enable the VNC Server and hit enter.  
 
 ![img_22](images/RPi_imager_22.PNG)
 
@@ -307,11 +307,11 @@ VNC server will now be enabled, hit enter.
 
 ![img_23](images/RPi_imager_23.PNG)
 
-Finish with the Configuration Tool by selecting "Finish" and hit enter.
+Finish with the Configuration Tool by selecting **Finish** and hit enter.
 
 ![img_24](images/RPi_imager_24.PNG)
 
-Reboot the RPi, type "sudo reboot" and hit enter.  This will close the PuTTY connection.  You can close the Putty window.
+Reboot the RPi, type **sudo reboot** and hit enter.  This will close the PuTTY connection.  You can close the Putty window.
 
 ![img_25](images/RPi_imager_25.PNG)
 
@@ -328,11 +328,11 @@ Create a new connections and enter the hostname into the VNC Server box, add fre
 
 ![img_26](images/RPi_imager_26.PNG)
 
-Open this VNC connection to your RPi, you will get a "VNC server not recognised" window from RealVNC. Select "Continue"
+Open this VNC connection to your RPi, you will get a **VNC server not recognised** window from RealVNC. Select **Continue**
 
 ![img_27](images/RPi_imager_27.PNG)
 
-You will now get an "Authentication" window from RealVNC, enter user and password details and select remember password to make it easier to login in future.
+You will now get an **Authentication** window from RealVNC, enter user and password details and select remember password to make it easier to login in future.
 
 ![img_28](images/RPi_imager_28.PNG)
 
@@ -355,21 +355,21 @@ Open a terminal window and type
 ```
 sudo apt install python3-pandas
 ```
-and hit enter.  You will be asked to type "y" to proceed.  This will install pandas and other dependencies related to pandas.
+and hit enter.  You will be asked to type **y** to proceed.  This will install pandas and other dependencies related to pandas.
 
 ![img_30](images/RPi_imager_30.PNG)
 
 2. gnuplot
 
-Open the application menu (Raspberry) and select "Preferences" and "Add/Remove Software".
+Open the application menu (Raspberry) and select **Preferences** and **Add/Remove Software**.
 
 ![img_31](images/RPi_imager_31.PNG)
 
-From the "Add/Remove Software window type "gnuplot" into the search bar and hit enter.  When the available packages have been found select the packages in the following image and select "Apply".
+From the **Add/Remove Software window type **gnuplot** into the search bar and hit enter.  When the available packages have been found select the packages in the following image and select **Apply**.
 
 ![img_32](images/RPi_imager_32.PNG)
 
-You will be asked to enter the pi password.  Enter your pi password and select "Authenticate".  This will then install the gnuplot package and any dependencies required.
+You will be asked to enter the pi password.  Enter your pi password and select **Authenticate**.  This will then install the gnuplot package and any dependencies required.
 
 ![img_33](images/RPi_imager_33.PNG)
 
@@ -390,27 +390,27 @@ and press enter.
 
 ![img_37](images/RPi_imager_37.PNG)
 
-Select the "<> Code" tab and then select "Download ZIP".  This will download all the necessary code/files for the Python code.  Close the web browser.
+Select the **<> Code** tab and then select **Download ZIP**.  This will download all the necessary code/files for the Python code.  Close the web browser.
 
 ![img_38](images/RPi_imager_38.PNG)
 
-Open file manager and navigate to the "Downloads" folder - you should see a zip folder of the downloaded files.
+Open file manager and navigate to the **Downloads** folder - you should see a zip folder of the downloaded files.
 
 ![img_39](images/RPi_imager_39.PNG)
 
-Double click on the zip folder to bring up the extraction tool. Select the "extract files" to extract all the files in the zip folder.
+Double click on the zip folder to bring up the extraction tool. Select the **extract files** to extract all the files in the zip folder.
 
 ![img_40](images/RPi_imager_40.PNG)
 
-You will be asked where you want the files to be extracted to - change the selection to the pi home directory."  Close the extraction tool when finished.
+You will be asked where you want the files to be extracted to - change the selection to the pi home directory.**  Close the extraction tool when finished.
 
 ![img_41](images/RPi_imager_41.PNG)
 
-From the open file manager navigate to /home/pi directory and you will see a new folder "PicoMuon_Python_code-main".  Select this folder and right-click mouse and select "Rename".
+From the open file manager navigate to /home/pi directory and you will see a new folder **PicoMuon_Python_code-main**.  Select this folder and right-click mouse and select **Rename**.
 
 ![img_42](images/RPi_imager_42.PNG)
 
-Change the name of the folder to "UKRAA_muons" and select "OK".
+Change the name of the folder to **UKRAA_muons** and select **OK**.
 
 ![img_43](images/RPi_imager_43.PNG)
 
@@ -506,7 +506,7 @@ and press enter.
 We expect to see...
 ![img_49](images/RPi_imager_49.PNG)
 
-If we dont see green "enabled" and "active", then we have a typo in the muon_ACM0.service file.
+If we dont see green **enabled** and **active**, then we have a typo in the muon_ACM0.service file.
 
 To start your service type:
 ```
@@ -539,7 +539,7 @@ Three plots will be created:
 This can be done after midnight automatically using CRON because the processing of the cpm takes about 6 hours and the processing of the adc values takes about 1 hour on a RPi4.  It takes less time to run these two processes on a RPi5.
 
 1. Open terminal window
-2. Type "sudo crontab -e" and press enter - this will open crontab text editor.  The first time it will ask what editor you prefer - I prefer nano.
+2. Type **sudo crontab -e** and press enter - this will open crontab text editor.  The first time it will ask what editor you prefer - I prefer nano.
 
 ![img_50](images/RPi_imager_50.PNG)
 
@@ -548,36 +548,36 @@ This can be done after midnight automatically using CRON because the processing 
 # m h  dom mon dow   command
 
 # cron entry to get neutron data from NDB NEST
-10 03 * * *  su pi -c "/usr/bin/python3 /home/pi/UKRAA_muons/scripts/GetNeutronData.py"
+10 03 * * *  su pi -c **/usr/bin/python3 /home/pi/UKRAA_muons/scripts/GetNeutronData.py**
 
 # cron entry to process yesterdays raw muon count rate
-30 00 * * * su pi -c "/usr/bin/python3 /home/pi/UKRAA_muons/scripts/ProcessMuonCpmACM0.py"
+30 00 * * * su pi -c **/usr/bin/python3 /home/pi/UKRAA_muons/scripts/ProcessMuonCpmACM0.py**
 
 # cron entry to process yesterdays raw muon adc values
-45 00 * * * su pi -c "/usr/bin/python3 /home/pi/UKRAA_muons/scripts/ProcessMuonAdcACM0.py"
+45 00 * * * su pi -c **/usr/bin/python3 /home/pi/UKRAA_muons/scripts/ProcessMuonAdcACM0.py**
 
 # cron entry to plot yesterdays count rate
-55 07 * * * su pi -c "/usr/bin/gnuplot /home/pi/UKRAA_muons/scripts/PlotMuonCpmACM0.gp"
+55 07 * * * su pi -c **/usr/bin/gnuplot /home/pi/UKRAA_muons/scripts/PlotMuonCpmACM0.gp**
 
 # cron entry to plot yesterdays count frequency
-56 07 * * * su pi -c "/usr/bin/gnuplot /home/pi/UKRAA_muons/scripts/PlotMuonFreqACM0.gp"
+56 07 * * * su pi -c **/usr/bin/gnuplot /home/pi/UKRAA_muons/scripts/PlotMuonFreqACM0.gp**
 
 # crom entry to plot yesterdays adc values
-57 07 * * * su pi -c "/usr/bin/gnuplot /home/pi/UKRAA_muons/scripts/PlotMuonAdcACM0.gp"
+57 07 * * * su pi -c **/usr/bin/gnuplot /home/pi/UKRAA_muons/scripts/PlotMuonAdcACM0.gp**
 ```
 
 ![img_51](images/RPi_imager_51.PNG)
 
 4. Save (Ctrl + s) and exit (Ctrl + x).
-5. If this went well you will see "crontab: installing new crontab" on the terminal window.
+5. If this went well you will see **crontab: installing new crontab** on the terminal window.
 
 This should now process and graph yesterdays data from the detector overnight.
 
-Plots will appear in the "plots" folder and the "temp" folder.
+Plots will appear in the **plots** folder and the **temp** folder.
 
-The "plots" folder hold plots for each day in year/month folder.
+The **plots** folder hold plots for each day in year/month folder.
 
-The "temp" folder only holds plots for yesterday, updated each day, for pushing to a website/etc.
+The **temp** folder only holds plots for yesterday, updated each day, for pushing to a website/etc.
 
 ---
 
@@ -587,7 +587,7 @@ The "temp" folder only holds plots for yesterday, updated each day, for pushing 
 
 We can create a simple web server on our RPi to be able to view our detector results on our smart phone when connected to our home metwork.
 
-To set up the web server on the RPi, follow the instruction from "tom's HARDWARE" (https://www.tomshardware.com/news/raspberry-pi-web-server,40174.html).  Only need to do first section - upto 9. Build your website.
+To set up the web server on the RPi, follow the instruction from **tom's HARDWARE** (https://www.tomshardware.com/news/raspberry-pi-web-server,40174.html).  Only need to do first section - upto 9. Build your website.
 
 ---
 
@@ -621,25 +621,25 @@ Once you have completed building your RPi web server, we need to move some files
 ```
 
 1. Open terminal window
-2. Type "cd UKRAA_muons/WWW/" and press enter - this will take you to the files in the WWW folder.  
+2. Type **cd UKRAA_muons/WWW/** and press enter - this will take you to the files in the WWW folder.  
 
 ![img_52](images/RPi_imager_52.PNG)
 
-3. We can check we are in the coorect location by typing "ls -l" and press enter, we should see the following...
+3. We can check we are in the coorect location by typing **ls -l** and press enter, we should see the following...
 
 ![img_53](images/RPi_imager_53.PNG)
 
 4. We now need to copy the files and folders from WWW to /var/www/html.
 
-5. Type "sudo cp index.html /var/www/html/index.html" and press enter.
+5. Type **sudo cp index.html /var/www/html/index.html** and press enter.
 
 ![img_54](images/RPi_imager_54.PNG)
 
-6. Type "sudo cp -r images /var/www/html/" and press enter.
+6. Type **sudo cp -r images /var/www/html/** and press enter.
 
 ![img_56](images/RPi_imager_56.PNG)
 
-7. Type "sudo cp -r temp /var/www/html/" and press enter.
+7. Type **sudo cp -r temp /var/www/html/** and press enter.
 
 ![img_57](images/RPi_imager_57.PNG)
 
@@ -647,7 +647,7 @@ Once you have completed building your RPi web server, we need to move some files
 
 ![img_58](images/RPi_imager_58.PNG)
 
-9. You should now be able to access the webpage from your smart phone.  On your smart phone open your preferred web application (Safari, chrome, etc..). In the search bar type "http://rpi4-ukraa.local" and press enter - should access the web page.
+9. You should now be able to access the webpage from your smart phone.  On your smart phone open your preferred web application (Safari, chrome, etc..). In the search bar type **http://rpi4-ukraa.local** and press enter - should access the web page.
 
 ![img_59](images/RPi_imager_59.PNG)
 
@@ -677,7 +677,7 @@ and press enter - this will open crontab text editor.
 ![img_60](images/RPi_imager_60.PNG)
 
 4. Save (Ctrl + s) and exit (Ctrl + x).
-5. If this went well you will see "crontab: installing new crontab" on the terminal window.
+5. If this went well you will see **crontab: installing new crontab** on the terminal window.
 
 This should copy yesterdays plots at 8.00am each morning to the website for viewing.
 
@@ -693,7 +693,7 @@ MIT License
 Copyright (c) 2024 UKRAA
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
+of this software and associated documentation files (the **Software**), to deal
 in the Software without restriction, including without limitation the rights
 to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 copies of the Software, and to permit persons to whom the Software is
@@ -702,7 +702,7 @@ furnished to do so, subject to the following conditions:
 The above copyright notice and this permission notice shall be included in all
 copies or substantial portions of the Software.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+THE SOFTWARE IS PROVIDED **AS IS**, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
 AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
