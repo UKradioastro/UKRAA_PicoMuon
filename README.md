@@ -566,7 +566,7 @@ sudo nano /etc/systemd/system/muon_ACM0.service
 &nbsp;
 
 3. Type in the following text...
-```
+```bash
 [Unit]
 Description=start GetDataRawACM0.py
 After=multi-user.target
