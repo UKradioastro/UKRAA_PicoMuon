@@ -33,6 +33,10 @@ I have written this software to suit my set-up, feel free use as you see fit.
   - [License](#License)
   - [Contact Us](#Contact-Us)
 
+---
+
+&nbsp;
+<!-- =============================================================================== --> 
 ## Requirements
 
 The software needed to run will depend on what you intend.  You will need the following:
@@ -41,6 +45,10 @@ The software needed to run will depend on what you intend.  You will need the fo
 * Optional: [Pandas](https://pandas.pydata.org/) for neutron data 
 * Optional: [gnuplot](http://www.gnuplot.info/) for graphing processed data 
 
+---
+
+&nbsp;
+<!-- =============================================================================== --> 
 ## File structure
 
 ### scripts
@@ -142,6 +150,10 @@ The software needed to run will depend on what you intend.  You will need the fo
     └── index.html
 ```
 
+---
+
+&nbsp;
+<!-- =============================================================================== --> 
 ## Using the code
 
 The code assumes that you the UKRAA PicoMuon detector is connected to the RPi4/5 via USB and that it is /dev/ttyACM0 - you can check this by using "ls /dev/tty*" in a terminal window on the RPi4/5 and reviewing the response.
@@ -154,8 +166,16 @@ The code assumes one detector connected to RPi USB and will be "/dev/ttyACM0", i
 
 Other scripts (Python and gnuplot) are run from cron
 
+---
+
+&nbsp;
+<!-- =============================================================================== --> 
 ## Set-up instructions
 
+---
+
+&nbsp;
+<!-- =============================================================================== --> 
 ### Raspberry Pi OS
 
 Download Raspberry Pi Imager for your operating system.
@@ -235,6 +255,10 @@ When finished, you can remove the microSD card and select "CONTINUE" and close t
 ![img_14](images/RPi_imager_14.PNG).
 
 
+---
+
+&nbsp;
+<!-- =============================================================================== --> 
 ### RPi4 configuration
 
 Put the microSD card you have just created into your RPi4, connect the RPi to your LAN if necessary,  insert the power cable and turn on.
@@ -292,6 +316,10 @@ Reboot the RPi, type "sudo reboot" and hit enter.  This will close the PuTTY con
 ![img_25](images/RPi_imager_25.PNG)
 
 
+---
+
+&nbsp;
+<!-- =============================================================================== --> 
 ### Headless access to RPi via VNC
 
 Using a VNC program like RealVNC (https://www.realvnc.com/en/), connect to your RPi...
@@ -313,6 +341,10 @@ You are now remotely accessing your RPi...
 ![img_29](images/RPi_imager_29.PNG)
 
 
+---
+
+&nbsp;
+<!-- =============================================================================== --> 
 ### Add additional software to your RPi
 
 We need to add some dependencies to the RPi.
@@ -340,6 +372,10 @@ You will be asked to enter the pi password.  Enter your pi password and select "
 Select OK to close the window.
 
 
+---
+
+&nbsp;
+<!-- =============================================================================== --> 
 ### Get code from github
 
 Open the web browser on the RPi. In the address bar type "https://github.com/UKradioastro/PicoMuon_Python_code" and press enter.
@@ -373,6 +409,10 @@ Change the name of the folder to "UKRAA_muons" and select "OK".
 Scripts and folder structure should now be in place to run the code.
 
 
+---
+
+&nbsp;
+<!-- =============================================================================== --> 
 ### Where is my detector?.
 
 Plug your detector into any of the RPI USB ports - I normally use the blue ports (USB3).
@@ -388,6 +428,10 @@ If you do not see /dev/ttyACM0, then unplug and plug the detector back in and tr
 
 As long as we see /dev/ttyACM0 then we do not have to make any changes to the python scripts, because they are looking for ACM0.
 
+---
+
+&nbsp;
+<!-- =============================================================================== --> 
 ### Running the code to get data from the detector.
 
 It is an easy process to set up services to run the code, check it is running and restart the code if it stps.
@@ -423,6 +467,10 @@ To stop your service type:
 "sudo systemctl stop muon_ACM0.service"
 
 
+---
+
+&nbsp;
+<!-- =============================================================================== --> 
 ### Running the code to process and plot the data from the detector.
 
 The data will be processed to get counts per minute and the frequency of the adc values for the previous day.
@@ -456,14 +504,20 @@ The "plots" folder hold plots for each day in year/month folder.
 
 The "temp" folder only holds plots for yesterday, updated each day, for pushing to a website/etc.
 
+---
 
+&nbsp;
+<!-- =============================================================================== --> 
 ### Creating simple home intranet web server on your RPi.
 
 We can create a simple web server on our RPi to be able to view our detector results on our smart phone when connected to our home metwork.
 
 To set up the web server on the RPi, follow the instruction from "tom's HARDWARE" (https://www.tomshardware.com/news/raspberry-pi-web-server,40174.html).  Only need to do first section - upto 9. Build your website.
 
+---
 
+&nbsp;
+<!-- =============================================================================== --> 
 ### Creating simple website for you PicoMuon plots to view your results on your smart phome.
 
 Once you have completed building your RPi web server, we need to move some files over to the /var/www/html folder, these are all located in the WWW folder from your downloaded git zip file - as shown below.
@@ -523,6 +577,10 @@ Once you have completed building your RPi web server, we need to move some files
 ![img_59](images/RPi_imager_59.PNG)
 
 
+---
+
+&nbsp;
+<!-- =============================================================================== --> 
 ### Get daily plots to your website.
 
 The data on the website is static - we need to push the daily plots to the website so that they can be updated and viewed.
@@ -541,6 +599,10 @@ This can be done after the plots are completed automatically using CRON.
 This should copy yesterdays plots at 8.00am each morning to the website for viewing.
 
 
+---
+
+&nbsp;
+<!-- =============================================================================== --> 
 ### License
 
 MIT License
@@ -565,6 +627,11 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
+
+---
+
+&nbsp;
+<!-- =============================================================================== --> 
 ### Contact us
 
 Please send an e-mail to picomuon@ukraa.com
