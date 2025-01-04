@@ -190,7 +190,7 @@ Other scripts (Python and gnuplot) are run from cron
 
 &nbsp;
 
-3. Select **CHOOSE DEVICE** and then select your ***Raspberry Pi device**.
+3. Select **CHOOSE DEVICE** and then select your **Raspberry Pi device**.
 
 ![img_2](images/RPi_imager_2.PNG)
 
@@ -222,13 +222,13 @@ Other scripts (Python and gnuplot) are run from cron
 
 8. On the **GENERAL** page...
 
-    - Set hostname - set to whatever you want - but write it down, we will need it latter!
-    - Set username and password 
+    - **Set hostname** - set to whatever you want - but write it down, we will need it latter!
+    - Set **Username:** and **Password:** 
         - Keep username as **pi**
         - set your own password
     - Configure wireless LAN
         - if you wish to use you RPi wirelessly
-        - Enter your wireless network's SSID, Password and Country
+        - Enter your wireless network's **SSID:**, **Password:** and **Wireless LAN country:**
     - Set locale settings
         - set timezone and keyboard to your preferences
 
@@ -294,7 +294,7 @@ Put the microSD card you have just created into your RPi4, connect the RPi to yo
 
 Using PuTTY (https://www.putty.org/)
 
-1. In Host Name (or IP address), type the host name of your RPi that you wrote down earlier... and select **Open**
+1. In **Host Name (or IP address)**, type the host name of your RPi that you wrote down earlier... and select **Open**
 
 ![img_15](images/RPi_imager_15.PNG)
 
@@ -310,7 +310,7 @@ Using PuTTY (https://www.putty.org/)
 
 &nbsp;
 
-4. Now type the command below and hit enter.  This will update the RPi OS
+4. Now type the command below and press enter.  This will update the RPi OS
 ```
 sudo apt update
 ```
@@ -319,7 +319,7 @@ sudo apt update
 
 &nbsp;
 
-5. Now type the command below and hit enter.  This will update any preinstalled software packages.  You will be asked to type **y** to proceed.
+5. Now type the command below and press enter.  This will update any preinstalled software packages.  You will be asked to type **y** to proceed.
 ```
 sudo apt upgrade
 ```
@@ -328,7 +328,7 @@ sudo apt upgrade
 
 &nbsp;
 
-6. You may be advised that you can remove **no longer required** packages.  You can type the command below and hit enter. Again, you will be asked to type **y** to proceed.
+6. You may be advised that you can remove **no longer required** packages.  You can type the command below and press enter. Again, you will be asked to type **y** to proceed.
 ```
 sudo apt autoremove
 ```
@@ -337,7 +337,7 @@ sudo apt autoremove
 
 &nbsp;
 
-7. We can now set up VNC to access the RPi from our desktop PC. Type the command below and hit enter.  We will be presented with the RPi configuration tool.
+7. We can now set up VNC to access the RPi from our desktop PC. Type the command below and press enter.  We will be presented with the RPi configuration tool.
 ```
 sudo raspi-config
 ```
@@ -356,25 +356,25 @@ sudo raspi-config
 
 &nbsp;
 
-10. Select **Yes** to enable the VNC Server and hit enter.  
+10. Select **Yes** to enable the VNC Server and press enter.  
 
 ![img_22](images/RPi_imager_22.PNG)
 
 &nbsp;
 
-11. VNC server will now be enabled, hit enter.
+11. VNC server will now be enabled, press enter.
 
 ![img_23](images/RPi_imager_23.PNG)
 
 &nbsp;
 
-12. Finish with the Configuration Tool by selecting **Finish** and hit enter.
+12. Finish with the Configuration Tool by selecting **Finish** and press enter.
 
 ![img_24](images/RPi_imager_24.PNG)
 
 &nbsp;
 
-13. Reboot the RPi, type the command below and hit enter.  This will close the PuTTY connection.  You can close the Putty window.
+13. Reboot the RPi, type the command below and press enter.  This will close the PuTTY connection.  You can close the Putty window.
 ```
 sudo reboot
 ```
@@ -423,7 +423,7 @@ Using a VNC program like RealVNC (https://www.realvnc.com/en/), connect to your 
 We need to add some dependencies to the RPi.
 
 **pandas**
-1. Open a terminal window and type the command below and hit enter.  You will be asked to type **y** to proceed.  This will install pandas and other dependencies related to pandas.
+1. Open a terminal window and type the command below and press enter.  You will be asked to type **y** to proceed.  This will install pandas and other dependencies related to pandas.
 ```
 sudo apt install python3-pandas
 ```
@@ -440,7 +440,7 @@ sudo apt install python3-pandas
 
 &nbsp;
 
-2. From the **Add/Remove Software** search window type **gnuplot** into the search bar and hit enter.  When the available packages have been found, select the packages in the following image and select **Apply**.
+2. From the **Add/Remove Software** search window type **gnuplot** into the search bar and press enter.  When the available packages have been found, select the packages in the following image and select **Apply**.
 
 ![img_32](images/RPi_imager_32.PNG)
 
