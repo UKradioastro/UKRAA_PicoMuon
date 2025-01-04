@@ -320,7 +320,7 @@ and hit enter.  This will update the RPi OS
 
 &nbsp;
 
-Now type
+5. Now type
 ```
 sudo apt upgrade
 ```
@@ -330,7 +330,7 @@ and hit enter.  This will update any preinstalled software packages.  You will b
 
 &nbsp;
 
-You may be advised that you can remove **no longer required** packages.  You can type 
+6. You may be advised that you can remove **no longer required** packages.  You can type 
 ```
 sudo apt autoremove
 ```
@@ -340,11 +340,7 @@ to do this. Again, you will be asked to type **y** to proceed.
 
 &nbsp;
 
-We can now set up VNC to access the RPi from our desktop PC.
-
-&nbsp;
-
-Type 
+7. We can now set up VNC to access the RPi from our desktop PC. Type 
 ```
 sudo raspi-config
 ```
@@ -352,37 +348,37 @@ and hit enter.  We will be presented with the RPi configuration tool.
 
 &nbsp;
 
-Select **3 Interface Options** and press return.
+8. Select **3 Interface Options** and press return.
 
 ![img_20](images/RPi_imager_20.PNG)
 
 &nbsp;
 
-Now navigate down to **I3 VNC** and press return.
+9. Now navigate down to **I3 VNC** and press return.
 
 ![img_21](images/RPi_imager_21.PNG)
 
 &nbsp;
 
-Select **Yes** to enable the VNC Server and hit enter.  
+10. Select **Yes** to enable the VNC Server and hit enter.  
 
 ![img_22](images/RPi_imager_22.PNG)
 
 &nbsp;
 
-VNC server will now be enabled, hit enter.
+11. VNC server will now be enabled, hit enter.
 
 ![img_23](images/RPi_imager_23.PNG)
 
 &nbsp;
 
-Finish with the Configuration Tool by selecting **Finish** and hit enter.
+12. Finish with the Configuration Tool by selecting **Finish** and hit enter.
 
 ![img_24](images/RPi_imager_24.PNG)
 
 &nbsp;
 
-Reboot the RPi, type
+13. Reboot the RPi, type
 ```
 sudo reboot
 ```
