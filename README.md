@@ -520,7 +520,7 @@ https://github.com/UKradioastro/PicoMuon_Python_code
 Plug your detector into any of the RPI USB ports - I normally use the blue ports (USB3).
 
 1. Open a terminal window and type the following command and press enter
-``` bash
+```
 ls /dev/tty*
 ```
 
