@@ -310,41 +310,37 @@ Using PuTTY (https://www.putty.org/)
 
 &nbsp;
 
-4. Now type 
+4. Now type the command below and hit enter.  This will update the RPi OS
 ```
 sudo apt update
 ```
-and hit enter.  This will update the RPi OS
 
 ![img_17](images/RPi_imager_17.PNG)
 
 &nbsp;
 
-5. Now type
+5. Now type the command below and hit enter.  This will update any preinstalled software packages.  You will be asked to type **y** to proceed.
 ```
 sudo apt upgrade
 ```
-and hit enter.  This will update any preinstalled software packages.  You will be asked to type **y** to proceed.
 
 ![img_18](images/RPi_imager_18.PNG)
 
 &nbsp;
 
-6. You may be advised that you can remove **no longer required** packages.  You can type 
+6. You may be advised that you can remove **no longer required** packages.  You can type the command below and hit enter. Again, you will be asked to type **y** to proceed.
 ```
 sudo apt autoremove
 ```
-and hit enter. Again, you will be asked to type **y** to proceed.
 
 ![img_19](images/RPi_imager_19.PNG)
 
 &nbsp;
 
-7. We can now set up VNC to access the RPi from our desktop PC. Type 
+7. We can now set up VNC to access the RPi from our desktop PC. Type the command below and hit enter.  We will be presented with the RPi configuration tool.
 ```
 sudo raspi-config
 ```
-and hit enter.  We will be presented with the RPi configuration tool.
 
 &nbsp;
 
@@ -378,11 +374,10 @@ and hit enter.  We will be presented with the RPi configuration tool.
 
 &nbsp;
 
-13. Reboot the RPi, type
+13. Reboot the RPi, type the command below and hit enter.  This will close the PuTTY connection.  You can close the Putty window.
 ```
 sudo reboot
 ```
-and hit enter.  This will close the PuTTY connection.  You can close the Putty window.
 
 ![img_25](images/RPi_imager_25.PNG)
 
