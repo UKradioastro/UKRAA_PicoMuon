@@ -351,7 +351,11 @@ We need to add some dependencies to the RPi.
 
 1. pandas
 
-Open a terminal window and type "sudo apt install python3-pandas and hit enter.  You will be asked to type "y" to proceed.  This will install pandas and other dependencies related to pandas.
+Open a terminal window and type 
+```
+sudo apt install python3-pandas
+```
+and hit enter.  You will be asked to type "y" to proceed.  This will install pandas and other dependencies related to pandas.
 
 ![img_30](images/RPi_imager_30.PNG)
 
