@@ -382,7 +382,11 @@ Select OK to close the window.
 <!-- =============================================================================== --> 
 ### Get code from github
 
-Open the web browser on the RPi. In the address bar type "https://github.com/UKradioastro/PicoMuon_Python_code" and press enter.
+Open the web browser on the RPi. In the address bar type 
+```
+https://github.com/UKradioastro/PicoMuon_Python_code
+```
+and press enter.
 
 ![img_37](images/RPi_imager_37.PNG)
 
@@ -421,7 +425,12 @@ Scripts and folder structure should now be in place to run the code.
 
 Plug your detector into any of the RPI USB ports - I normally use the blue ports (USB3).
 
-Open a terminal window and type "ls /dev/tty*" and press return.
+Open a terminal window and type 
+```
+ls /dev/tty*
+```
+and press enter.
+
 ![img_48](images/RPi_imager_48.PNG)
 
 You are looking for /dev/ttyACM0 - this will be on the RHS of the screen above.
@@ -443,21 +452,56 @@ It is an easy process to set up services to run the code, check it is running an
 To do this we need to create the service, then enable the service.
 
 1. Open terminal window
-2. Type "sudo nano /etc/systemd/system/muon_ACM0.service" and press enter - this will open nano text editor.
+2. Type 
+```
+sudo nano /etc/systemd/system/muon_ACM0.service
+```
+and press enter - this will open nano text editor.
 3. Type in the following text...
+```
+[Unit]
+Description=start GetDataRawACM0.py
+After=multi-user.target
+
+[Service]
+Type=idle
+User=pi
+ExecStart=/usr/bin/python3 /home/pi/UKRAA_muons/scripts/GetDataRawACM0.py
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
+
+```
 ![img_44](images/RPi_imager_44.PNG)
 4. Save (Ctrl + s) and exit (Ctrl + x)
-5. Type "sudo chmod 644 /etc/systemd/system/muon_ACM0.service" to change permissions of your created service file and press enter.
+5. Type 
+```
+sudo chmod 644 /etc/systemd/system/muon_ACM0.service
+```
+and press enter - this will change permissions of your created service file and press enter.
 ![img_45](images/RPi_imager_45.PNG)
-6. Type "sudo systemctl daemon-reload" to reload services.
+6. Type 
+```
+sudo systemctl daemon-reload
+```
+and press enter - this will reload services.
 ![img_46](images/RPi_imager_46.PNG)
-7. Type "sudo systemctl enable muon_ACM0.service" to enable your new service.
+7. Type 
+```
+sudo systemctl enable muon_ACM0.service
+```
+and press enter - this will enable your new service.
 ![img_47](images/RPi_imager_47.PNG)
 
 The service you have set will automatically start whenever the RPi is started or rebooted.
 
 To check status of your service type:
-"sudo systemctl status muon_ACM0.service"
+```
+sudo systemctl status muon_ACM0.service
+```
+and press enter.
 
 We expect to see...
 ![img_49](images/RPi_imager_49.PNG)
@@ -465,10 +509,16 @@ We expect to see...
 If we dont see green "enabled" and "active", then we have a typo in the muon_ACM0.service file.
 
 To start your service type:
-"sudo systemctl start muon_ACM0.service"
+```
+sudo systemctl start muon_ACM0.service
+```
+and press enter.
 
 To stop your service type:
-"sudo systemctl stop muon_ACM0.service"
+```
+sudo systemctl stop muon_ACM0.service
+```
+and press enter.
 
 
 ---
