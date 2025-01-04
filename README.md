@@ -294,53 +294,99 @@ Put the microSD card you have just created into your RPi4, connect the RPi to yo
 
 Using PuTTY (https://www.putty.org/)
 
-In Host Name (or IP address), type the host name of your RPi that you wrote down earlier... and select open.
+1. In Host Name (or IP address), type the host name of your RPi that you wrote down earlier... and select open.
 
 ![img_15](images/RPi_imager_15.PNG)
 
+&nbsp;
 
-You will be presented with a PuTTY Security Alert - select **Accept**.  You will now have a PuTTY terminal window.
+2. You will be presented with a PuTTY Security Alert - select **Accept**.  You will now have a PuTTY terminal window.
 
 ![img_16](images/RPi_imager_16.PNG)
 
-Login as **pi** and enter your password
+&nbsp;
 
-Now type **sudo apt update** and hit enter.  This will update the RPi OS
+3. Login as **pi** and enter your password
+
+&nbsp;
+
+4. Now type 
+```
+sudo apt update
+```
+and hit enter.  This will update the RPi OS
 
 ![img_17](images/RPi_imager_17.PNG)
 
-Now type **sudo apt upgrade** and hit enter.  This will update any preinstalled software packages.  You will be asked to type **y** to proceed.
+&nbsp;
+
+Now type
+```
+sudo apt upgrade
+```
+and hit enter.  This will update any preinstalled software packages.  You will be asked to type **y** to proceed.
 
 ![img_18](images/RPi_imager_18.PNG)
 
-You may be advised that you can remove **no longer required** packages.  You can type **sudo apt autoremove** to do this. Again, you will be asked to type **y** to proceed.
+&nbsp;
+
+You may be advised that you can remove **no longer required** packages.  You can type 
+```
+sudo apt autoremove
+```
+to do this. Again, you will be asked to type **y** to proceed.
 
 ![img_19](images/RPi_imager_19.PNG)
 
+&nbsp;
+
 We can now set up VNC to access the RPi from our desktop PC.
 
-Type **sudo raspi-config** and hit enter.  We will be presented with the RPi configuration tool.  
+&nbsp;
+
+Type 
+```
+sudo raspi-config
+```
+and hit enter.  We will be presented with the RPi configuration tool.
+
+&nbsp;
+
 Select **3 Interface Options** and press return.
 
 ![img_20](images/RPi_imager_20.PNG)
+
+&nbsp;
 
 Now navigate down to **I3 VNC** and press return.
 
 ![img_21](images/RPi_imager_21.PNG)
 
+&nbsp;
+
 Select **Yes** to enable the VNC Server and hit enter.  
 
 ![img_22](images/RPi_imager_22.PNG)
+
+&nbsp;
 
 VNC server will now be enabled, hit enter.
 
 ![img_23](images/RPi_imager_23.PNG)
 
+&nbsp;
+
 Finish with the Configuration Tool by selecting **Finish** and hit enter.
 
 ![img_24](images/RPi_imager_24.PNG)
 
-Reboot the RPi, type **sudo reboot** and hit enter.  This will close the PuTTY connection.  You can close the Putty window.
+&nbsp;
+
+Reboot the RPi, type
+```
+sudo reboot
+```
+and hit enter.  This will close the PuTTY connection.  You can close the Putty window.
 
 ![img_25](images/RPi_imager_25.PNG)
 
