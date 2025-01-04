@@ -617,35 +617,35 @@ sudo systemctl enable muon_ACM0.service
 
 &nbsp;
 
-The service you have set will automatically start whenever the RPi is started or rebooted.
+8. The service you have set will automatically start whenever the RPi is started or rebooted.
 
 &nbsp;
 
-To check **status** of your service, type the following command and press enter
+9. To check **status** of your service, type the following command and press enter
 ```
 sudo systemctl status muon_ACM0.service
 ```
 
 &nbsp;
 
-We expect to see...
+10. We expect to see...
 
 ![img_49](images/RPi_imager_49.PNG)
 
 &nbsp;
 
-If we dont see green **enabled** and **active**, then we have a typo in the **muon_ACM0.service** file.
+11. If we dont see green **enabled** and **active**, then we have a typo in the **muon_ACM0.service** file.
 
 &nbsp;
 
-To **start** your service, type the following command and press enter.
+12. To **start** your service, type the following command and press enter.
 ```
 sudo systemctl start muon_ACM0.service
 ```
 
 &nbsp;
 
-To **stop** your service, type the following command and press enter.
+13. To **stop** your service, type the following command and press enter.
 ```
 sudo systemctl stop muon_ACM0.service
 ```
@@ -670,9 +670,17 @@ Three plots will be created:
 This can be done after midnight automatically using CRON because the processing of the cpm takes about 6 hours and the processing of the adc values takes about 1 hour on a RPi4.  It takes less time to run these two processes on a RPi5.
 
 1. Open terminal window
-2. Type **sudo crontab -e** and press enter - this will open crontab text editor.  The first time it will ask what editor you prefer - I prefer nano.
+
+&nbsp;
+
+2. Type the following command and press enter - this will open crontab text editor.  The first time it will ask what editor you prefer - I prefer nano.
+```
+sudo crontab -e
+``` 
 
 ![img_50](images/RPi_imager_50.PNG)
+
+&nbsp;
 
 3. Scroll to bottom and type the following...
 ```
@@ -699,7 +707,12 @@ This can be done after midnight automatically using CRON because the processing 
 
 ![img_51](images/RPi_imager_51.PNG)
 
+&nbsp;
+
 4. Save (Ctrl + s) and exit (Ctrl + x).
+
+&nbsp;
+
 5. If this went well you will see **crontab: installing new crontab** on the terminal window.
 
 This should now process and graph yesterdays data from the detector overnight.
@@ -752,31 +765,63 @@ Once you have completed building your RPi web server, we need to move some files
 ```
 
 1. Open terminal window
-2. Type **cd UKRAA_muons/WWW/** and press enter - this will take you to the files in the WWW folder.  
+
+&nbsp;
+
+2. Type the following command and press enter - this will take you to the files in the WWW folder.  
+```
+cd UKRAA_muons/WWW/
+```
 
 ![img_52](images/RPi_imager_52.PNG)
 
-3. We can check we are in the coorect location by typing **ls -l** and press enter, we should see the following...
+&nbsp;
+
+3. We can check we are in the coorect location by typing the following command and press enter, we should see the following...
+```
+ls -l
+```
 
 ![img_53](images/RPi_imager_53.PNG)
 
+&nbsp;
+
 4. We now need to copy the files and folders from WWW to /var/www/html.
 
-5. Type **sudo cp index.html /var/www/html/index.html** and press enter.
+&nbsp;
+
+5. Type the following command and press enter - this will copy the **index.html** file.
+```
+sudo cp index.html /var/www/html/index.html
+```
 
 ![img_54](images/RPi_imager_54.PNG)
 
-6. Type **sudo cp -r images /var/www/html/** and press enter.
+&nbsp;
+
+6. Type the following command and press enter - this will copy the **images** director and content.
+```
+sudo cp -r images /var/www/html/
+```
 
 ![img_56](images/RPi_imager_56.PNG)
 
-7. Type **sudo cp -r temp /var/www/html/** and press enter.
+&nbsp;
+
+7. Type the following command and press enter - this will copy the **temp** director and content.
+```
+sudo cp -r temp /var/www/html/
+```
 
 ![img_57](images/RPi_imager_57.PNG)
+
+&nbsp;
 
 8. File manager, you can check that the file/folders have been copied correctly by navigating to /var/www/html and you should see the folowing.
 
 ![img_58](images/RPi_imager_58.PNG)
+
+&nbsp;
 
 9. You should now be able to access the webpage from your smart phone.  On your smart phone open your preferred web application (Safari, chrome, etc..). In the search bar type **http://rpi4-ukraa.local** and press enter - should access the web page.
 
@@ -794,11 +839,16 @@ The data on the website is static - we need to push the daily plots to the websi
 This can be done after the plots are completed automatically using CRON.
 
 1. Open terminal window
-2. Type 
+
+&nbsp;
+
+2. Type the following command and press enter - this will open crontab text editor.
 ```
 sudo crontab -e
 ```
-and press enter - this will open crontab text editor.  
+
+&nbsp;
+
 3. Scroll to bottom and type the following after what you had previously typed in above...
 
 ```
@@ -807,8 +857,15 @@ and press enter - this will open crontab text editor.
 ```
 ![img_60](images/RPi_imager_60.PNG)
 
+&nbsp;
+
 4. Save (Ctrl + s) and exit (Ctrl + x).
+
+&nbsp;
+
 5. If this went well you will see **crontab: installing new crontab** on the terminal window.
+
+&nbsp;
 
 This should copy yesterdays plots at 8.00am each morning to the website for viewing.
 
