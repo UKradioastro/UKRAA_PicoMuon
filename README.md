@@ -170,7 +170,7 @@ Other scripts (Python and gnuplot) are run from cron
 
 &nbsp;
 <!-- =============================================================================== --> 
-## Set-up instructions
+# Set-up instructions
 
 ---
 
