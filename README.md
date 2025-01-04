@@ -178,8 +178,7 @@ Other scripts (Python and gnuplot) are run from cron
 <!-- =============================================================================== --> 
 ### Raspberry Pi OS
 
-1. Download Raspberry Pi Imager for your operating system.
-Web link https://www.raspberrypi.com/software/
+1. Download [Raspberry Pi Imager](https://www.raspberrypi.com/software/) for your operating system.
 
 ![img_0](images/RPI_OS.PNG)
 
@@ -187,7 +186,7 @@ Web link https://www.raspberrypi.com/software/
 
 ![img_1](images/RPi_imager_1.PNG)
 
-3. Select **CHOOSE DEVICE** and then select your Raspberry Pi device.
+3. Select **CHOOSE DEVICE** and then select your ***Raspberry Pi device**.
 
 ![img_2](images/RPi_imager_2.PNG)
 
@@ -195,7 +194,7 @@ Web link https://www.raspberrypi.com/software/
 
 ![img_3](images/RPi_imager_3.PNG)
 
-5. Select **CHOOSE STORAGE** and select your microSD card for your RPi.
+5. Select **CHOOSE STORAGE** and select your **microSD card** for your RPi.
 
 ![img_4](images/RPi_imager_4.PNG)
 
@@ -210,15 +209,15 @@ Web link https://www.raspberrypi.com/software/
 
 8. On the **GENERAL** page...
 
-1. Set hostname - set to whatever you want - but write it down, we will need it latter!
-2. Set username and password 
-* Keep username as **pi**
-* set your own password
-3. Configure wireless LAN
-* if you wish to use you RPi wirelessly
-* Enter your wireless network's SSID, Password and Country
-4. Set locale settings
-* set timezone and keyboard to your preferences
+    - Set hostname - set to whatever you want - but write it down, we will need it latter!
+    - Set username and password 
+        - Keep username as **pi**
+        - set your own password
+    - Configure wireless LAN
+        - if you wish to use you RPi wirelessly
+        - Enter your wireless network's SSID, Password and Country
+    - Set locale settings
+        - set timezone and keyboard to your preferences
 
 ![img_7](images/RPi_imager_7.PNG)
 
