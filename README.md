@@ -8,6 +8,31 @@ Set of Python code to run on a RPi4/5 to get, process and present data from the 
 
 I have written this software to suit my set-up, feel free use as you see fit.
 
+## Table of Contents
+
+  - [Requirements](#Requirements)
+  - [File structure](#file-structureile-structure)
+    - [scripts](#scripts)
+    - [data](#data)
+    - [plots](#plots)
+    - [temp](#temp)
+    - [website](#website)
+  - [Using the code](#using-the-codesing-the-code)
+  - [Set-up instructions](#set-up-instructionset-up-instructions)
+    - [Raspberry Pi OS](#raspberry-pi-os)
+    - [RPi4 configuration](#rpi4-configuration)
+    - [Headless access to RPi via VNC](#headless-access-to-rpi-via-vnc)
+    - [Add additional software to your RPi](#add-additional-software-to-your-rpi)
+    - [Get code from github](#get-code-from-github)
+    - [Where is my detector?](#where-is-my-detector)
+    - [Running the code to get data from the detector](#running-the-code-to-get-data-from-the-detector)
+    - [Running the code to process and plot the data from the detector](#running-the-code-to-process-and-plot-the-data-from-the-detector)
+    - [Creating simple home intranet web server on your RPi](#creating-simple-home-intranet-web-server-on-your-rpi)
+    - [Creating simple website for your data](#creating-simple-website-for-you-picomuon-plots-to-view-your-results-on-your-smart-phome)
+    - [Get daily plots to your website](#get-daily-plots-to-your-website)
+  - [License](#License)
+  - [Contact Us](#Contact-Us)
+
 ## Requirements
 
 The software needed to run will depend on what you intend.  You will need the following:
@@ -514,3 +539,32 @@ This can be done after the plots are completed automatically using CRON.
 5. If this went well you will see "crontab: installing new crontab" on the terminal window.
 
 This should copy yesterdays plots at 8.00am each morning to the website for viewing.
+
+
+### License
+
+MIT License
+
+Copyright (c) 2024 UKRAA
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+### Contact us
+
+Please send an e-mail to picomuon@ukraa.com
