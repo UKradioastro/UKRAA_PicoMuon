@@ -1,5 +1,5 @@
 <div align=center>
-<img src="images/UKRAA_Logo_Black.svg" width="400" height="150"/>
+<img src="images/UKRAA_Logo_Black.svg" width="400" height="400"/>
 </div>
 
 
