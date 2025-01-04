@@ -160,11 +160,11 @@ The code assumes that you the UKRAA PicoMuon detector is connected to the RPi4/5
 
 The code assumes user is **pi**, if **pi** is not the user then need to change '/home/pi' to '/home/user' in the python and gnuplot scripts to whatever your username is.
 
-The code assumes one detector connected to RPi USB and will be **/dev/ttyACM0**, if there are other devices connected to the RPi and your detector is not **/dev/ttyACM0** then  then need to change '/dev/ttyACM0' to '/dev/ttyACMx' in the GetDataRaw.py python script.
+The code assumes one detector connected to RPi USB and will be **/dev/ttyACM0**, if there are other devices connected to the RPi and your detector is not **/dev/ttyACM0** then need to change **/dev/ttyACM0** to **/dev/ttyACMx** in the **GetDataRawACM0.py** python script.
 
 **GetDataRawACM0.py** is run as a service
 
-Other scripts (Python and gnuplot) are run from cron
+Other scripts (Python and gnuplot) are run from **cron**
 
 ---
 
@@ -230,27 +230,27 @@ Other scripts (Python and gnuplot) are run from cron
         - if you wish to use you RPi wirelessly
         - Enter your wireless network's **SSID:**, **Password:** and **Wireless LAN country:**
     - Set locale settings
-        - set timezone and keyboard to your preferences
+        - set **Time zone:** and **Keyboard layout** to your preferences
 
 ![img_7](images/RPi_imager_7.PNG)
 
 &nbsp;
 
 9. Select **SERVICES**
-* Keep defaults
+* Keep as shown
 
 ![img_8](images/RPi_imager_8.PNG)
 
 &nbsp;
 
 10. Select **OPTIONS**
-* Keep defaults
+* Keep as shown
 
 ![img_9](images/RPi_imager_9.PNG)
 
 &nbsp;
 
-11. Select **SAVE**
+11. Select **SAVE** at bottom of window.
 
 &nbsp;
 
@@ -344,19 +344,19 @@ sudo raspi-config
 
 &nbsp;
 
-8. Select **3 Interface Options** and press return.
+8. Select **3 Interface Options** and selecting **Select** and press enter.
 
 ![img_20](images/RPi_imager_20.PNG)
 
 &nbsp;
 
-9. Now navigate down to **I3 VNC** and press return.
+9. Now navigate down to **I3 VNC** and selecting **Select** and press enter.
 
 ![img_21](images/RPi_imager_21.PNG)
 
 &nbsp;
 
-10. Select **Yes** to enable the VNC Server and press enter.  
+10. Select **Yes** and press enter to enable the VNC Server.  
 
 ![img_22](images/RPi_imager_22.PNG)
 
@@ -388,9 +388,9 @@ sudo reboot
 <!-- =============================================================================== --> 
 ### Headless access to RPi via VNC
 
-Using a VNC program like RealVNC (https://www.realvnc.com/en/), connect to your RPi...
+Using a VNC program like RealVNC (https://www.realvnc.com/en/), connect to your RPi using your desktop PC...
 
-1. Create a new connections and enter the hostname into the VNC Server box, add freindly name in the Name box and select okay.
+1. Create a **New connections** (CTRL-N) and enter the hostname into the **VNC Server:** box, add freindly name in the **Name** box and select **OK**.
 
 ![img_26](images/RPi_imager_26.PNG)
 
@@ -452,7 +452,7 @@ sudo apt install python3-pandas
 
 &nbsp;
 
-4. Select OK to close the window.
+4. Select **OK** to close the window.
 
 &nbsp;
 
@@ -489,13 +489,13 @@ https://github.com/UKradioastro/PicoMuon_Python_code
 
 &nbsp;
 
-5. You will be asked where you want the files to be extracted to - change the selection to the pi home directory - **/home/pi**.  Close the extraction tool when finished.
+5. You will be asked where you want the files to be extracted to - change the selection to the pi home directory - **/home/pi**.  Select **Extract** to extract the files and then close the extraction tool when finished.
 
 ![img_41](images/RPi_imager_41.PNG)
 
 &nbsp;
 
-6. From the open file manager navigate to **/home/pi** directory and you will see a new folder **PicoMuon_Python_code-main**.  Select this folder and right-click mouse and select **Rename**.
+6. From the open file manager navigate to **/home/pi** directory and you will see a new folder **PicoMuon_Python_code-main**.  Select this folder and right-click mouse and select **Rename...**.
 
 ![img_42](images/RPi_imager_42.PNG)
 
@@ -517,7 +517,7 @@ https://github.com/UKradioastro/PicoMuon_Python_code
 <!-- =============================================================================== --> 
 ### Where is my detector?.
 
-Plug your detector into any of the RPI USB ports - I normally use the blue ports (USB3).
+Plug your detector into any of the RPi USB ports - I normally use the blue ports (USB3).
 
 1. Open a terminal window and type the following command and press enter
 ```
@@ -528,19 +528,19 @@ ls /dev/tty*
 
 &nbsp;
 
-2. You are looking for /dev/ttyACM0 - this will be on the RHS of the screen above.
+2. You are looking for **/dev/ttyACM0** - this is on the right hand side of the screen shot above.
 
 &nbsp;
 
-3. This is the USB address for your attached detector - if you have more than one detector attached you may see /dev/ttyACM1 etc.
+3. This is the USB address for your attached detector - if you have more than one detector attached you may see **/dev/ttyACM1** etc.
 
 &nbsp;
 
-4. If you do not see /dev/ttyACM0, then unplug and plug the detector back in and try again.
+4. If you do not see **/dev/ttyACM0**, then unplug and plug the detector back in and try again.
 
 &nbsp;
 
-5. As long as we see /dev/ttyACM0 then we do not have to make any changes to the python scripts, because they are looking for ACM0.
+5. As long as we see **/dev/ttyACM0** then we do not have to make any changes to the python scripts, because they are looking for **ACM0**.
 
 &nbsp;
 
@@ -660,14 +660,14 @@ sudo systemctl stop muon_ACM0.service
 
 The data will be processed to get counts per minute and the frequency of the adc values for the previous day.
 
-A request will be made to NEST to get the previous days recorded neutron count, this data will be overlayed onto the counts per minute graphs.
+A request will be made to [NMDB](https://www.nmdb.eu/) via NEST to get the previous days recorded neutron count, this data will be overlayed onto the counts per minute graphs.
 
 Three plots will be created:
 * counts per minute
 * frequency of counts per minute
 * frequency of ADC values recorded
 
-This can be done after midnight automatically using CRON because the processing of the cpm takes about 6 hours and the processing of the adc values takes about 1 hour on a RPi4.  It takes less time to run these two processes on a RPi5.
+This can be done after midnight automatically using **CRON** because the processing of the cpm takes about 6 hours and the processing of the adc values takes about 1 hour on a RPi4.  It takes less time to run these two processes on a RPi5.
 
 1. Open terminal window
 
@@ -682,7 +682,7 @@ sudo crontab -e
 
 &nbsp;
 
-3. Scroll to bottom and type the following...
+3. Scroll to bottom and type the following after **# m h  dom mon dow   command**...
 ```
 # m h  dom mon dow   command
 
@@ -729,7 +729,7 @@ The **temp** folder only holds plots for yesterday, updated each day, for pushin
 <!-- =============================================================================== --> 
 ### Creating simple home intranet web server on your RPi.
 
-We can create a simple web server on our RPi to be able to view our detector results on our smart phone when connected to our home metwork.
+We can create a simple web server on our RPi so that we can view our detector's results on our smart phone when connected to our home network.
 
 To set up the web server on the RPi, follow the instruction from **tom's HARDWARE** (https://www.tomshardware.com/news/raspberry-pi-web-server,40174.html).  Only need to do first section - upto 9. Build your website.
 
@@ -739,7 +739,7 @@ To set up the web server on the RPi, follow the instruction from **tom's HARDWAR
 <!-- =============================================================================== --> 
 ### Creating simple website for you PicoMuon plots to view your results on your smart phome.
 
-Once you have completed building your RPi web server, we need to move some files over to the /var/www/html folder, these are all located in the WWW folder from your downloaded git zip file - as shown below.
+Once you have completed building your RPi web server, we need to move some files over to the **/var/www/html** folder on your RPi, these are all located in the WWW folder from your downloaded git zip file - as shown below.
 
 
 ```
@@ -777,7 +777,7 @@ cd UKRAA_muons/WWW/
 
 &nbsp;
 
-3. We can check we are in the coorect location by typing the following command and press enter, we should see the following...
+3. We can check we are in the correct location by typing the following command and press enter, we should see the following...
 ```
 ls -l
 ```
@@ -786,7 +786,7 @@ ls -l
 
 &nbsp;
 
-4. We now need to copy the files and folders from WWW to /var/www/html.
+4. We now need to copy the files and folders from **~/UKRAA_muons/WWW** to **/var/www/html**.
 
 &nbsp;
 
@@ -799,7 +799,7 @@ sudo cp index.html /var/www/html/index.html
 
 &nbsp;
 
-6. Type the following command and press enter - this will copy the **images** director and content.
+6. Type the following command and press enter - this will copy the **images** directory and content.
 ```
 sudo cp -r images /var/www/html/
 ```
@@ -808,7 +808,7 @@ sudo cp -r images /var/www/html/
 
 &nbsp;
 
-7. Type the following command and press enter - this will copy the **temp** director and content.
+7. Type the following command and press enter - this will copy the **temp** directory and content.
 ```
 sudo cp -r temp /var/www/html/
 ```
@@ -817,13 +817,13 @@ sudo cp -r temp /var/www/html/
 
 &nbsp;
 
-8. File manager, you can check that the file/folders have been copied correctly by navigating to /var/www/html and you should see the folowing.
+8. From file manager, you can check that the file/folders have been copied correctly, by navigating to **/var/www/html** and you should see the folowing.
 
 ![img_58](images/RPi_imager_58.PNG)
 
 &nbsp;
 
-9. You should now be able to access the webpage from your smart phone.  On your smart phone open your preferred web application (Safari, chrome, etc..). In the search bar type **http://rpi4-ukraa.local** and press enter - should access the web page.
+9. You should now be able to access the webpage from your smart phone.  On your smart phone open your preferred web application (Safari, chrome, etc..). In the search bar type the hostname of your RPi, e.g. **http://rpi4-ukraa.local**, and press enter - should access the web page.
 
 ![img_59](images/RPi_imager_59.PNG)
 
@@ -836,7 +836,7 @@ sudo cp -r temp /var/www/html/
 
 The data on the website is static - we need to push the daily plots to the website so that they can be updated and viewed.
 
-This can be done after the plots are completed automatically using CRON.
+This can be done after the plots are completed automatically using **CRON**.
 
 1. Open terminal window
 
