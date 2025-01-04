@@ -314,7 +314,7 @@ Using PuTTY (https://www.putty.org/)
 ```
 sudo apt update
 ```
-    and hit enter.  This will update the RPi OS
+and hit enter.  This will update the RPi OS
 
 ![img_17](images/RPi_imager_17.PNG)
 
@@ -324,7 +324,7 @@ sudo apt update
 ```
 sudo apt upgrade
 ```
-    and hit enter.  This will update any preinstalled software packages.  You will be asked to type **y** to proceed.
+and hit enter.  This will update any preinstalled software packages.  You will be asked to type **y** to proceed.
 
 ![img_18](images/RPi_imager_18.PNG)
 
@@ -334,7 +334,7 @@ sudo apt upgrade
 ```
 sudo apt autoremove
 ```
-    and hit enter. Again, you will be asked to type **y** to proceed.
+and hit enter. Again, you will be asked to type **y** to proceed.
 
 ![img_19](images/RPi_imager_19.PNG)
 
@@ -344,7 +344,7 @@ sudo apt autoremove
 ```
 sudo raspi-config
 ```
-    and hit enter.  We will be presented with the RPi configuration tool.
+and hit enter.  We will be presented with the RPi configuration tool.
 
 &nbsp;
 
@@ -382,7 +382,7 @@ sudo raspi-config
 ```
 sudo reboot
 ```
-    and hit enter.  This will close the PuTTY connection.  You can close the Putty window.
+and hit enter.  This will close the PuTTY connection.  You can close the Putty window.
 
 ![img_25](images/RPi_imager_25.PNG)
 
