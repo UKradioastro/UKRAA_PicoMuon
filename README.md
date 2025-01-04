@@ -182,30 +182,43 @@ Other scripts (Python and gnuplot) are run from cron
 
 ![img_0](images/RPI_OS.PNG)
 
+&nbsp;
+
 2. Run Raspberry Pi Imager.
 
 ![img_1](images/RPi_imager_1.PNG)
+
+&nbsp;
 
 3. Select **CHOOSE DEVICE** and then select your ***Raspberry Pi device**.
 
 ![img_2](images/RPi_imager_2.PNG)
 
+&nbsp;
+
 4. Select **CHOOSE OS** and then select **Raspberry Pi OS (64bit)**.
 
 ![img_3](images/RPi_imager_3.PNG)
+
+&nbsp;
 
 5. Select **CHOOSE STORAGE** and select your **microSD card** for your RPi.
 
 ![img_4](images/RPi_imager_4.PNG)
 
+&nbsp;
+
 6. Select **NEXT**
 
 ![img_5](images/RPi_imager_5.PNG)
+
+&nbsp;
 
 7. You are presented with a **Use OS customisation?** window, select **EDIT SETTINGS**.
 
 ![img_6](images/RPi_imager_6.PNG)
 
+&nbsp;
 
 8. On the **GENERAL** page...
 
@@ -221,38 +234,55 @@ Other scripts (Python and gnuplot) are run from cron
 
 ![img_7](images/RPi_imager_7.PNG)
 
-5. Select **SERVICES**
+&nbsp;
+
+9. Select **SERVICES**
 * Keep defaults
 
 ![img_8](images/RPi_imager_8.PNG)
 
-6. Select **OPTIONS**
+&nbsp;
+
+10. Select **OPTIONS**
 * Keep defaults
 
 ![img_9](images/RPi_imager_9.PNG)
 
-7. Select **SAVE**
+&nbsp;
 
-9. Now apply the customised OS settings by selecting **YES**.
+11. Select **SAVE**
+
+&nbsp;
+
+12. Now apply the customised OS settings by selecting **YES**.
 
 ![img_10](images/RPi_imager_10.PNG)
 
-10. You will be asked if you wish to proceed, select **YES**.
+&nbsp;
+
+13. You will be asked if you wish to proceed, select **YES**.
 
 ![img_11](images/RPi_imager_11.PNG)
 
-11. The operating system will now be written to the microSD card 
+&nbsp;
+
+14. The operating system will now be written to the microSD card 
 
 ![img_12](images/RPi_imager_12.PNG)
 
-12. and then verified, this take a bit of time...
+&nbsp;
+
+15. and then verified, this take a bit of time...
 
 ![img_13](images/RPi_imager_13.PNG)
 
-13. When finished, you can remove the microSD card and select **CONTINUE** and close the Raspberry Pi Imager.
+&nbsp;
+
+16. When finished, you can remove the microSD card and select **CONTINUE** and close the **Raspberry Pi Imager**.
 
 ![img_14](images/RPi_imager_14.PNG).
 
+&nbsp;
 
 ---
 
