@@ -394,18 +394,25 @@ Using a VNC program like RealVNC (https://www.realvnc.com/en/), connect to your 
 
 ![img_26](images/RPi_imager_26.PNG)
 
+&nbsp;
+
 2. Open this VNC connection to your RPi, you will get a **VNC server not recognised** window from RealVNC. Select **Continue**
 
 ![img_27](images/RPi_imager_27.PNG)
+
+&nbsp;
 
 3. You will now get an **Authentication** window from RealVNC, enter your **Username** and **Password** details and select **Remember password** to make it easier to login in future.
 
 ![img_28](images/RPi_imager_28.PNG)
 
+&nbsp;
+
 4. You are now remotely accessing your RPi from your desktop PC...
 
 ![img_29](images/RPi_imager_29.PNG)
 
+&nbsp;
 
 ---
 
@@ -421,8 +428,9 @@ We need to add some dependencies to the RPi.
 sudo apt install python3-pandas
 ```
 
-
 ![img_30](images/RPi_imager_30.PNG)
+
+&nbsp;
 
 **gnuplot**
 
@@ -430,16 +438,23 @@ sudo apt install python3-pandas
 
 ![img_31](images/RPi_imager_31.PNG)
 
+&nbsp;
+
 2. From the **Add/Remove Software** search window type **gnuplot** into the search bar and hit enter.  When the available packages have been found, select the packages in the following image and select **Apply**.
 
 ![img_32](images/RPi_imager_32.PNG)
+
+&nbsp;
 
 3. You will be asked to enter the pi **password**.  Enter your pi **password** and select **Authenticate**.  This will then install the gnuplot package and any dependencies required.
 
 ![img_33](images/RPi_imager_33.PNG)
 
+&nbsp;
+
 4. Select OK to close the window.
 
+&nbsp;
 
 ---
 
@@ -454,32 +469,47 @@ https://github.com/UKradioastro/PicoMuon_Python_code
 
 ![img_37](images/RPi_imager_37.PNG)
 
+&nbsp;
+
 2. Select the **<> Code** tab and then select **Download ZIP**.  This will download all the necessary code/files for the Python code.  Close the web browser.
 
 ![img_38](images/RPi_imager_38.PNG)
+
+&nbsp;
 
 3. Open file manager and navigate to the **Downloads** folder - you should see a zip folder of the downloaded files.
 
 ![img_39](images/RPi_imager_39.PNG)
 
+&nbsp;
+
 4. Double click on the zip folder to bring up the extraction tool. Select the **extract files** to extract all the files in the zip folder.
 
 ![img_40](images/RPi_imager_40.PNG)
+
+&nbsp;
 
 5. You will be asked where you want the files to be extracted to - change the selection to the pi home directory - **/home/pi**.  Close the extraction tool when finished.
 
 ![img_41](images/RPi_imager_41.PNG)
 
+&nbsp;
+
 6. From the open file manager navigate to **/home/pi** directory and you will see a new folder **PicoMuon_Python_code-main**.  Select this folder and right-click mouse and select **Rename**.
 
 ![img_42](images/RPi_imager_42.PNG)
+
+&nbsp;
 
 7. Change the name of the folder to **UKRAA_muons** and select **OK**.
 
 ![img_43](images/RPi_imager_43.PNG)
 
+&nbsp;
+
 8. Scripts and folder structure should now be in place to run the code.
 
+&nbsp;
 
 ---
 
@@ -489,21 +519,30 @@ https://github.com/UKradioastro/PicoMuon_Python_code
 
 Plug your detector into any of the RPI USB ports - I normally use the blue ports (USB3).
 
-Open a terminal window and type 
+1. Open a terminal window and type the following command and press enter
 ```
 ls /dev/tty*
 ```
-and press enter.
 
 ![img_48](images/RPi_imager_48.PNG)
 
-You are looking for /dev/ttyACM0 - this will be on the RHS of the screen above.
+&nbsp;
 
-This is the USB address for your attached detector - if you have more than one detector attached you may see /dev/ttyACM1 etc.
+2. You are looking for /dev/ttyACM0 - this will be on the RHS of the screen above.
 
-If you do not see /dev/ttyACM0, then unplug and plug the detector back in and try again.
+&nbsp;
 
-As long as we see /dev/ttyACM0 then we do not have to make any changes to the python scripts, because they are looking for ACM0.
+3. This is the USB address for your attached detector - if you have more than one detector attached you may see /dev/ttyACM1 etc.
+
+&nbsp;
+
+4. If you do not see /dev/ttyACM0, then unplug and plug the detector back in and try again.
+
+&nbsp;
+
+5. As long as we see /dev/ttyACM0 then we do not have to make any changes to the python scripts, because they are looking for ACM0.
+
+&nbsp;
 
 ---
 
@@ -516,11 +555,16 @@ It is an easy process to set up services to run the code, check it is running an
 To do this we need to create the service, then enable the service.
 
 1. Open terminal window
-2. Type 
+
+&nbsp;
+
+2. Type the following command and press enter - this will open nano text editor. 
 ```
 sudo nano /etc/systemd/system/muon_ACM0.service
 ```
-and press enter - this will open nano text editor.
+
+&nbsp;
+
 3. Type in the following text...
 ```
 [Unit]
@@ -539,51 +583,74 @@ WantedBy=multi-user.target
 
 ```
 ![img_44](images/RPi_imager_44.PNG)
+
+&nbsp;
+
 4. Save (Ctrl + s) and exit (Ctrl + x)
-5. Type 
+
+&nbsp;
+
+5. Type the following command and press enter - this will change permissions of your created service file and press enter.
 ```
 sudo chmod 644 /etc/systemd/system/muon_ACM0.service
 ```
-and press enter - this will change permissions of your created service file and press enter.
+
 ![img_45](images/RPi_imager_45.PNG)
-6. Type 
+
+&nbsp;
+
+6. Type the following command and press enter - this will reload services.
 ```
 sudo systemctl daemon-reload
 ```
-and press enter - this will reload services.
+
 ![img_46](images/RPi_imager_46.PNG)
-7. Type 
+
+&nbsp;
+
+7. Type the following command and press enter - this will **enable** your new service.
 ```
 sudo systemctl enable muon_ACM0.service
 ```
-and press enter - this will enable your new service.
+
 ![img_47](images/RPi_imager_47.PNG)
+
+&nbsp;
 
 The service you have set will automatically start whenever the RPi is started or rebooted.
 
-To check status of your service type:
+&nbsp;
+
+To check **status** of your service, type the following command and press enter
 ```
 sudo systemctl status muon_ACM0.service
 ```
-and press enter.
+
+&nbsp;
 
 We expect to see...
+
 ![img_49](images/RPi_imager_49.PNG)
 
-If we dont see green **enabled** and **active**, then we have a typo in the muon_ACM0.service file.
+&nbsp;
 
-To start your service type:
+If we dont see green **enabled** and **active**, then we have a typo in the **muon_ACM0.service** file.
+
+&nbsp;
+
+To **start** your service, type the following command and press enter.
 ```
 sudo systemctl start muon_ACM0.service
 ```
-and press enter.
 
-To stop your service type:
+&nbsp;
+
+To **stop** your service, type the following command and press enter.
 ```
 sudo systemctl stop muon_ACM0.service
 ```
-and press enter.
 
+&nbsp;
 
 ---
 
