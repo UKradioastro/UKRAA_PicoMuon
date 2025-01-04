@@ -178,37 +178,37 @@ Other scripts (Python and gnuplot) are run from cron
 <!-- =============================================================================== --> 
 ### Raspberry Pi OS
 
-Download Raspberry Pi Imager for your operating system.
+1. Download Raspberry Pi Imager for your operating system.
 Web link https://www.raspberrypi.com/software/
 
 ![img_0](images/RPI_OS.PNG)
 
-Run Raspberry Pi Imager.
+2. Run Raspberry Pi Imager.
 
 ![img_1](images/RPi_imager_1.PNG)
 
-Select "CHOOSE DEVICE" and then select your Raspberry Pi device.
+3. Select "CHOOSE DEVICE" and then select your Raspberry Pi device.
 
 ![img_2](images/RPi_imager_2.PNG)
 
-Select "CHOOSE OS" and then select "Raspberry Pi OS (64bit)".
+4. Select "CHOOSE OS" and then select "Raspberry Pi OS (64bit)".
 
 ![img_3](images/RPi_imager_3.PNG)
 
-Select "CHOOSE STORAGE" and select your microSD card for your RPi.
+5. Select "CHOOSE STORAGE" and select your microSD card for your RPi.
 
 ![img_4](images/RPi_imager_4.PNG)
 
-Select "NEXT"
+6. Select "NEXT"
 
 ![img_5](images/RPi_imager_5.PNG)
 
-You are presented with a "Use OS customisation?" window, select "EDIT SETTINGS".
+7. You are presented with a "Use OS customisation?" window, select "EDIT SETTINGS".
 
 ![img_6](images/RPi_imager_6.PNG)
 
 
-On the "GENERAL" page...
+8. On the "GENERAL" page...
 
 1. Set hostname - set to whatever you want - but write it down, we will need it latter!
 2. Set username and password 
@@ -234,23 +234,23 @@ On the "GENERAL" page...
 
 7. Select "SAVE"
 
-Now apply the customised OS settings by selecting "YES".
+9. Now apply the customised OS settings by selecting "YES".
 
 ![img_10](images/RPi_imager_10.PNG)
 
-You will be asked if you wish to proceed, select "YES".
+10. You will be asked if you wish to proceed, select "YES".
 
 ![img_11](images/RPi_imager_11.PNG)
 
-The operating system will now be written to the microSD card 
+11. The operating system will now be written to the microSD card 
 
 ![img_12](images/RPi_imager_12.PNG)
 
-and then verified, this take a bit of time...
+12. and then verified, this take a bit of time...
 
 ![img_13](images/RPi_imager_13.PNG)
 
-When finished, you can remove the microSD card and select "CONTINUE" and close the Raspberry Pi Imager.
+13. When finished, you can remove the microSD card and select "CONTINUE" and close the Raspberry Pi Imager.
 
 ![img_14](images/RPi_imager_14.PNG).
 
@@ -544,6 +544,27 @@ This can be done after midnight automatically using CRON because the processing 
 ![img_50](images/RPi_imager_50.PNG)
 
 3. Scroll to bottom and type the following...
+```
+# m h  dom mon dow   command
+
+# cron entry to get neutron data from NDB NEST
+10 03 * * *  su pi -c "/usr/bin/python3 /home/pi/UKRAA_muons/scripts/GetNeutronData.py"
+
+# cron entry to process yesterdays raw muon count rate
+30 00 * * * su pi -c "/usr/bin/python3 /home/pi/UKRAA_muons/scripts/ProcessMuonCpmACM0.py"
+
+# cron entry to process yesterdays raw muon adc values
+45 00 * * * su pi -c "/usr/bin/python3 /home/pi/UKRAA_muons/scripts/ProcessMuonAdcACM0.py"
+
+# cron entry to plot yesterdays count rate
+55 07 * * * su pi -c "/usr/bin/gnuplot /home/pi/UKRAA_muons/scripts/PlotMuonCpmACM0.gp"
+
+# cron entry to plot yesterdays count frequency
+56 07 * * * su pi -c "/usr/bin/gnuplot /home/pi/UKRAA_muons/scripts/PlotMuonFreqACM0.gp"
+
+# crom entry to plot yesterdays adc values
+57 07 * * * su pi -c "/usr/bin/gnuplot /home/pi/UKRAA_muons/scripts/PlotMuonAdcACM0.gp"
+```
 
 ![img_51](images/RPi_imager_51.PNG)
 
@@ -642,9 +663,17 @@ The data on the website is static - we need to push the daily plots to the websi
 This can be done after the plots are completed automatically using CRON.
 
 1. Open terminal window
-2. Type "sudo crontab -e" and press enter - this will open crontab text editor.  
+2. Type 
+```
+sudo crontab -e
+```
+and press enter - this will open crontab text editor.  
 3. Scroll to bottom and type the following after what you had previously typed in above...
 
+```
+# cron entry to upload plot files to www
+00 08 * * * cp -r /home/pi/UKRAA_muons/temp /var/www/html/
+```
 ![img_60](images/RPi_imager_60.PNG)
 
 4. Save (Ctrl + s) and exit (Ctrl + x).
