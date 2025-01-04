@@ -294,7 +294,7 @@ Put the microSD card you have just created into your RPi4, connect the RPi to yo
 
 Using PuTTY (https://www.putty.org/)
 
-1. In Host Name (or IP address), type the host name of your RPi that you wrote down earlier... and select open.
+1. In Host Name (or IP address), type the host name of your RPi that you wrote down earlier... and select **Open**
 
 ![img_15](images/RPi_imager_15.PNG)
 
@@ -306,7 +306,7 @@ Using PuTTY (https://www.putty.org/)
 
 &nbsp;
 
-3. Login as **pi** and enter your password
+3. Login as **pi** and enter your **password**
 
 &nbsp;
 
