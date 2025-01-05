@@ -770,7 +770,7 @@ Once you have completed building your RPi web server, we need to move some files
 
 2. Type the following command and press enter - this will take you to the files in the WWW folder.  
 ```
-cd UKRAA_muons/WWW/
+cd ~/UKRAA_muons/WWW/
 ```
 
 ![img_52](images/RPi_imager_52.PNG)
