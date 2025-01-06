@@ -689,23 +689,29 @@ sudo crontab -e
 ```
 # m h  dom mon dow   command
 
-# cron entry to get neutron data from NDB NEST
-10 03 * * *  su pi -c **/usr/bin/python3 /home/pi/UKRAA_muons/scripts/GetNeutronData.py**
+# cron entry to get neutron data from NMDC NEST
+10 03 * * * su pi -c "/usr/bin/python3 /home/pi/UKRAA_muons/scripts/GetNeutronData.py"
 
-# cron entry to process yesterdays raw muon count rate
-30 00 * * * su pi -c **/usr/bin/python3 /home/pi/UKRAA_muons/scripts/ProcessMuonCpmACM0.py**
+# cron entry to process yesterdays raw muon counts per minute 
+30 00 * * * su pi -c "/usr/bin/python3 /home/pi/UKRAA_muons/scripts/ProcessMuonsCpm.py"
 
-# cron entry to process yesterdays raw muon adc values
-45 00 * * * su pi -c **/usr/bin/python3 /home/pi/UKRAA_muons/scripts/ProcessMuonAdcACM0.py**
+# cron entry to process yesterdays raw muon adc values 
+45 00 * * * su pi -c "/usr/bin/python3 /home/pi/UKRAA_muons/scripts/ProcessMuonsAdcm.py"
 
-# cron entry to plot yesterdays count rate
-55 07 * * * su pi -c **/usr/bin/gnuplot /home/pi/UKRAA_muons/scripts/PlotMuonCpmACM0.gp**
+# cron entry to plot yesterdays counts per minute 
+50 07 * * * su pi -c "/usr/bin/gnuplot /home/pi/UKRAA_muons/scripts/PlotMuonCpmACM0.gp"
 
-# cron entry to plot yesterdays count frequency
-56 07 * * * su pi -c **/usr/bin/gnuplot /home/pi/UKRAA_muons/scripts/PlotMuonFreqACM0.gp**
+# cron entry to plot yesterdays counts per minute frequency 
+51 07 * * * su pi -c "/usr/bin/gnuplot /home/pi/UKRAA_muons/scripts/PlotMuonFreqACM0.gp"
 
-# crom entry to plot yesterdays adc values
-57 07 * * * su pi -c **/usr/bin/gnuplot /home/pi/UKRAA_muons/scripts/PlotMuonAdcACM0.gp**
+# cron entry to plot yesterdays adc frequency 
+52 07 * * * su pi -c "/usr/bin/gnuplot /home/pi/UKRAA_muons/scripts/PlotMuonAdcACM0.gp"
+
+# cron entry to plot the last weeks muons counts per minute 
+53 07 * * * su pi -c "/usr/bin/gnuplot /home/pi/UKRAA_muons/scripts/PlotMuonCpmACM0_week.gp"
+
+# cron entry to plot the last months muons counts per minute
+54 07 * * * su pi -c "/usr/bin/gnuplot /home/pi/UKRAA_muons/scripts/PlotMuonCpmACM0_month.gp"
 ```
 
 ![img_51](images/RPi_imager_51.PNG)
