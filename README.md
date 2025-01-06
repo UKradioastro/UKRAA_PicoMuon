@@ -9,7 +9,7 @@
 
 Set of Python code to run on a RPi4/5 to get, process and present data from the UKRAA PicoMuon detector
 
-I have written this software to suit my set-up, feel free use as you see fit.
+I have written this software to suit my set-up, feel free to use as you see fit.
 
 ## Table of Contents
 
