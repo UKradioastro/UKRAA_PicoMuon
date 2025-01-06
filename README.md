@@ -3,7 +3,10 @@
 </div>
 
 
-# PicoMuon_Python_code
+# Python code for the UKRAA PicoMuon
+[![License](https://img.shields.io/badge/license-MIT-brightgreen.svg)](/LICENSE)
+
+
 Set of Python code to run on a RPi4/5 to get, process and present data from the UKRAA PicoMuon detector
 
 I have written this software to suit my set-up, feel free use as you see fit.
@@ -731,7 +734,7 @@ The **temp** folder only holds plots for yesterday, updated each day, for pushin
 
 We can create a simple web server on our RPi so that we can view our detector's results on our smart phone when connected to our home network.
 
-To set up the web server on the RPi, follow the instruction from **tom's HARDWARE** (https://www.tomshardware.com/news/raspberry-pi-web-server,40174.html).  Only need to do first section - upto 9. Build your website.
+To set up the web server on the RPi, follow the instruction from [**tom's HARDWARE**](https://www.tomshardware.com/news/raspberry-pi-web-server,40174.html).  Only need to do first section - upto 9. Build your website.
 
 ---
 
