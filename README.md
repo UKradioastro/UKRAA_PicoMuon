@@ -693,10 +693,10 @@ sudo crontab -e
 10 03 * * * su pi -c "/usr/bin/python3 /home/pi/UKRAA_muons/scripts/GetNeutronData.py"
 
 # cron entry to process yesterdays raw muon counts per minute 
-30 00 * * * su pi -c "/usr/bin/python3 /home/pi/UKRAA_muons/scripts/ProcessMuonsCpm.py"
+30 00 * * * su pi -c "/usr/bin/python3 /home/pi/UKRAA_muons/scripts/ProcessMuonsCpmACM0.py"
 
 # cron entry to process yesterdays raw muon adc values 
-45 00 * * * su pi -c "/usr/bin/python3 /home/pi/UKRAA_muons/scripts/ProcessMuonsAdcm.py"
+45 00 * * * su pi -c "/usr/bin/python3 /home/pi/UKRAA_muons/scripts/ProcessMuonsAdcACM0.py"
 
 # cron entry to plot yesterdays counts per minute 
 50 07 * * * su pi -c "/usr/bin/gnuplot /home/pi/UKRAA_muons/scripts/PlotMuonCpmACM0.gp"
