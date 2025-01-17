@@ -5,6 +5,12 @@ import os
 # local library that generates the html strings to download NEST data
 import nest
 
+# print message to log file to say started
+print('Started getting neutron data, for', \
+      dt.datetime.strftime(dt.datetime.now() - dt.timedelta(1), '%Y-%m-%d'), \
+      'on', dt.datetime.strftime(dt.datetime.now(), '%Y-%m-%d'), \
+      'at',dt.datetime.strftime(dt.datetime.now(), '%H:%M:%S'))
+
 # get yesterday variable
 yesterday = dt.date.today() - dt.timedelta(days = 1)
 
@@ -62,4 +68,14 @@ names.insert(0, "start_date_time") # add header for first column
 df = pd.read_table(download, sep=";", comment="#", header=0, names=names)
 
 # Save panda dataframe to csv file
-df.to_csv(outfile,  sep=",", index=False, header=False, encoding='utf-8') 
+df.to_csv(outfile,  sep=",", index=False, header=False, encoding='utf-8')
+
+# =============================================================================
+# Message to log file at end of program
+
+# print message to log file to say completed
+print('Completed getting neutron data for', \
+      dt.datetime.strftime(dt.datetime.now() - dt.timedelta(1), '%Y-%m-%d'), \
+      'on',dt.datetime.strftime(dt.datetime.now(), '%Y-%m-%d'), \
+      'at',dt.datetime.strftime(dt.datetime.now(), '%H:%M:%S'))
+     

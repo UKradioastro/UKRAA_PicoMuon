@@ -204,6 +204,10 @@ set output pathPlot.".png"
 replot
 # end replot
 
+# print to log file
+set print "-"
+print "Completed CPM plot for ".system("date -d yesterday +'%Y-%m-%d'")." at ".system("date +'%H:%M:%S'")." on ".system("date +'%A %d %B %Y'")
+
 # This is important because it closes our output file.
 set output
 
