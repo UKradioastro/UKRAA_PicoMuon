@@ -731,28 +731,34 @@ sudo crontab -e
 # m h  dom mon dow   command
 
 # cron entry to get neutron data from NMDC NEST
-10 03 * * * su pi -c "/usr/bin/python3 /home/pi/UKRAA_muons/scripts/GetNeutronData.py"
+10 00 * * * su pi -c "/usr/bin/python3 /home/pi/UKRAA_muons/scripts/GetNeutronData.py       >> /home/pi/UKRAA_muons/logfiles/>
 
-# cron entry to process yesterdays raw muon counts per minute 
-30 00 * * * su pi -c "/usr/bin/python3 /home/pi/UKRAA_muons/scripts/ProcessMuonCpm.py"
+# cron entry to process yesterdays raw muon counts per minute
+30 00 * * * su pi -c "/usr/bin/python3 /home/pi/UKRAA_muons/scripts/ProcessMuonCpmACM0.py   >> /home/pi/UKRAA_muons/logfiles/>
+30 02 * * * su pi -c "/usr/bin/python3 /home/pi/UKRAA_muons/scripts/ProcessDataDayACM0.py   >> /home/pi/UKRAA_muons/logfiles/>
+30 04 * * * su pi -c "/usr/bin/python3 /home/pi/UKRAA_muons/scripts/ProcessDataWeekACM0.py  >> /home/pi/UKRAA_muons/logfiles/>
+30 05 * * * su pi -c "/usr/bin/python3 /home/pi/UKRAA_muons/scripts/ProcessDataMonthACM0.py >> /home/pi/UKRAA_muons/logfiles/>
 
-# cron entry to process yesterdays raw muon adc values 
-45 00 * * * su pi -c "/usr/bin/python3 /home/pi/UKRAA_muons/scripts/ProcessMuonAdcm.py"
+# cron entry to process yesterdays raw muon adc values
+45 00 * * * su pi -c "/usr/bin/python3 /home/pi/UKRAA_muons/scripts/ProcessMuonAdcACM0.py   >> /home/pi/UKRAA_muons/logfiles/>
 
-# cron entry to plot yesterdays counts per minute 
-50 07 * * * su pi -c "/usr/bin/gnuplot /home/pi/UKRAA_muons/scripts/PlotMuonCpmACM0.gp"
+# cron entry to plot yesterdays counts per minute
+50 07 * * * su pi -c "/usr/bin/gnuplot /home/pi/UKRAA_muons/scripts/PlotMuonCpmACM0.gp      >> /home/pi/UKRAA_muons/logfiles/>
 
-# cron entry to plot yesterdays counts per minute frequency 
-51 07 * * * su pi -c "/usr/bin/gnuplot /home/pi/UKRAA_muons/scripts/PlotMuonFreqACM0.gp"
+# cron entry to plot yesterdays counts per minute frequency
+51 07 * * * su pi -c "/usr/bin/gnuplot /home/pi/UKRAA_muons/scripts/PlotMuonFreqACM0.gp     >> /home/pi/UKRAA_muons/logfiles/>
 
-# cron entry to plot yesterdays adc frequency 
-52 07 * * * su pi -c "/usr/bin/gnuplot /home/pi/UKRAA_muons/scripts/PlotMuonAdcACM0.gp"
+# cron entry to plot yesterdays adc frequency
+52 07 * * * su pi -c "/usr/bin/gnuplot /home/pi/UKRAA_muons/scripts/PlotMuonAdcACM0.gp      >> /home/pi/UKRAA_muons/logfiles/>
 
-# cron entry to plot the last weeks muons counts per minute 
-53 07 * * * su pi -c "/usr/bin/gnuplot /home/pi/UKRAA_muons/scripts/PlotMuonCpmACM0_week.gp"
+# cron entry to plot yesterdays % muons & % neutron deviation
+53 07 * * * su pi -c "/usr/bin/gnuplot /home/pi/UKRAA_muons/scripts/PlotDataDayACM0.gp      >> /home/pi/UKRAA_muons/logfiles/>
 
-# cron entry to plot the last months muons counts per minute
-54 07 * * * su pi -c "/usr/bin/gnuplot /home/pi/UKRAA_muons/scripts/PlotMuonCpmACM0_month.gp"
+# cron entry to plot last weeks % muons & % neutron deviation
+54 07 * * * su pi -c "/usr/bin/gnuplot /home/pi/UKRAA_muons/scripts/PlotDataWeekACM0.gp     >> /home/pi/UKRAA_muons/logfiles/>
+
+# cron entry to plot last months % muons & % neutron deviation
+55 07 * * * su pi -c "/usr/bin/gnuplot /home/pi/UKRAA_muons/scripts/PlotDataMonthACM0.gp    >> /home/pi/UKRAA_muons/logfiles/>
 ```
 
 ![img_51](images/RPi_imager_51.PNG)
@@ -795,12 +801,16 @@ Once you have completed building your RPi web server, we need to move some files
 ```
 └── 📁WWW
     └── 📁images
-        └── AndrewBanner.jpg
-        └── Cosmic_muons.jpg
+        └── default-monthly.png
+        └── default-weekly.png
+        └── default.png
         └── favicon.ico
         └── PicoMuon_1.png
         └── PicoMuon_2.png
         └── PicoMuon_3.png
+        └── SunHeader.png
+        └── UKRAA_logo_black.png
+        └── UKRAA_logo_white.png
     └── 📁temp
         └── ACM0_B-Adc.png
         └── ACM0_B-Cpm.png
@@ -808,9 +818,11 @@ Once you have completed building your RPi web server, we need to move some files
         └── ACM0_C-Adc.png
         └── ACM0_C-Cpm.png
         └── ACM0_C-Freq.png
+        └── ACM0_day_plot.png
         └── ACM0_T-Adc.png
         └── ACM0_T-Cpm.png
         └── ACM0_T-Freq.png
+        └── ACM0_week_plot.png
     └── index.html
 ```
 
