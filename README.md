@@ -59,47 +59,69 @@ The software needed to run will depend on what you intend.  You will need the fo
 └── 📁scripts
     └── 📁__pycache__
         └── nest.cpython-311.pyc
-    └── DateTimeTest.py
-    └── GetDataRaw.py
     └── GetDataRawACM0.py
-    └── GetEnvironment.py
     └── GetNeutronData.py
     └── nest.py
+    └── PlotDataDayACM0.gp
+    └── PlotDataMonthACM0.gp
+    └── PlotDataWeekACM0.gp
     └── PlotMuonAdcACM0.gp
+    └── PlotMuonCpmACM0_month.gp
+    └── PlotMuonCpmACM0_old.gp
+    └── PlotMuonCpmACM0_week.gp
     └── PlotMuonCpmACM0.gp
     └── PlotMuonFreqACM0.gp
+    └── ProcessDataDayACM0.py
+    └── ProcessDataMonthACM0.py
+    └── ProcessDataWeekACM0.py
     └── ProcessMuonAdcACM0.py
     └── ProcessMuonCpmACM0.py
+```
+
+```
+└── 📁logfiles
 ```
 
 ### data
 ```
 └── 📁data
-    └── 📁environment
-        └── 📁2024
-            └── 📁2024-10
-                └── 2024-10-30.txt
-        └── info.txt
     └── 📁neutrons
-        └── 📁2024
-            └── 📁2024-10
-                └── 2024-10-30.txt
+        └── 📁2025
+            └── 📁2025-01
+                └── 2025-01-16.txt
     └── 📁processed
         └── 📁adc
             └── 📁ACM0
-                └── 📁2024
-                    └── 📁2024-10
-                        └── 2024-10-30.txt
-        └── 📁cpm
-            └── 📁ACM0
-                └── 📁2024
-                    └── 📁2024-10
-                       └── 2024-10-30.txt
+                └── 📁2025
+                    └── 📁2025-01
+                        └── 2025-01-16.txt
+    └── 📁cpm
+        └── 📁ACM0
+            └── 📁2025
+                └── 📁2025-01
+                    └── 2025-01-16.txt
+    └── 📁day
+        └── 📁ACM0
+            └── 📁2025
+                └── 📁2025-01
+                   └── 2025-01-16.txt
+    └── 📁month
+        └── 📁ACM0
+            └── 📁2025
+                └── 📁2025-01
+                    └── 2025-01-16.txt
+                    └── temp.txt
+    └── 📁week
+        └── 📁ACM0
+            └── 📁2025
+                └── 📁2025-01
+                    └── 2025-01-16.txt
+                    └── temp.txt
     └── 📁raw
         └── 📁ACM0
-            └── 📁2024
-                └── 📁2024-10
-                   └── 2024-10-31.txt
+            └── 📁2025
+                └── 📁2025-01
+                    └── 2025-01-16.txt
 ```
 
 ### plots
@@ -107,13 +129,23 @@ The software needed to run will depend on what you intend.  You will need the fo
 └── 📁plots
     └── 📁adc
         └── 📁ACM0
-          └── 2024-10-30_ADC_T_plot.png
+          └── 2025-01-16_ADC_T_plot.png
     └── 📁cpm
         └── 📁ACM0
-           └── 2024-10-30_CPM_T_plot.png
+           └── 2025-01-16_CPM_T_plot.png
+    └── 📁day
+        └── 📁ACM0
+            └── 2025-01-16_day_plot.png
     └── 📁freq
         └── 📁ACM0
-          └── 2024-10-30_Freq_T_plot.png
+          └── 2025-01-16_Freq_T_plot.png
+    └── 📁month
+        └── 📁ACM0
+            └── 2025-01-16_month_plot.png
+    └── 📁week
+        └── 📁ACM0
+            └── 2025-01-16_week_plot.png
+  
 ```
 
 ### temp
@@ -125,21 +157,28 @@ The software needed to run will depend on what you intend.  You will need the fo
     └── ACM0_C-Adc.png
     └── ACM0_C-Cpm.png
     └── ACM0_C-Freq.png
+    └── ACM0_day_plot.png
+    └── ACM0_month_plot.png
     └── ACM0_T-Adc.png
     └── ACM0_T-Cpm.png
     └── ACM0_T-Freq.png
+    └── ACM0_week_plot.png
 ```
 
 ### website
 ```
 └── 📁WWW
     └── 📁images
-        └── AndrewBanner.jpg
-        └── Cosmic_muons.jpg
+        └── default-monthly.png
+        └── default-weekly.png
+        └── default.png
         └── favicon.ico
         └── PicoMuon_1.png
         └── PicoMuon_2.png
         └── PicoMuon_3.png
+        └── SunHeader.png
+        └── UKRAA_logo_black.png
+        └── UKRAA_logo_white.png
     └── 📁temp
         └── ACM0_B-Adc.png
         └── ACM0_B-Cpm.png
@@ -147,9 +186,11 @@ The software needed to run will depend on what you intend.  You will need the fo
         └── ACM0_C-Adc.png
         └── ACM0_C-Cpm.png
         └── ACM0_C-Freq.png
+        └── ACM0_day_plot.png
         └── ACM0_T-Adc.png
         └── ACM0_T-Cpm.png
         └── ACM0_T-Freq.png
+        └── ACM0_week_plot.png
     └── index.html
 ```
 
