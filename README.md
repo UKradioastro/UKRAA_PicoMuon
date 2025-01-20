@@ -59,28 +59,37 @@ The software needed to run will depend on what you intend.  You will need the fo
 └── 📁scripts
     └── 📁__pycache__
         └── nest.cpython-311.pyc
+    └── GetDataNeutron.py
     └── GetDataRawACM0.py
-    └── GetNeutronData.py
     └── nest.py
+    └── PlotDataAdcACM0.gp
+    └── PlotDataCpmACM0.gp
     └── PlotDataDayACM0.gp
+    └── PlotDataFreqACM0.gp
     └── PlotDataMonthACM0.gp
     └── PlotDataWeekACM0.gp
-    └── PlotMuonAdcACM0.gp
-    └── PlotMuonCpmACM0_month.gp
-    └── PlotMuonCpmACM0_old.gp
-    └── PlotMuonCpmACM0_week.gp
-    └── PlotMuonCpmACM0.gp
-    └── PlotMuonFreqACM0.gp
+    └── ProcessDataAdcACM0.py
+    └── ProcessDataCpmACM0.py
     └── ProcessDataDayACM0.py
     └── ProcessDataMonthACM0.py
     └── ProcessDataWeekACM0.py
-    └── ProcessMuonAdcACM0.py
-    └── ProcessMuonCpmACM0.py
 ```
 
 ### logfiles
 ```
 └── 📁logfiles
+    └── cron-DataAdc.log
+    └── cron-DataCpm.log
+    └── cron-DataDay.log
+    └── cron-DataMonth.log
+    └── cron-DataNeutrons.log
+    └── cron-DataWeek.log
+    └── cron-PlotAdc.log
+    └── cron-PlotCpm.log
+    └── cron-PlotDay.log
+    └── cron-PlotFreq.log
+    └── cron-PlotMonth.log
+    └── cron-DataWeek.log
 ```
 
 ### data
@@ -96,28 +105,28 @@ The software needed to run will depend on what you intend.  You will need the fo
                 └── 📁2025
                     └── 📁2025-01
                         └── 2025-01-16.txt
-    └── 📁cpm
-        └── 📁ACM0
-            └── 📁2025
-                └── 📁2025-01
+        └── 📁cpm
+            └── 📁ACM0
+                └── 📁2025
+                    └── 📁2025-01
+                        └── 2025-01-16.txt
+        └── 📁day
+            └── 📁ACM0
+                └── 📁2025
+                    └── 📁2025-01
                     └── 2025-01-16.txt
-    └── 📁day
-        └── 📁ACM0
-            └── 📁2025
-                └── 📁2025-01
-                   └── 2025-01-16.txt
-    └── 📁month
-        └── 📁ACM0
-            └── 📁2025
-                └── 📁2025-01
-                    └── 2025-01-16.txt
-                    └── temp.txt
-    └── 📁week
-        └── 📁ACM0
-            └── 📁2025
-                └── 📁2025-01
-                    └── 2025-01-16.txt
-                    └── temp.txt
+        └── 📁month
+            └── 📁ACM0
+                └── 📁2025
+                    └── 📁2025-01
+                        └── 2025-01-16.txt
+                        └── temp.txt
+        └── 📁week
+            └── 📁ACM0
+                └── 📁2025
+                    └── 📁2025-01
+                        └── 2025-01-16.txt
+                        └── temp.txt
     └── 📁raw
         └── 📁ACM0
             └── 📁2025
@@ -170,8 +179,6 @@ The software needed to run will depend on what you intend.  You will need the fo
 ```
 └── 📁WWW
     └── 📁images
-        └── default-monthly.png
-        └── default-weekly.png
         └── default.png
         └── favicon.ico
         └── PicoMuon_1.png
@@ -802,8 +809,6 @@ Once you have completed building your RPi web server, we need to move some files
 ```
 └── 📁WWW
     └── 📁images
-        └── default-monthly.png
-        └── default-weekly.png
         └── default.png
         └── favicon.ico
         └── PicoMuon_1.png
