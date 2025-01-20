@@ -732,25 +732,25 @@ sudo crontab -e
 # m h  dom mon dow   command
 
 # cron entry to get neutron data from NMDC NEST
-10 00 * * * su pi -c "/usr/bin/python3 /home/pi/UKRAA_muons/scripts/GetNeutronData.py       >> /home/pi/UKRAA_muons/logfiles/cron-DataNeutrons.log 2>&1"
+10 00 * * * su pi -c "/usr/bin/python3 /home/pi/UKRAA_muons/scripts/GetDataNeutron.py       >> /home/pi/UKRAA_muons/logfiles/cron-DataNeutrons.log 2>&1"
 
 # cron entry to process yesterdays raw muon counts per minute
-30 00 * * * su pi -c "/usr/bin/python3 /home/pi/UKRAA_muons/scripts/ProcessMuonCpmACM0.py   >> /home/pi/UKRAA_muons/logfiles/cron-DataCpm.log 2>&1"
+30 00 * * * su pi -c "/usr/bin/python3 /home/pi/UKRAA_muons/scripts/ProcessDataCpmACM0.py   >> /home/pi/UKRAA_muons/logfiles/cron-DataCpm.log 2>&1"
 30 02 * * * su pi -c "/usr/bin/python3 /home/pi/UKRAA_muons/scripts/ProcessDataDayACM0.py   >> /home/pi/UKRAA_muons/logfiles/cron-DataDay.log 2>&1"
 30 04 * * * su pi -c "/usr/bin/python3 /home/pi/UKRAA_muons/scripts/ProcessDataWeekACM0.py  >> /home/pi/UKRAA_muons/logfiles/cron-DataWeek.log 2>&1"
 30 05 * * * su pi -c "/usr/bin/python3 /home/pi/UKRAA_muons/scripts/ProcessDataMonthACM0.py >> /home/pi/UKRAA_muons/logfiles/cron-DataMonth.log 2>&1"
 
 # cron entry to process yesterdays raw muon adc values
-45 00 * * * su pi -c "/usr/bin/python3 /home/pi/UKRAA_muons/scripts/ProcessMuonAdcACM0.py   >> /home/pi/UKRAA_muons/logfiles/cron-DataAdc.log 2>&1"
+45 00 * * * su pi -c "/usr/bin/python3 /home/pi/UKRAA_muons/scripts/ProcessDataAdcACM0.py   >> /home/pi/UKRAA_muons/logfiles/cron-DataAdc.log 2>&1"
 
 # cron entry to plot yesterdays counts per minute
-50 07 * * * su pi -c "/usr/bin/gnuplot /home/pi/UKRAA_muons/scripts/PlotMuonCpmACM0.gp      >> /home/pi/UKRAA_muons/logfiles/cron-PlotCpm.log 2>&1"
+50 07 * * * su pi -c "/usr/bin/gnuplot /home/pi/UKRAA_muons/scripts/PlotDataCpmACM0.gp      >> /home/pi/UKRAA_muons/logfiles/cron-PlotCpm.log 2>&1"
 
 # cron entry to plot yesterdays counts per minute frequency
-51 07 * * * su pi -c "/usr/bin/gnuplot /home/pi/UKRAA_muons/scripts/PlotMuonFreqACM0.gp     >> /home/pi/UKRAA_muons/logfiles/cron-PlotFreq.log 2>&1"
+51 07 * * * su pi -c "/usr/bin/gnuplot /home/pi/UKRAA_muons/scripts/PlotDataFreqACM0.gp     >> /home/pi/UKRAA_muons/logfiles/cron-PlotFreq.log 2>&1"
 
 # cron entry to plot yesterdays adc frequency
-52 07 * * * su pi -c "/usr/bin/gnuplot /home/pi/UKRAA_muons/scripts/PlotMuonAdcACM0.gp      >> /home/pi/UKRAA_muons/logfiles/cron-PlotAdct.log 2>&1"
+52 07 * * * su pi -c "/usr/bin/gnuplot /home/pi/UKRAA_muons/scripts/PlotDataAdcACM0.gp      >> /home/pi/UKRAA_muons/logfiles/cron-PlotAdc.log 2>&1"
 
 # cron entry to plot yesterdays % muons & % neutron deviation
 53 07 * * * su pi -c "/usr/bin/gnuplot /home/pi/UKRAA_muons/scripts/PlotDataDayACM0.gp      >> /home/pi/UKRAA_muons/logfiles/cron-PlotDay.log 2>&1"
