@@ -18,7 +18,7 @@ RawFieldNames    = ['RawDateTime','RawPosition', 'RawCount', 'RawADC', \
 # Set path for data file structure
 
 # raw data file source
-RawDataFile   = "/home/pi/UKRAA_muons/data/raw/ACM0/" \
+RawDataFile   = "/home/pi/UKRAA_PicoMuon/data/raw/ACM0/" \
                  + datetime.strftime(datetime.now() - timedelta(1), '%Y') \
                  + "/" \
                  + datetime.strftime(datetime.now() - timedelta(1), '%Y-%m') \
@@ -27,7 +27,7 @@ RawDataFile   = "/home/pi/UKRAA_muons/data/raw/ACM0/" \
                  + ".txt"
 
 # Processed data path
-ProcessedPath = '/home/pi/UKRAA_muons/data/processed/cpm/ACM0/'\
+ProcessedPath = '/home/pi/UKRAA_PicoMuon/data/processed/cpm/ACM0/'\
                 + datetime.strftime(datetime.now() - timedelta(1), '%Y') \
                 + "/" \
                 + datetime.strftime(datetime.now() - timedelta(1), '%Y-%m')
@@ -39,7 +39,7 @@ if not pathExists:
     os.makedirs(ProcessedPath)
 
 # Processed data file name
-ProcessedDataFile = "/home/pi/UKRAA_muons/data/processed/cpm/ACM0/" \
+ProcessedDataFile = "/home/pi/UKRAA_PicoMuon/data/processed/cpm/ACM0/" \
                      + datetime.strftime(datetime.now() - timedelta(1), '%Y') \
                      + "/" \
                      + datetime.strftime(datetime.now() - timedelta(1), '%Y-%m') \

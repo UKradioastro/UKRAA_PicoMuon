@@ -24,7 +24,7 @@ yesterdayMonth=yesterday.month
 yesterdayDay = yesterday.day
 
 # create path to save data
-path = '/home/pi/UKRAA_muons/data/neutrons/'\
+path = '/home/pi/UKRAA_PicoMuon/data/neutrons/'\
        + dt.datetime.strftime(dt.date.today() - dt.timedelta(days = 1), '%Y')\
        + '/'\
        + dt.datetime.strftime(dt.date.today() - dt.timedelta(days = 1), '%Y-%m')
@@ -37,7 +37,7 @@ if not pathExist:
     print('New directory created')
 
 # create file for yesterdays data
-outfile = '/home/pi/UKRAA_muons/data/neutrons/'\
+outfile = '/home/pi/UKRAA_PicoMuon/data/neutrons/'\
           + dt.datetime.strftime(dt.date.today() - dt.timedelta(days = 1), '%Y')\
           + '/'\
           + dt.datetime.strftime(dt.date.today() - dt.timedelta(days = 1), '%Y-%m')\

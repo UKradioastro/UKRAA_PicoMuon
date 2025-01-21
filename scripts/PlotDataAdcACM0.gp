@@ -21,7 +21,7 @@ reset
 set terminal pngcairo enhanced font "DejaVuSansCondensed, 10" rounded size 640,540 
 
 # Set up data paths
-pathData = "/home/pi/UKRAA_muons/data/processed/adc/ACM0"
+pathData = "/home/pi/UKRAA_PicoMuon/data/processed/adc/ACM0"
 #pathEnvironment = "/home/pi/muons/data/environment"
 
 # Year folder

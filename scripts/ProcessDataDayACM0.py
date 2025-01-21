@@ -25,7 +25,7 @@ RawFieldNames    = ['RawDateTime',\
 # Set path for data file structure
 
 # raw data file source
-RawDataFile   = "/home/pi/UKRAA_muons/data/raw/ACM0/" \
+RawDataFile   = "/home/pi/UKRAA_PicoMuon/data/raw/ACM0/" \
                  + datetime.strftime(datetime.now() - timedelta(1), '%Y') \
                  + "/" \
                  + datetime.strftime(datetime.now() - timedelta(1), '%Y-%m') \
@@ -41,7 +41,7 @@ NeutronFieldNames    = ['NeutronDateTime', \
                         'EfficiencyCorrected']
 
 # Neutron data file source
-NeutronDataFile   = "/home/pi/UKRAA_muons/data/neutrons/" \
+NeutronDataFile   = "/home/pi/UKRAA_PicoMuon/data/neutrons/" \
                  + datetime.strftime(datetime.now() - timedelta(1), '%Y') \
                  + "/" \
                  + datetime.strftime(datetime.now() - timedelta(1), '%Y-%m') \
@@ -50,7 +50,7 @@ NeutronDataFile   = "/home/pi/UKRAA_muons/data/neutrons/" \
                  + ".txt"
 
 # Processed data path
-ProcessedPath = '/home/pi/UKRAA_muons/data/processed/day/ACM0/'\
+ProcessedPath = '/home/pi/UKRAA_PicoMuon/data/processed/day/ACM0/'\
                 + datetime.strftime(datetime.now() - timedelta(1), '%Y') \
                 + "/" \
                 + datetime.strftime(datetime.now() - timedelta(1), '%Y-%m')
@@ -62,7 +62,7 @@ if not pathExists:
     os.makedirs(ProcessedPath)
 
 # Processed data file name
-ProcessedDataFile = "/home/pi/UKRAA_muons/data/processed/day/ACM0/" \
+ProcessedDataFile = "/home/pi/UKRAA_PicoMuon/data/processed/day/ACM0/" \
                      + datetime.strftime(datetime.now() - timedelta(1), '%Y') \
                      + "/" \
                      + datetime.strftime(datetime.now() - timedelta(1), '%Y-%m') \

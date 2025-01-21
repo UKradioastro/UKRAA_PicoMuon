@@ -21,9 +21,9 @@ reset
 set terminal pngcairo enhanced font "DejaVuSansCondensed, 10" rounded size 640,540 
 
 # Set up data paths
-pathData        = "/home/pi/UKRAA_muons/data/processed/cpm/ACM0"
-pathEnvironment = "/home/pi/UKRAA_muons/data/environment"
-pathNeutron     = "/home/pi/UKRAA_muons/data/neutrons"
+pathData        = "/home/pi/UKRAA_PicoMuon/data/processed/cpm/ACM0"
+pathEnvironment = "/home/pi/UKRAA_PicoMuon/data/environment"
+pathNeutron     = "/home/pi/UKRAA_PicoMuon/data/neutrons"
 
 # Year folder
 YearFolder = "/".system("date -d yesterday +'%Y'")
@@ -49,16 +49,16 @@ StartXaxis = system("date -d '-1 day' +'%Y-%m-%d'")." 00:00:00"
 EndXaxis = system("date +'%Y-%m-%d'")." 00:00:00"
 
 # Path to each data file for graphing
-#FileMuon = "/home/pi/UKRAA_muons/data/".date."/".date."_processed_CPM.txt"
+#FileMuon = "/home/pi/UKRAA_PicoMuon/data/".date."/".date."_processed_CPM.txt"
 
 # setting output path to include data stamp
 # Path to directory to store file
 # top detector
-pathPlot1 = "/home/pi/UKRAA_muons/plots/cpm/ACM0/".date."_CPM_T_plot.png"
+pathPlot1 = "/home/pi/UKRAA_PicoMuon/plots/cpm/ACM0/".date."_CPM_T_plot.png"
 # bottom detector
-pathPlot2 = "/home/pi/UKRAA_muons/plots/cpm/ACM0/".date."_CPM_B_plot.png"
+pathPlot2 = "/home/pi/UKRAA_PicoMuon/plots/cpm/ACM0/".date."_CPM_B_plot.png"
 # muons detected
-pathPlot3 = "/home/pi/UKRAA_muons/plots/cpm/ACM0/".date."_CPM_M_plot.png"
+pathPlot3 = "/home/pi/UKRAA_PicoMuon/plots/cpm/ACM0/".date."_CPM_M_plot.png"
 
 # set output path to Plot folder
 #set output pathPlot
@@ -149,7 +149,7 @@ set terminal pngcairo enhanced font "DejaVuSansCondensed, 10" rounded size 640,5
 # setting output path to include data stamp
 
 # Path to directory to store file
-pathPlot = "/home/pi/UKRAA_muons/temp/ACM0_T-Cpm"
+pathPlot = "/home/pi/UKRAA_PicoMuon/temp/ACM0_T-Cpm"
 
 # set output path to Plot folder
 set output pathPlot.".png"
@@ -172,7 +172,7 @@ set terminal pngcairo enhanced font "DejaVuSansCondensed, 10" rounded size 640,5
 # setting output path to include data stamp
 
 # Path to directory to store file
-pathPlot = "/home/pi/UKRAA_muons/temp/ACM0_B-Cpm"
+pathPlot = "/home/pi/UKRAA_PicoMuon/temp/ACM0_B-Cpm"
 
 # set output path to Plot folder
 set output pathPlot.".png"
@@ -195,7 +195,7 @@ set terminal pngcairo enhanced font "DejaVuSansCondensed, 10" rounded size 640,5
 # setting output path to include data stamp
 
 # Path to directory to store file
-pathPlot = "/home/pi/UKRAA_muons/temp/ACM0_C-Cpm"
+pathPlot = "/home/pi/UKRAA_PicoMuon/temp/ACM0_C-Cpm"
 
 # set output path to Plot folder
 set output pathPlot.".png"

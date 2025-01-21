@@ -21,7 +21,7 @@ reset
 set terminal pngcairo enhanced font "DejaVuSansCondensed, 10" rounded size 640,540 
 
 # Set up data paths
-pathData = "/home/pi/UKRAA_muons/data/processed/cpm/ACM0"
+pathData = "/home/pi/UKRAA_PicoMuon/data/processed/cpm/ACM0"
 #pathEnvironment = "/home/pi/muons/data/environment"
 
 # Year folder
@@ -42,11 +42,11 @@ FileData = pathData.YearFolder.YearMonthFolder.YmdFile
 # setting output path to include data stamp
 # Path to directory to store file
 # top detector
-pathPlot1 = "/home/pi/UKRAA_muons/plots/freq/ACM0/".date."_Freq_T_plot.png"
+pathPlot1 = "/home/pi/UKRAA_PicoMuon/plots/freq/ACM0/".date."_Freq_T_plot.png"
 # bottom detector
-pathPlot2 = "/home/pi/UKRAA_muons/plots/freq/ACM0/".date."_Freq_B_plot.png"
+pathPlot2 = "/home/pi/UKRAA_PicoMuon/plots/freq/ACM0/".date."_Freq_B_plot.png"
 # muons detected
-pathPlot3 = "/home/pi/UKRAA_muons/plots/freq/ACM0/".date."_Freq_M_plot.png"
+pathPlot3 = "/home/pi/UKRAA_PicoMuon/plots/freq/ACM0/".date."_Freq_M_plot.png"
 
 
 # Set separator to ","
@@ -125,7 +125,7 @@ set terminal pngcairo enhanced font "DejaVuSansCondensed, 10" rounded size 640,5
 # setting output path to include data stamp
 
 # Path to directory to store file
-pathPlot = "/home/pi/UKRAA_muons/temp/ACM0_T-Freq"
+pathPlot = "/home/pi/UKRAA_PicoMuon/temp/ACM0_T-Freq"
 
 # set output path to Plot folder
 set output pathPlot.".png"
@@ -146,7 +146,7 @@ set terminal pngcairo enhanced font "DejaVuSansCondensed, 10" rounded size 640,5
 # setting output path to include data stamp
 
 # Path to directory to store file
-pathPlot = "/home/pi/UKRAA_muons/temp/ACM0_B-Freq"
+pathPlot = "/home/pi/UKRAA_PicoMuon/temp/ACM0_B-Freq"
 
 # set output path to Plot folder
 set output pathPlot.".png"
@@ -167,7 +167,7 @@ set terminal pngcairo enhanced font "DejaVuSansCondensed, 10" rounded size 640,5
 # setting output path to include data stamp
 
 # Path to directory to store file
-pathPlot = "/home/pi/UKRAA_muons/temp/ACM0_C-Freq"
+pathPlot = "/home/pi/UKRAA_PicoMuon/temp/ACM0_C-Freq"
 
 # set output path to Plot folder
 set output pathPlot.".png"

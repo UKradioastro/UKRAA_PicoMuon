@@ -18,7 +18,7 @@ print('Started processing ACM0 month data, from ', \
 
 # raw data file source
 for i in range(1, 32):
-    globals()['RawDataFile%s' % i] = '/home/pi/UKRAA_muons/data/processed/day/ACM0/' \
+    globals()['RawDataFile%s' % i] = '/home/pi/UKRAA_PicoMuon/data/processed/day/ACM0/' \
                                      + datetime.strftime(datetime.now() - timedelta(i), '%Y') \
                                      + '/' \
                                      + datetime.strftime(datetime.now() - timedelta(i), '%Y-%m') \
@@ -38,7 +38,7 @@ MonthFieldNames    = ['DateTime', \
 
 
 # create months worth of data
-MonthPath = '/home/pi/UKRAA_muons/data/processed/month/ACM0/' \
+MonthPath = '/home/pi/UKRAA_PicoMuon/data/processed/month/ACM0/' \
            + datetime.strftime(datetime.now() - timedelta(1), '%Y') \
            + "/" \
            + datetime.strftime(datetime.now() - timedelta(1), '%Y-%m')
@@ -50,7 +50,7 @@ if not pathExists:
     os.makedirs(MonthPath)
 
 # Month data file name
-MonthDataFile = '/home/pi/UKRAA_muons/data/processed/month/ACM0/' \
+MonthDataFile = '/home/pi/UKRAA_PicoMuon/data/processed/month/ACM0/' \
                + datetime.strftime(datetime.now() - timedelta(1), '%Y') \
                + "/" \
                + datetime.strftime(datetime.now() - timedelta(1), '%Y-%m') \
@@ -93,7 +93,7 @@ with open(MonthDataFile,'wb') as wfd:
             shutil.copyfileobj(fd, wfd)
 
 # Processed data path
-ProcessedPath = '/home/pi/UKRAA_muons/data/processed/month/ACM0/'\
+ProcessedPath = '/home/pi/UKRAA_PicoMuon/data/processed/month/ACM0/'\
                 + datetime.strftime(datetime.now() - timedelta(1), '%Y') \
                 + "/" \
                 + datetime.strftime(datetime.now() - timedelta(1), '%Y-%m')
@@ -105,7 +105,7 @@ if not pathExists:
     os.makedirs(ProcessedPath)
 
 # Processed data file name
-ProcessedDataFile = "/home/pi/UKRAA_muons/data/processed/month/ACM0/" \
+ProcessedDataFile = "/home/pi/UKRAA_PicoMuon/data/processed/month/ACM0/" \
                      + datetime.strftime(datetime.now() - timedelta(1), '%Y') \
                      + "/" \
                      + datetime.strftime(datetime.now() - timedelta(1), '%Y-%m') \

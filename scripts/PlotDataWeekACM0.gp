@@ -18,7 +18,7 @@ reset
 set terminal pngcairo enhanced font "DejaVuSansCondensed, 10" rounded size 640,540 
 
 # Set up data paths
-pathData        = "/home/pi/UKRAA_muons/data/processed/week/ACM0"
+pathData        = "/home/pi/UKRAA_PicoMuon/data/processed/week/ACM0"
 
 # Year folder
 YearFolder = "/".system("date -d yesterday +'%Y'")
@@ -51,7 +51,7 @@ EndXaxis = system("date +'%Y-%m-%d'")." 00:00:00"
 # setting output path to include data stamp
 # Path to directory to store file
 # week data
-pathPlot3 = "/home/pi/UKRAA_muons/plots/week/ACM0/".date."_week_plot.png"
+pathPlot3 = "/home/pi/UKRAA_PicoMuon/plots/week/ACM0/".date."_week_plot.png"
 
 # Title for graph
 # muons detected
@@ -130,7 +130,7 @@ set terminal pngcairo enhanced font "DejaVuSansCondensed, 10" rounded size 640,5
 # setting output path to include data stamp
 
 # Path to directory to store file
-pathPlot = "/home/pi/UKRAA_muons/temp/ACM0_week_plot"
+pathPlot = "/home/pi/UKRAA_PicoMuon/temp/ACM0_week_plot"
 
 # set output path to Plot folder
 set output pathPlot.".png"
