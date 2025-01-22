@@ -553,7 +553,7 @@ https://github.com/UKradioastro/PicoMuon_Python_code
 
 &nbsp;
 
-7. Change the name of the folder to **UKRAA_muons** and select **OK**.
+7. Change the name of the folder to **UKRAA_PicoMuon** and select **OK**.
 
 ![img_43](images/RPi_imager_43.PNG)
 
@@ -612,7 +612,7 @@ To do this we need to create the service, then enable the service.
 
 2. Type the following command and press enter - this will open nano text editor. 
 ```
-sudo nano /etc/systemd/system/muon_ACM0.service
+sudo nano /etc/systemd/system/PicoMuonACM0.service
 ```
 
 &nbsp;
@@ -626,7 +626,7 @@ After=multi-user.target
 [Service]
 Type=idle
 User=pi
-ExecStart=/usr/bin/python3 /home/pi/UKRAA_muons/scripts/GetDataRawACM0.py
+ExecStart=/usr/bin/python3 /home/pi/UKRAA_PicoMuon/scripts/GetDataRawACM0.py
 Restart=always
 RestartSec=10
 
@@ -644,7 +644,7 @@ WantedBy=multi-user.target
 
 5. Type the following command and press enter - this will change permissions of your created service file and press enter.
 ```
-sudo chmod 644 /etc/systemd/system/muon_ACM0.service
+sudo chmod 644 /etc/systemd/system/PicoMuonACM0.service
 ```
 
 ![img_45](images/RPi_imager_45.PNG)
@@ -662,7 +662,7 @@ sudo systemctl daemon-reload
 
 7. Type the following command and press enter - this will **enable** your new service.
 ```
-sudo systemctl enable muon_ACM0.service
+sudo systemctl enable PicoMuonACM0.service
 ```
 
 ![img_47](images/RPi_imager_47.PNG)
@@ -675,7 +675,7 @@ sudo systemctl enable muon_ACM0.service
 
 9. To check **status** of your service, type the following command and press enter
 ```
-sudo systemctl status muon_ACM0.service
+sudo systemctl status PicoMuonACM0.service
 ```
 
 &nbsp;
@@ -686,20 +686,20 @@ sudo systemctl status muon_ACM0.service
 
 &nbsp;
 
-11. If we dont see green **enabled** and **active**, then we have a typo in the **muon_ACM0.service** file.
+11. If we dont see green **enabled** and **active**, then we have a typo in the **PicoMuonACM0.service** file.
 
 &nbsp;
 
 12. To **start** your service, type the following command and press enter.
 ```
-sudo systemctl start muon_ACM0.service
+sudo systemctl start PicoMuonACM0.service
 ```
 
 &nbsp;
 
 13. To **stop** your service, type the following command and press enter.
 ```
-sudo systemctl stop muon_ACM0.service
+sudo systemctl stop PicoMuonACM0.service
 ```
 
 &nbsp;
@@ -739,34 +739,34 @@ sudo crontab -e
 # m h  dom mon dow   command
 
 # cron entry to get neutron data from NMDC NEST
-10 00 * * * su pi -c "/usr/bin/python3 /home/pi/UKRAA_muons/scripts/GetDataNeutron.py       >> /home/pi/UKRAA_muons/logfiles/cron-DataNeutrons.log 2>&1"
+10 00 * * * su pi -c "/usr/bin/python3 /home/pi/UKRAA_PicoMuon/scripts/GetDataNeutron.py       >> /home/pi/UKRAA_PicoMuon/logfiles/cron-PicoMuonACM0.log 2>&1"
 
 # cron entry to process yesterdays raw muon counts per minute
-30 00 * * * su pi -c "/usr/bin/python3 /home/pi/UKRAA_muons/scripts/ProcessDataCpmACM0.py   >> /home/pi/UKRAA_muons/logfiles/cron-DataCpm.log 2>&1"
-30 02 * * * su pi -c "/usr/bin/python3 /home/pi/UKRAA_muons/scripts/ProcessDataDayACM0.py   >> /home/pi/UKRAA_muons/logfiles/cron-DataDay.log 2>&1"
-30 04 * * * su pi -c "/usr/bin/python3 /home/pi/UKRAA_muons/scripts/ProcessDataWeekACM0.py  >> /home/pi/UKRAA_muons/logfiles/cron-DataWeek.log 2>&1"
-30 05 * * * su pi -c "/usr/bin/python3 /home/pi/UKRAA_muons/scripts/ProcessDataMonthACM0.py >> /home/pi/UKRAA_muons/logfiles/cron-DataMonth.log 2>&1"
+30 00 * * * su pi -c "/usr/bin/python3 /home/pi/UKRAA_PicoMuon/scripts/ProcessDataCpmACM0.py   >> /home/pi/UKRAA_PicoMuon/logfiles/cron-PicoMuonACM0.log 2>&1"
+30 02 * * * su pi -c "/usr/bin/python3 /home/pi/UKRAA_PicoMuon/scripts/ProcessDataDayACM0.py   >> /home/pi/UKRAA_PicoMuon/logfiles/cron-PicoMuonACM0.log 2>&1"
+30 04 * * * su pi -c "/usr/bin/python3 /home/pi/UKRAA_PicoMuon/scripts/ProcessDataWeekACM0.py  >> /home/pi/UKRAA_PicoMuon/logfiles/cron-PicoMuonACM0.log 2>&1"
+30 05 * * * su pi -c "/usr/bin/python3 /home/pi/UKRAA_PicoMuon/scripts/ProcessDataMonthACM0.py >> /home/pi/UKRAA_PicoMuon/logfiles/cron-PicoMuonACM0.log 2>&1"
 
 # cron entry to process yesterdays raw muon adc values
-45 00 * * * su pi -c "/usr/bin/python3 /home/pi/UKRAA_muons/scripts/ProcessDataAdcACM0.py   >> /home/pi/UKRAA_muons/logfiles/cron-DataAdc.log 2>&1"
+45 00 * * * su pi -c "/usr/bin/python3 /home/pi/UKRAA_PicoMuon/scripts/ProcessDataAdcACM0.py   >> /home/pi/UKRAA_PicoMuon/logfiles/cron-PicoMuonACM0.log 2>&1"
 
 # cron entry to plot yesterdays counts per minute
-50 07 * * * su pi -c "/usr/bin/gnuplot /home/pi/UKRAA_muons/scripts/PlotDataCpmACM0.gp      >> /home/pi/UKRAA_muons/logfiles/cron-PlotCpm.log 2>&1"
+50 07 * * * su pi -c "/usr/bin/gnuplot /home/pi/UKRAA_PicoMuon/scripts/PlotDataCpmACM0.gp      >> /home/pi/UKRAA_PicoMuon/logfiles/cron-PicoMuonACM0.log 2>&1"
 
 # cron entry to plot yesterdays counts per minute frequency
-51 07 * * * su pi -c "/usr/bin/gnuplot /home/pi/UKRAA_muons/scripts/PlotDataFreqACM0.gp     >> /home/pi/UKRAA_muons/logfiles/cron-PlotFreq.log 2>&1"
+51 07 * * * su pi -c "/usr/bin/gnuplot /home/pi/UKRAA_PicoMuon/scripts/PlotDataFreqACM0.gp     >> /home/pi/UKRAA_PicoMuon/logfiles/cron-PicoMuonACM0.log 2>&1"
 
 # cron entry to plot yesterdays adc frequency
-52 07 * * * su pi -c "/usr/bin/gnuplot /home/pi/UKRAA_muons/scripts/PlotDataAdcACM0.gp      >> /home/pi/UKRAA_muons/logfiles/cron-PlotAdc.log 2>&1"
+52 07 * * * su pi -c "/usr/bin/gnuplot /home/pi/UKRAA_PicoMuon/scripts/PlotDataAdcACM0.gp      >> /home/pi/UKRAA_PicoMuon/logfiles/cron-PicoMuonACM0.log 2>&1"
 
 # cron entry to plot yesterdays % muons & % neutron deviation
-53 07 * * * su pi -c "/usr/bin/gnuplot /home/pi/UKRAA_muons/scripts/PlotDataDayACM0.gp      >> /home/pi/UKRAA_muons/logfiles/cron-PlotDay.log 2>&1"
+53 07 * * * su pi -c "/usr/bin/gnuplot /home/pi/UKRAA_PicoMuon/scripts/PlotDataDayACM0.gp      >> /home/pi/UKRAA_PicoMuon/logfiles/cron-PicoMuonACM0.log 2>&1"
 
 # cron entry to plot last weeks % muons & % neutron deviation
-54 07 * * * su pi -c "/usr/bin/gnuplot /home/pi/UKRAA_muons/scripts/PlotDataWeekACM0.gp     >> /home/pi/UKRAA_muons/logfiles/cron-PlotWeek.log 2>&1">
+54 07 * * * su pi -c "/usr/bin/gnuplot /home/pi/UKRAA_PicoMuon/scripts/PlotDataWeekACM0.gp     >> /home/pi/UKRAA_PicoMuon/logfiles/cron-PicoMuonACM0.log 2>&1">
 
 # cron entry to plot last months % muons & % neutron deviation
-55 07 * * * su pi -c "/usr/bin/gnuplot /home/pi/UKRAA_muons/scripts/PlotDataMonthACM0.gp    >> /home/pi/UKRAA_muons/logfiles/cron-PlotMonth.log 2>&1"
+55 07 * * * su pi -c "/usr/bin/gnuplot /home/pi/UKRAA_PicoMuon/scripts/PlotDataMonthACM0.gp    >> /home/pi/UKRAA_PicoMuon/logfiles/cron-PicoMuonACM0.log 2>&1"
 ```
 
 ![img_51](images/RPi_imager_51.PNG)
@@ -838,7 +838,7 @@ Once you have completed building your RPi web server, we need to move some files
 
 2. Type the following command and press enter - this will take you to the files in the WWW folder.  
 ```
-cd ~/UKRAA_muons/WWW/
+cd ~/UKRAA_PicoMuon/WWW/
 ```
 
 ![img_52](images/RPi_imager_52.PNG)
@@ -854,7 +854,7 @@ ls -l
 
 &nbsp;
 
-4. We now need to copy the files and folders from **~/UKRAA_muons/WWW** to **/var/www/html**.
+4. We now need to copy the files and folders from **~/UKRAA_PicoMuon/WWW** to **/var/www/html**.
 
 &nbsp;
 
@@ -921,7 +921,7 @@ sudo crontab -e
 
 ```
 # cron entry to upload plot files to www
-00 08 * * * cp -r /home/pi/UKRAA_muons/temp /var/www/html/
+00 08 * * * cp -r /home/pi/UKRAA_PicoMuon/temp /var/www/html/
 ```
 ![img_60](images/RPi_imager_60.PNG)
 
