@@ -9,7 +9,7 @@
 
 Set of Python code to run on a RPi4/5 to get, process and present data from the UKRAA PicoMuon detector
 
-I have written this software to suit my set-up, feel free to use as you see fit.
+This software was written to suit a specific set-up, feel free to use as you see fit.
 
 ## Table of Contents
 
@@ -78,18 +78,7 @@ The software needed to run will depend on what you intend.  You will need the fo
 ### logfiles
 ```
 └── 📁logfiles
-    └── cron-DataAdc.log
-    └── cron-DataCpm.log
-    └── cron-DataDay.log
-    └── cron-DataMonth.log
-    └── cron-DataNeutrons.log
-    └── cron-DataWeek.log
-    └── cron-PlotAdc.log
-    └── cron-PlotCpm.log
-    └── cron-PlotDay.log
-    └── cron-PlotFreq.log
-    └── cron-PlotMonth.log
-    └── cron-DataWeek.log
+    └── cron-PicoMuonACM0.log
 ```
 
 ### data

@@ -1,0 +1,26 @@
+Started getting neutron data, for 2025-01-25 on 2025-01-26 at 00:10:02
+Completed getting neutron data for 2025-01-25 on 2025-01-26 at 00:10:05
+Started processing ACM0 muon adc data for 2025-01-25 on 2025-01-26 at 00:45:01
+Completed processing ACM0 muon adc data for  2025-01-25 on 2025-01-26 at 01:44:17
+Started processing ACM0 day data, for  2025-01-25 on 2025-01-26 at 02:30:01
+Completed processing ACM0 day data for  2025-01-25 on 2025-01-26 at 03:41:16
+Started processing ACM0 week data, from  2025-01-19 to 2025-01-25 on 2025-01-26 at 04:30:01
+Completed processing ACM0 week data, from  2025-01-19 to 2025-01-25 on 2025-01-26 at 04:31:13
+Started processing ACM0 month data, from  2024-12-26 to 2025-01-25 on 2025-01-26 at 05:30:01
+Traceback (most recent call last):
+  File "/home/pi/UKRAA_muons/scripts/ProcessDataMonthACM0.py", line 92, in <module>
+    with open(f,'rb') as fd:
+         ^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/home/pi/UKRAA_muons/data/processed/day/ACM0/2024/2024-12/2024-12-26.txt'
+Started processing ACM0 muon cpm data for  2025-01-25 on 2025-01-26 at 00:30:01
+Completed processing ACM0 muon cpm data for  2025-01-25 on 2025-01-26 at 06:34:49
+Completed CPM plot for 2025-01-25 at 07:50:02 on Sunday 26 January 2025
+Completed frequency plot for 2025-01-25 at 07:51:02 on Sunday 26 January 2025
+Completed ADC plot for 2025-01-25 at 07:52:01 on Sunday 26 January 2025
+Completed day plot for 2025-01-25 at 07:53:02 on Sunday 26 January 2025
+Completed week plot for 2025-01-25 at 07:54:01 on Sunday 26 January 2025
+"/home/pi/UKRAA_muons/scripts/PlotDataMonthACM0.gp" line 39: warning: Cannot find or open file "/home/pi/UKRAA_muons/data/processed/month/ACM0/2025/2025-01/2025-01-25.txt"
+"/home/pi/UKRAA_muons/scripts/PlotDataMonthACM0.gp" line 39: warning: Can't read data file
+"/home/pi/UKRAA_muons/scripts/PlotDataMonthACM0.gp" line 40: warning: Cannot find or open file "/home/pi/UKRAA_muons/data/processed/month/ACM0/2025/2025-01/2025-01-25.txt"
+"/home/pi/UKRAA_muons/scripts/PlotDataMonthACM0.gp" line 40: warning: Can't read data file
+"/home/pi/UKRAA_muons/scripts/PlotDataMonthACM0.gp" line 105: undefined variable: MUON_min
