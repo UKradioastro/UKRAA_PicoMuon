@@ -671,7 +671,7 @@ sudo systemctl start PicoMuonACM0.service
 
 10. We expect to see...
 
-![img_47a](images/RPi_imager_49.PNG)
+![img_49a](images/RPi_imager_49a.PNG)
 
 &nbsp;
 
