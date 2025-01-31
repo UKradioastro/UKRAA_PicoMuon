@@ -662,33 +662,67 @@ sudo systemctl enable PicoMuonACM0.service
 
 &nbsp;
 
-9. To check **status** of your service, type the following command and press enter
-```
-sudo systemctl status PicoMuonACM0.service
-```
-
-&nbsp;
-
-10. We expect to see...
-
-![img_49](images/RPi_imager_49.PNG)
-
-&nbsp;
-
-11. If we dont see green **enabled** and **active**, then we have a typo in the **PicoMuonACM0.service** file.
-
-&nbsp;
-
-12. To **start** your service, type the following command and press enter.
+9. We need to **start** the service, type the following command and press enter
 ```
 sudo systemctl start PicoMuonACM0.service
 ```
 
 &nbsp;
 
-13. To **stop** your service, type the following command and press enter.
+10. We expect to see...
+
+![img_47a](images/RPi_imager_49.PNG)
+
+&nbsp;
+
+11. To check **status** of your service, type the following command and press enter
+```
+sudo systemctl status PicoMuonACM0.service
+```
+
+&nbsp;
+
+12. We expect to see...
+
+![img_49](images/RPi_imager_49.PNG)
+
+&nbsp;
+
+13. If we dont see green **enabled** and **active**, then we have a typo in the **PicoMuonACM0.service** file.
+
+&nbsp;
+
+14. To **start** your service, type the following command and press enter.
+```
+sudo systemctl start PicoMuonACM0.service
+```
+
+&nbsp;
+
+15. To **stop** your service, type the following command and press enter.
 ```
 sudo systemctl stop PicoMuonACM0.service
+```
+
+&nbsp;
+
+16. To check the **status** of your service, type the following command and press enter.
+```
+sudo systemctl status PicoMuonACM0.service
+```
+
+&nbsp;
+
+17. To **enable** your service, type the following command and press enter.
+```
+sudo systemctl enable PicoMuonACM0.service
+```
+
+&nbsp;
+
+18. To **disable** your service, type the following command and press enter.
+```
+sudo systemctl disable PicoMuonACM0.service
 ```
 
 &nbsp;
