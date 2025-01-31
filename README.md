@@ -197,13 +197,13 @@ The software needed to run will depend on what you intend.  You will need the fo
 <!-- =============================================================================== --> 
 ## Using the code
 
-The code assumes that you the UKRAA PicoMuon detector is connected to the RPi4/5 via USB and that it is /dev/ttyACM0 - you can check this by using **ls /dev/tty*** in a terminal window on the RPi4/5 and reviewing the response.
+The code assumes that you the UKRAA PicoMuon detector is connected to the RPi4/5 via supplied USB cable and that it is /dev/ttyACM0 - you can check this by using **ls /dev/tty*** in a terminal window on the RPi4/5 and reviewing the response.
 
-The code assumes user is **pi**, if **pi** is not the user then need to change '/home/pi' to '/home/user' in the python and gnuplot scripts to whatever your username is.
+The code assumes username is **pi**.  If **pi** is not the username, then you will need to change all occurances of '/home/pi' to '/home/*username*' in the python and gnuplot scripts, where *username* is the username you have selected for your RPi4/5.
 
-The code assumes one detector connected to RPi USB and will be **/dev/ttyACM0**, if there are other devices connected to the RPi and your detector is not **/dev/ttyACM0** then need to change **/dev/ttyACM0** to **/dev/ttyACMx** in the **GetDataRawACM0.py** python script.
+The code assumes one detector connected to the RPi4/5 USB and will be **/dev/ttyACM0**, if there are other devices connected to the RPi and your detector is not **/dev/ttyACM0**, then you will need to change **/dev/ttyACM0** to **/dev/*ttyACMx*** in the **GetDataRawACM0.py** python script, where *ttyACMx* is the tty address of you connected detector.
 
-**GetDataRawACM0.py** is run as a service
+**GetDataRawACM0.py** is run as a service.
 
 Other scripts (Python and gnuplot) are run from **cron**
 
