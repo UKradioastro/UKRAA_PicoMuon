@@ -49,12 +49,9 @@ StartXaxis = system("date -d '-1 day' +'%Y-%m-%d'")." 00:00:00"
 EndXaxis = system("date +'%Y-%m-%d'")." 00:00:00"
 
 # setting output path to include data stamp
-# Path to directory to store file
-# day data
 pathPlot3 = "/home/pi/UKRAA_PicoMuon/plots/day/ACM0/".date."_day_plot.png"
 
 # Title for graph
-# muons detected
 GraphTitle3 = "% change of muon and neutron count rate from mean count rate for ".system("date -d yesterday +'%A %d %B %Y'")."\n Graph is updated every day at 9.30am \n"
 
 # Set data types
@@ -119,7 +116,6 @@ set label 2 at graph 0.02, 0.90 tc default
 
 
 # Plot command 
-# for 1 day
 GraphTitle = GraphTitle3
 set key title GraphTitle
 set output pathPlot3
@@ -128,8 +124,6 @@ plot FileData using 1:(((($4/MUON_mean)*100)-100)) linetype 1 linewidth 1 lineco
 
 # Replot to terminal and create .png image with data tag for future upload to web page
 set terminal pngcairo enhanced font "DejaVuSansCondensed, 10" rounded size 640,540 
-
-# setting output path to include data stamp
 
 # Path to directory to store file
 pathPlot = "/home/pi/UKRAA_PicoMuon/temp/ACM0_day_plot"

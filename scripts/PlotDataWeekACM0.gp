@@ -49,7 +49,6 @@ StartXaxis = system("date -d 'last week' +'%Y-%m-%d'")." 00:00:00"
 EndXaxis = system("date +'%Y-%m-%d'")." 00:00:00"
 
 # setting output path to include data stamp
-# Path to directory to store file
 # week data
 pathPlot3 = "/home/pi/UKRAA_PicoMuon/plots/week/ACM0/".date."_week_plot.png"
 
@@ -126,8 +125,6 @@ plot FileData using 1:(((($4/MUON_mean)*100)-100)) linetype 1 linewidth 1 lineco
 
 # Replot to terminal and create .png image with data tag for future upload to web page
 set terminal pngcairo enhanced font "DejaVuSansCondensed, 10" rounded size 640,540 
-
-# setting output path to include data stamp
 
 # Path to directory to store file
 pathPlot = "/home/pi/UKRAA_PicoMuon/temp/ACM0_week_plot"

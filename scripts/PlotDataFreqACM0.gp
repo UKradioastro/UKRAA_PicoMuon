@@ -14,15 +14,11 @@
 # Reset gnuplot variables
 reset
 
-# Clear gnuplot terminal
-#clear
-
 # Set terminal 
 set terminal pngcairo enhanced font "DejaVuSansCondensed, 10" rounded size 640,540 
 
 # Set up data paths
 pathData = "/home/pi/UKRAA_PicoMuon/data/processed/cpm/ACM0"
-#pathEnvironment = "/home/pi/muons/data/environment"
 
 # Year folder
 YearFolder = "/".system("date -d yesterday +'%Y'")
@@ -40,7 +36,6 @@ date = system("date -d yesterday +'%Y-%m-%d'")
 FileData = pathData.YearFolder.YearMonthFolder.YmdFile
 
 # setting output path to include data stamp
-# Path to directory to store file
 # top detector
 pathPlot1 = "/home/pi/UKRAA_PicoMuon/plots/freq/ACM0/".date."_Freq_T_plot.png"
 # bottom detector
@@ -72,7 +67,6 @@ set grid layerdefault linetype 0 linecolor 0 linewidth 0.500 dashtype solid,  li
 # Set Legend (Key) above plot
 set key outside above center
 set key samplen 10
-#set key title GraphTitle
 set key nobox
 
 # X-axis tics
@@ -122,8 +116,6 @@ plot FileData using (rounded($2)):(1) smooth frequency with boxes linecolor "#00
 # Replot to terminal and create .png image with data tag for future upload to web page
 set terminal pngcairo enhanced font "DejaVuSansCondensed, 10" rounded size 640,540 
 
-# setting output path to include data stamp
-
 # Path to directory to store file
 pathPlot = "/home/pi/UKRAA_PicoMuon/temp/ACM0_T-Freq"
 
@@ -143,8 +135,6 @@ plot FileData using (rounded($3)):(1) smooth frequency with boxes linecolor "#FF
 # Replot to terminal and create .png image with data tag for future upload to web page
 set terminal pngcairo enhanced font "DejaVuSansCondensed, 10" rounded size 640,540 
 
-# setting output path to include data stamp
-
 # Path to directory to store file
 pathPlot = "/home/pi/UKRAA_PicoMuon/temp/ACM0_B-Freq"
 
@@ -163,8 +153,6 @@ plot FileData using (rounded($4)):(1) smooth frequency with boxes linecolor "#00
 
 # Replot to terminal and create .png image with data tag for future upload to web page
 set terminal pngcairo enhanced font "DejaVuSansCondensed, 10" rounded size 640,540 
-
-# setting output path to include data stamp
 
 # Path to directory to store file
 pathPlot = "/home/pi/UKRAA_PicoMuon/temp/ACM0_C-Freq"

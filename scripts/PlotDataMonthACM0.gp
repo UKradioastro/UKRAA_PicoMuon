@@ -48,13 +48,11 @@ StartXaxis = system("date -d 'last month' +'%Y-%m-%d'")." 00:00:00"
 # End of X axis time
 EndXaxis = system("date +'%Y-%m-%d'")." 00:00:00"
 
-# setting output path to include data stamp
 # Path to directory to store file
 # week data
 pathPlot3 = "/home/pi/UKRAA_PicoMuon/plots/month/ACM0/".date."_week_plot.png"
 
 # Title for graph
-# muons detected
 GraphTitle3 = "% change of muon and neutron count rate from mean count rate for the last month.\n Graph is updated every day at 9.30am \n"
 
 # Set data types
@@ -126,8 +124,6 @@ plot FileData using 1:(((($4/MUON_mean)*100)-100)) linetype 1 linewidth 1 lineco
 
 # Replot to terminal and create .png image with data tag for future upload to web page
 set terminal pngcairo enhanced font "DejaVuSansCondensed, 10" rounded size 640,540 
-
-# setting output path to include data stamp
 
 # Path to directory to store file
 pathPlot = "/home/pi/UKRAA_PicoMuon/temp/ACM0_month_plot"

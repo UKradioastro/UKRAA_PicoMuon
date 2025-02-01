@@ -14,15 +14,11 @@
 # Reset gnuplot variables
 reset
 
-# Clear gnuplot terminal
-#clear
-
 # Set terminal 
 set terminal pngcairo enhanced font "DejaVuSansCondensed, 10" rounded size 640,540 
 
 # Set up data paths
 pathData = "/home/pi/UKRAA_PicoMuon/data/processed/adc/ACM0"
-#pathEnvironment = "/home/pi/muons/data/environment"
 
 # Year folder
 YearFolder = "/".system("date -d yesterday +'%Y'")
@@ -40,7 +36,6 @@ date = system("date -d yesterday +'%Y-%m-%d'")
 FileData = pathData.YearFolder.YearMonthFolder.YmdFile
 
 # setting output path to include data stamp
-# Path to directory to store file
 # top detector
 pathPlot1 = "/home/pi/UKRAA_muons/plots/adc/ACM0/".date."_ADC_T_plot.png"
 # bottom detector
@@ -71,7 +66,6 @@ set grid layerdefault linetype 0 linecolor 0 linewidth 0.500 dashtype solid,  li
 # Set Legend (Key) above plot
 set key outside above center
 set key samplen 10
-#set key title GraphTitle
 set key nobox
 
 # X-axis tics
@@ -105,8 +99,6 @@ plot FileData using 1:2 linetype 1 linewidth 1 linecolor rgb "#0000FF" title "Fr
 # Replot to terminal and create .png image with data tag for future upload to web page
 set terminal pngcairo enhanced font "DejaVuSansCondensed, 10" rounded size 640,540 
 
-# setting output path to include data stamp
-
 # Path to directory to store file
 pathPlot = "/home/pi/UKRAA_muons/temp/ACM0_T-Adc"
 
@@ -126,8 +118,6 @@ plot FileData using 1:3 linetype 1 linewidth 1 linecolor rgb "#FF0000" title "Fr
 # Replot to terminal and create .png image with data tag for future upload to web page
 set terminal pngcairo enhanced font "DejaVuSansCondensed, 10" rounded size 640,540 
 
-# setting output path to include data stamp
-
 # Path to directory to store file
 pathPlot = "/home/pi/UKRAA_muons/temp/ACM0_B-Adc"
 
@@ -146,8 +136,6 @@ plot FileData using 1:4 linetype 1 linewidth 1 linecolor rgb "#00FF00" title "Fr
 
 # Replot to terminal and create .png image with data tag for future upload to web page
 set terminal pngcairo enhanced font "DejaVuSansCondensed, 10" rounded size 640,540 
-
-# setting output path to include data stamp
 
 # Path to directory to store file
 pathPlot = "/home/pi/UKRAA_muons/temp/ACM0_C-Adc"
