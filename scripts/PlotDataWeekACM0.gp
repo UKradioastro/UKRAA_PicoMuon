@@ -61,7 +61,7 @@ GraphTitle3 = "% change of muon and neutron count rate from mean count rate for 
 set xdata time
 
 # Set format types
-set format x "%d/%m" timedate
+set format x "%a %d" timedate
 set format y "%.1f" 
 set format y2 "%.1f" 
 set timefmt "%Y-%m-%d %H:%M:%S"
@@ -95,7 +95,7 @@ set y2tics norangelimit autofreq
 set y2tics textcolor rgb "black"
 
 # X-axis label and ranges
-set xlabel "Date (%d/%m UTC)" 
+set xlabel "Date (%a %d UTC)" 
 set xlabel textcolor rgb "black" norotate
 set xrange [ StartXaxis : EndXaxis ] noreverse nowriteback
 
