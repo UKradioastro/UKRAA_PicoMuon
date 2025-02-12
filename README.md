@@ -197,7 +197,7 @@ The software needed to run will depend on what you intend.  You will need the fo
 <!-- =============================================================================== --> 
 ## Using the code
 
-The code assumes that you the UKRAA PicoMuon detector is connected to the RPi4/5 via supplied USB cable and that it is /dev/ttyACM0 - you can check this by using **ls /dev/tty*** in a terminal window on the RPi4/5 and reviewing the response.
+The code assumes that your UKRAA PicoMuon detector is connected to the RPi4/5 via supplied USB cable and that it is /dev/ttyACM0 - you can check this by using **ls /dev/tty*** in a terminal window on the RPi4/5 and reviewing the response.
 
 The code assumes username is **pi**.  If **pi** is not the username, then you will need to change all occurances of '/home/pi' to '/home/*username*' in the python and gnuplot scripts, where *username* is the username you have selected for your RPi4/5.
 
@@ -313,7 +313,7 @@ Other scripts (Python and gnuplot) are run from **cron**
 
 &nbsp;
 
-15. and then verified, this take a bit of time...
+15. and then verified, this takes a bit of time...
 
 ![img_13](images/RPi_imager_13.PNG)
 
