@@ -56,7 +56,7 @@ ls /dev/tty*
 
 &nbsp;
 
-5. As long as we see **/dev/ttyACM0** then we do not have to make any changes to the python scripts, because they are looking for **ACM0**.
+5. As long as you see **/dev/ttyACM0** then you do not have to make any changes to the python scripts, because they are looking for **ACM0**.
 
 &nbsp;
 
@@ -72,15 +72,16 @@ chmod +x *.sh
 sudo bash install.sh
 ```
 
+That's it!
 ---
 
 &nbsp;
 <!-- =============================================================================== --> 
 ## What does the code do?
 
-This code receives the event data from the UKRAA PicoMuon detector via serial over the supplied USB cable and stores it to the raw data folder:
+The code receives the event data from the UKRAA PicoMuon detector via serial over the supplied USB cable and stores the event data to the raw data folder:
 
-The raw data will be processed to get counts per minute, the frequency of the counts per minute and the frequency of the adc values for the previous day.
+The raw data will be processed overnight, via CRON, to get counts per minute, the frequency of the counts per minute and the frequency of the adc values for your previous day's data.
 
 Three plots will be created:
 * counts per minute
