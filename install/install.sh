@@ -84,7 +84,3 @@ echo "webpage update crontab entry installed"
 
 
 echo "Completed installing UKRAA PicoMuon software."
-
-
-echo "Checking PicoMuonACM0.service running"
-sudo systemctl status PicoMuonACM0.service
