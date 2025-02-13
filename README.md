@@ -66,9 +66,12 @@ ls /dev/tty*
 <!-- =============================================================================== --> 
 ## Install the software onto your RPi
 
+1. Open a terminal window and type the following command and press enter
 ```
 git clone https://github.com/UKradioastro/UKRAA_PicoMuon
 ```
+
+![img_01](images/RPi_imager_01.PNG)
 
 This will download all of the code to the directory **UKRAA_PicoMuon** inside **/home/pi**
 
