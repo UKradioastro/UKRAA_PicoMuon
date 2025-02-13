@@ -1,0 +1,30 @@
+
+# cron entry to get neutron data from NMDC NEST
+10 00 * * * su pi -c "/usr/bin/python3 /home/pi/UKRAA_PicoMuon/scripts/GetDataNeutron.py       >> /home/pi/UKRAA_PicoMuon/logfiles/cron-PicoMuonACM0.log 2>&1"
+
+# cron entry to process yesterdays raw muon counts per minute
+30 00 * * * su pi -c "/usr/bin/python3 /home/pi/UKRAA_PicoMuon/scripts/ProcessDataCpmACM0.py   >> /home/pi/UKRAA_PicoMuon/logfiles/cron-PicoMuonACM0.log 2>&1"
+30 02 * * * su pi -c "/usr/bin/python3 /home/pi/UKRAA_PicoMuon/scripts/ProcessDataDayACM0.py   >> /home/pi/UKRAA_PicoMuon/logfiles/cron-PicoMuonACM0.log 2>&1"
+30 04 * * * su pi -c "/usr/bin/python3 /home/pi/UKRAA_PicoMuon/scripts/ProcessDataWeekACM0.py  >> /home/pi/UKRAA_PicoMuon/logfiles/cron-PicoMuonACM0.log 2>&1"
+30 05 * * * su pi -c "/usr/bin/python3 /home/pi/UKRAA_PicoMuon/scripts/ProcessDataMonthACM0.py >> /home/pi/UKRAA_PicoMuon/logfiles/cron-PicoMuonACM0.log 2>&1"
+
+# cron entry to process yesterdays raw muon adc values
+45 00 * * * su pi -c "/usr/bin/python3 /home/pi/UKRAA_PicoMuon/scripts/ProcessDataAdcACM0.py   >> /home/pi/UKRAA_PicoMuon/logfiles/cron-PicoMuonACM0.log 2>&1"
+
+# cron entry to plot yesterdays counts per minute
+50 07 * * * su pi -c "/usr/bin/gnuplot /home/pi/UKRAA_PicoMuon/scripts/PlotDataCpmACM0.gp      >> /home/pi/UKRAA_PicoMuon/logfiles/cron-PicoMuonACM0.log 2>&1"
+
+# cron entry to plot yesterdays counts per minute frequency
+51 07 * * * su pi -c "/usr/bin/gnuplot /home/pi/UKRAA_PicoMuon/scripts/PlotDataFreqACM0.gp     >> /home/pi/UKRAA_PicoMuon/logfiles/cron-PicoMuonACM0.log 2>&1"
+
+# cron entry to plot yesterdays adc frequency
+52 07 * * * su pi -c "/usr/bin/gnuplot /home/pi/UKRAA_PicoMuon/scripts/PlotDataAdcACM0.gp      >> /home/pi/UKRAA_PicoMuon/logfiles/cron-PicoMuonACM0.log 2>&1"
+
+# cron entry to plot yesterdays % muons & % neutron deviation
+53 07 * * * su pi -c "/usr/bin/gnuplot /home/pi/UKRAA_PicoMuon/scripts/PlotDataDayACM0.gp      >> /home/pi/UKRAA_PicoMuon/logfiles/cron-PicoMuonACM0.log 2>&1"
+
+# cron entry to plot last weeks % muons & % neutron deviation
+54 07 * * * su pi -c "/usr/bin/gnuplot /home/pi/UKRAA_PicoMuon/scripts/PlotDataWeekACM0.gp     >> /home/pi/UKRAA_PicoMuon/logfiles/cron-PicoMuonACM0.log 2>&1">
+
+# cron entry to plot last months % muons & % neutron deviation
+55 07 * * * su pi -c "/usr/bin/gnuplot /home/pi/UKRAA_PicoMuon/scripts/PlotDataMonthACM0.gp    >> /home/pi/UKRAA_PicoMuon/logfiles/cron-PicoMuonACM0.log 2>&1"
