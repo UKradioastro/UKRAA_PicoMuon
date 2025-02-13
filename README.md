@@ -97,11 +97,40 @@ Other scripts (Python and gnuplot) are run from **cron**
 <!-- =============================================================================== --> 
 ## Install the software onto your RPi
 
+
+1. Open a terminal window and type the following command and press enter
 ```
 cd ~/UKRAA_PicoMuon/install
+```
+
+![img_02](images/RPi_imager_02.PNG)
+
+This will take you to the **install** directory inside **/home/pi/UKRAA_PicoMuon**
+
+
+2. Type the following command and press enter
+```
 chmod +x *.sh
+```
+
+![img_03](images/RPi_imager_03.PNG)
+
+This will make the **install.sh** script executable.
+
+
+3. Type the following command and press enter
+```
 sudo bash install.sh
 ```
+
+![img_04](images/RPi_imager_04.PNG)
+
+This will run the install script.
+
+There will be occasions during the running of the install script that require you to make a keyboard entry.
+
+When asked **Do you want to continue? [Y/n]** - enter **Y** or **y** 
+
 
 That's it!
 
