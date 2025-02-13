@@ -17,21 +17,21 @@ echo "gnuplot software installed"
 
 
 echo "Creating directory structure..."
-mkdir -vp data/neutrons
-mkdir -vp data/processed/adc/ACM0
-mkdir -vp data/processed/cpm/ACM0
-mkdir -vp data/processed/day/ACM0
-mkdir -vp data/processed/month/ACM0
-mkdir -vp data/processed/week/ACM0
-mkdir -vp data/processed/month/ACM0
-mkdir -v logfiles
-mkdir -vp plots/adc/ACM0
-mkdir -vp plots/cpm/ACM0
-mkdir -vp plots/day/ACM0
-mkdir -vp plots/freq/ACM0
-mkdir -vp plots/month/ACM0
-mkdir -vp plots/week/ACM0
-mkdir -v temp
+mkdir -vp /home/pi/UKRAA_PicoMuon/data/neutrons
+mkdir -vp /home/pi/UKRAA_PicoMuon/data/processed/adc/ACM0
+mkdir -vp /home/pi/UKRAA_PicoMuon/data/processed/cpm/ACM0
+mkdir -vp /home/pi/UKRAA_PicoMuon/data/processed/day/ACM0
+mkdir -vp /home/pi/UKRAA_PicoMuon/data/processed/month/ACM0
+mkdir -vp /home/pi/UKRAA_PicoMuon/data/processed/week/ACM0
+mkdir -vp /home/pi/UKRAA_PicoMuon/data/raw/ACM0
+mkdir -v  /home/pi/UKRAA_PicoMuon/logfiles
+mkdir -vp /home/pi/UKRAA_PicoMuon/plots/adc/ACM0
+mkdir -vp /home/pi/UKRAA_PicoMuon/plots/cpm/ACM0
+mkdir -vp /home/pi/UKRAA_PicoMuon/plots/day/ACM0
+mkdir -vp /home/pi/UKRAA_PicoMuon/plots/freq/ACM0
+mkdir -vp /home/pi/UKRAA_PicoMuon/plots/month/ACM0
+mkdir -vp /home/pi/UKRAA_PicoMuon/plots/week/ACM0
+mkdir -v  /home/pi/UKRAA_PicoMuon/temp
 echo "Directory structure created"
 
 
