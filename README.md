@@ -31,7 +31,7 @@ Other scripts (Python and gnuplot) are run from **cron**
 
 &nbsp;
 <!-- =============================================================================== --> 
-### Where is my detector?.
+### Where is my detector?
 
 Plug your detector into any of the RPi USB ports - I normally use the blue ports (USB3).
 
@@ -63,7 +63,7 @@ ls /dev/tty*
 ---
 &nbsp;
 <!-- =============================================================================== --> 
-## Install software on RPi
+## Install the software onto your RPi
 
 ```
 git clone https://github.com/UKradioastro/UKRAA_PicoMuon
@@ -78,41 +78,20 @@ sudo bash install.sh
 <!-- =============================================================================== --> 
 ## What does the code do?
 
-### GetDataRawACM0.py ###
+This code receives the event data from the UKRAA PicoMuon detector via serial over the supplied USB cable and stores it to the raw data folder:
 
-This code receives the event data from the UKRAA PicoMuon detector via the supplied USB cable and stores it to the raw data folder:
-
-```
-└── 📁data
-    └── 📁raw
-        └── 📁ACM0
-            └── 📁2025
-                └── 📁2025-01
-                    └── 2025-01-16.txt
-```
-
-The data will be processed to get counts per minute and the frequency of the adc values for the previous day.
+The raw data will be processed to get counts per minute, the frequency of the counts per minute and the frequency of the adc values for the previous day.
 
 Three plots will be created:
 * counts per minute
 * frequency of counts per minute
 * frequency of ADC values recorded
 
-A request will be made to [NMDB](https://www.nmdb.eu/) via NEST to get the previous days recorded neutron count, this data will be overlayed onto the counts per minute graphs.
+A request will be made to [NMDB](https://www.nmdb.eu/) via NEST to get the previous days recorded neutron count, this data will be overlayed onto the day / week / month % deviation counts per minute graphs.
 
+These will appear as the required amount of data is recorded by the detector
 
-This can be done after midnight automatically using **CRON** because the processing of the cpm takes about 6 hours and the processing of the adc values takes about 1 hour on a RPi4.  It takes less time to run these two processes on a RPi5.
-
-
----
-
-&nbsp;
-<!-- =============================================================================== --> 
-### Creating simple home intranet web server on your RPi.
-
-We can create a simple web server on our RPi so that we can view our detector's results on our smart phone when connected to our home network.
-
-To set up the web server on the RPi, follow the instruction from [**tom's HARDWARE**](https://www.tomshardware.com/news/raspberry-pi-web-server,40174.html).  Only need to do first section - upto **9. Build your website**.
+A simple web server and web page is set up on your RPi so that you can view your detector's results on your smart phone when connected to your home network.
 
 ---
 
