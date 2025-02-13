@@ -131,6 +131,15 @@ There will be occasions during the running of the install script that require yo
 
 When asked **Do you want to continue? [Y/n]** - enter **Y** or **y** 
 
+During **mysql_secure_installation** you will be asked a number of questions.  
+
+* Enter current password for root (enter for none): **enter**
+* Switch to unix_socket authentication [Y/n] **n**
+* Change the root password? [Y/n] **n**
+* Remove anonymous users? [Y/n] **y**
+* Disallow root login remotely? [Y/n] **y**
+* Remove test database and access to it? [Y/n] **y**
+* Reload privilege tables now? [Y/n] **y**
 
 That's it!
 
@@ -156,6 +165,47 @@ A request will be made to [NMDB](https://www.nmdb.eu/) via NEST to get the previ
 These will appear as the required amount of data is recorded by the detector
 
 A simple web server and web page is set up on your RPi so that you can view your detector's results on your smart phone when connected to your home network.
+
+---
+
+&nbsp;
+<!-- =============================================================================== --> 
+## Check GetDataRawACM0.py is running
+
+1. To check the **status** of your service, type the following command and press enter.
+```
+sudo systemctl status PicoMuonACM0.service
+```
+
+&nbsp;
+
+2. To **start** your service, type the following command and press enter.
+```
+sudo systemctl start PicoMuonACM0.service
+```
+
+&nbsp;
+
+3. To **stop** your service, type the following command and press enter.
+```
+sudo systemctl stop PicoMuonACM0.service
+```
+
+&nbsp;
+
+4. To **enable** your service, type the following command and press enter.
+```
+sudo systemctl enable PicoMuonACM0.service
+```
+
+&nbsp;
+
+5. To **disable** your service, type the following command and press enter.
+```
+sudo systemctl disable PicoMuonACM0.service
+```
+
+&nbsp;
 
 ---
 
