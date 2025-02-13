@@ -83,4 +83,10 @@ sudo crontab -l -u root | cat - /home/pi/UKRAA_PicoMuon/install/crontab-webpage-
 echo "webpage update crontab entry installed"
 
 
+echo "Final cleanup..."
+rm -rfv /home/pi/UKRAA_PicoMuon/images
+rm -v /home/pi/UKRAA_PicoMuon/README.md
+echo "Finished final cleanup"
+
+
 echo "Completed installing UKRAA PicoMuon software."
