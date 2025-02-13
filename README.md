@@ -11,6 +11,8 @@ Set of Python code to run on a RPi4/5 to get, process and present data from the 
 
 This software was written to suit a specific set-up, feel free to use as you see fit.
 
+
+Instruction for setting up a Raspberry Pi4/5 are included in the **docs** folder
 ---
 
 &nbsp;
@@ -66,7 +68,11 @@ ls /dev/tty*
 <!-- =============================================================================== --> 
 ## Install the software onto your RPi
 
-1. Open a terminal window and type the following command and press enter
+1. Log into your Raspberry Pi4/5 using VNC.
+
+&nbsp;
+
+2. Open a terminal window, type the following command and press enter
 ```
 git clone https://github.com/UKradioastro/UKRAA_PicoMuon
 ```
