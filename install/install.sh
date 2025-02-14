@@ -23,6 +23,7 @@ sudo -u  pi mkdir -vp /home/pi/UKRAA_PicoMuon/data/processed/day/ACM0
 sudo -u  pi mkdir -vp /home/pi/UKRAA_PicoMuon/data/processed/month/ACM0
 sudo -u  pi mkdir -vp /home/pi/UKRAA_PicoMuon/data/processed/week/ACM0
 sudo -u  pi mkdir -vp /home/pi/UKRAA_PicoMuon/data/raw/ACM0
+sudo -u  pi mkdir -vp /home/pi/UKRAA_PicoMuon/data/neutrons
 sudo -u  pi mkdir -v  /home/pi/UKRAA_PicoMuon/logfiles
 sudo -u  pi mkdir -vp /home/pi/UKRAA_PicoMuon/plots/adc/ACM0
 sudo -u  pi mkdir -vp /home/pi/UKRAA_PicoMuon/plots/cpm/ACM0
