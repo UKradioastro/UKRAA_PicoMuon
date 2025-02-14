@@ -37,11 +37,11 @@ FileData = pathData.YearFolder.YearMonthFolder.YmdFile
 
 # setting output path to include data stamp
 # top detector
-pathPlot1 = "/home/pi/UKRAA_muons/plots/adc/ACM0/".date."_ADC_T_plot.png"
+pathPlot1 = "/home/pi/UKRAA_PicoMuon/plots/adc/ACM0/".date."_ADC_T_plot.png"
 # bottom detector
-pathPlot2 = "/home/pi/UKRAA_muons/plots/adc/ACM0/".date."_ADC_B_plot.png"
+pathPlot2 = "/home/pi/UKRAA_PicoMuon/plots/adc/ACM0/".date."_ADC_B_plot.png"
 # muons detected
-pathPlot3 = "/home/pi/UKRAA_muons/plots/adc/ACM0/".date."_ADC_M_plot.png"
+pathPlot3 = "/home/pi/UKRAA_PicoMuon/plots/adc/ACM0/".date."_ADC_M_plot.png"
 
 # Set separator to ","
 set datafile separator ","
@@ -100,7 +100,7 @@ plot FileData using 1:2 linetype 1 linewidth 1 linecolor rgb "#0000FF" title "Fr
 set terminal pngcairo enhanced font "DejaVuSansCondensed, 10" rounded size 640,540 
 
 # Path to directory to store file
-pathPlot = "/home/pi/UKRAA_muons/temp/ACM0_T-Adc"
+pathPlot = "/home/pi/UKRAA_PicoMuon/temp/ACM0_T-Adc"
 
 # set output path to Plot folder
 set output pathPlot.".png"
@@ -119,7 +119,7 @@ plot FileData using 1:3 linetype 1 linewidth 1 linecolor rgb "#FF0000" title "Fr
 set terminal pngcairo enhanced font "DejaVuSansCondensed, 10" rounded size 640,540 
 
 # Path to directory to store file
-pathPlot = "/home/pi/UKRAA_muons/temp/ACM0_B-Adc"
+pathPlot = "/home/pi/UKRAA_PicoMuon/temp/ACM0_B-Adc"
 
 # set output path to Plot folder
 set output pathPlot.".png"
@@ -138,7 +138,7 @@ plot FileData using 1:4 linetype 1 linewidth 1 linecolor rgb "#00FF00" title "Fr
 set terminal pngcairo enhanced font "DejaVuSansCondensed, 10" rounded size 640,540 
 
 # Path to directory to store file
-pathPlot = "/home/pi/UKRAA_muons/temp/ACM0_C-Adc"
+pathPlot = "/home/pi/UKRAA_PicoMuon/temp/ACM0_C-Adc"
 
 # set output path to Plot folder
 set output pathPlot.".png"
