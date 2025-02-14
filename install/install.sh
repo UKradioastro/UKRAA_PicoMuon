@@ -31,6 +31,7 @@ sudo -u  pi mkdir -vp /home/pi/UKRAA_PicoMuon/plots/freq/ACM0
 sudo -u  pi mkdir -vp /home/pi/UKRAA_PicoMuon/plots/month/ACM0
 sudo -u  pi mkdir -vp /home/pi/UKRAA_PicoMuon/plots/week/ACM0
 sudo -u  pi mkdir -v  /home/pi/UKRAA_PicoMuon/temp
+sudo -u  pi mkdir -vp /home/pi/UKRAA_PicoMuon/WWW/temp
 echo "Directory structure created"
 
 
