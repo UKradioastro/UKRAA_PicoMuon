@@ -12,22 +12,7 @@ Set of Python code to run on a RPi4/5 to get, process and present data from the 
 This software was written to suit a specific set-up, feel free to use as you see fit.
 
 
-Instruction for setting up a Raspberry Pi4/5 are included in the **docs** folder
----
-
-&nbsp;
-<!-- =============================================================================== --> 
-## Using the code
-
-The code assumes that your UKRAA PicoMuon detector is connected to the RPi4/5 via supplied USB cable and that it is /dev/ttyACM0 - you can check this by using **ls /dev/tty*** in a terminal window on the RPi4/5 and reviewing the response.
-
-The code assumes username is **pi**.  If **pi** is not the username, then you will need to change all occurances of '/home/pi' to '/home/*username*' in the python and gnuplot scripts, where *username* is the username you have selected for your RPi4/5.
-
-The code assumes one detector connected to the RPi4/5 USB and will be **/dev/ttyACM0**, if there are other devices connected to the RPi and your detector is not **/dev/ttyACM0**, then you will need to change **/dev/ttyACM0** to **/dev/*ttyACMx*** in the **GetDataRawACM0.py** python script, where *ttyACMx* is the tty address of you connected detector.
-
-**GetDataRawACM0.py** is run as a service.
-
-Other scripts (Python and gnuplot) are run from **cron**
+Instructions for setting up a Raspberry Pi4/5 are included in the **docs** folder
 
 ---
 
@@ -91,7 +76,7 @@ The code assumes that your UKRAA PicoMuon detector is connected to the RPi4/5 vi
 
 The code assumes username is **pi**.  If **pi** is not the username, then you will need to change all occurances of '/home/pi' to '/home/*username*' in the python and gnuplot scripts, where *username* is the username you have selected for your RPi4/5.
 
-The code assumes one detector connected to the RPi4/5 USB and will be **/dev/ttyACM0**, if there are other devices connected to the RPi and your detector is not **/dev/ttyACM0**, then you will need to change **/dev/ttyACM0** to **/dev/*ttyACMx*** in the **GetDataRawACM0.py** python script, where *ttyACMx* is the tty address of you connected detector.
+The code assumes one detector connected to the RPi4/5 USB and that it will be connected via **/dev/ttyACM0**, if there are other devices connected to the RPi and your detector is not **/dev/ttyACM0**, then you will need to change **/dev/ttyACM0** to **/dev/*ttyACMx*** in the **GetDataRawACM0.py** python script, where *ttyACMx* is the tty address of you connected detector.
 
 **GetDataRawACM0.py** is run as a service.
 
@@ -149,7 +134,7 @@ During **mysql_secure_installation** you will be asked a number of questions.
 
 That's it!
 
-The code is now set up to run automatically, to get the data from the detector, process yesterdays data, plot yesterdays data and post yesterdays plots to your intranet web page once per day, at 8.00am in the morning.
+The code is now set up to run automatically; it will get the data from the detector, process yesterdays data, plot yesterdays data and post yesterdays plots to your intranet web page once per day, at 8.00am in the morning.
 
 ---
 
@@ -166,7 +151,7 @@ Three plots will be created:
 * frequency of counts per minute
 * frequency of ADC values recorded
 
-A request will be made to [NMDB](https://www.nmdb.eu/) via NEST to get the previous days recorded neutron count, this data will be overlayed onto the day / week / month % deviation counts per minute graphs.
+A request will be made to [NMDB](https://www.nmdb.eu/) via NEST to get the previous days recorded neutron count, this data will be overlaid onto the day / week / month % deviation counts per minute graphs.
 
 These will appear as the required amount of data is recorded by the detector
 
