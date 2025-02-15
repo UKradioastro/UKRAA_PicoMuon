@@ -126,8 +126,8 @@ During **mysql_secure_installation** you will be asked a number of questions.
 
 * Enter current password for root (enter for none): ------> press **enter**
 * Switch to unix_socket authentication [Y/n] -------------> type **n** and press enter
-* Change the root password? [Y/n] ------------------------> type **n** and press enter
-* Remove anonymous users? [Y/n] --------------------------> type **y** and press enter
+* Change the root password? [Y/n] -----------------------> type **n** and press enter
+* Remove anonymous users? [Y/n] ------------------------> type **y** and press enter
 * Disallow root login remotely? [Y/n] --------------------> type **y** and press enter
 * Remove test database and access to it? [Y/n] -----------> type **y** and press enter
 * Reload privilege tables now? [Y/n] ---------------------> type **y** and press enter
