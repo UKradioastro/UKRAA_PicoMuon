@@ -120,17 +120,17 @@ This will run the install script.
 
 There will be occasions during the running of the install script that require you to make a keyboard entry.
 
-When asked **Do you want to continue? [Y/n]** - enter **Y** or **y** 
+When asked **Do you want to continue? [Y/n]** - type **Y** or **y** and press enter 
 
 During **mysql_secure_installation** you will be asked a number of questions.  
 
-* Enter current password for root (enter for none): **enter**
-* Switch to unix_socket authentication [Y/n] **n**
-* Change the root password? [Y/n] **n**
-* Remove anonymous users? [Y/n] **y**
-* Disallow root login remotely? [Y/n] **y**
-* Remove test database and access to it? [Y/n] **y**
-* Reload privilege tables now? [Y/n] **y**
+* Enter current password for root (enter for none): ...... press **enter**
+* Switch to unix_socket authentication [Y/n] ............. type **n** and press enter
+* Change the root password? [Y/n] ........................ type **n** and press enter
+* Remove anonymous users? [Y/n] .......................... type **y** and press enter
+* Disallow root login remotely? [Y/n] .................... type **y** and press enter
+* Remove test database and access to it? [Y/n] ........... type **y** and press enter
+* Reload privilege tables now? [Y/n] ..................... type **y** and press enter
 
 That's it!
 
