@@ -17,20 +17,45 @@ reset
 # Set terminal 
 set terminal pngcairo enhanced font "DejaVuSansCondensed, 10" rounded size 640,540 
 
+# Set print to <stdout>
+set print "-"
+
+# print to log file
+print "PlotDataWeekACM0.gp    : "\
+    .system("date +'%Y/%M/%d %H:%M:%S'")\
+    ." : Started ACM0 weeks % deviation plot from "\
+    .system("date -d 'last week' +'%Y-%m-%d'")\
+    ." to "\
+    .system("date -d yesterday +'%Y-%m-%d'")
+
 # Set up data paths
 pathData        = "/home/pi/UKRAA_PicoMuon/data/processed/week/ACM0"
 
 # Year folder
-YearFolder = "/".system("date -d yesterday +'%Y'")
+YearFolder      = "/".system("date -d yesterday +'%Y'")
 
 # YearMonth folder
 YearMonthFolder = "/".system("date -d yesterday +'%Y-%m'")
 
 # YearMonthDay file
-YmdFile = "/".system("date -d yesterday +'%Y-%m-%d'").".txt"
+YmdFile         = "/".system("date -d yesterday +'%Y-%m-%d'").".txt"
 
 # Path to each data file for graphing
 FileData        = pathData.YearFolder.YearMonthFolder.YmdFile
+
+# check if FileData exists - 0=exists, 1=doesn't exist, if doesn't exist then exit, with message
+is_missing = system("/home/pi/UKRAA_PicoMuon/scripts/ismissing.sh ".FileData)
+if (is_missing == 1) {print "PlotDataWeekACM0.gp    : ".system("date +'%Y/%M/%d %H:%M:%S'")." : ACM0 week data file missing, so..."; 
+    print "PlotDataWeekACM0.gp    : "\
+        .system("date +'%Y/%M/%d %H:%M:%S'")\
+        ." : **FAILED** to complete ACM0 weeks % deviation plot from "\
+        .system("date -d 'last week' +'%Y-%m-%d'")\
+        ." to "\
+        .system("date -d yesterday +'%Y-%m-%d'")
+    exit
+}
+
+# FileData exists - good to continue...
 
 # Set separator to ","
 set datafile separator ","
@@ -54,7 +79,7 @@ pathPlot3 = "/home/pi/UKRAA_PicoMuon/plots/week/ACM0/".date."_week_plot.png"
 
 # Title for graph
 # muons detected
-GraphTitle3 = "% change of muon and neutron count rate from mean count rate for the last 7 days.\n Graph is updated every day at 9.30am \n"
+GraphTitle3 = "% change of muon and neutron count rate from mean count rate for the last 7 days.\n Graph is updated every day at 8.00am \n"
 
 # Set data types
 set xdata time
@@ -68,7 +93,7 @@ set timefmt "%Y-%m-%d %H:%M:%S"
 # Set grid format
 set grid xtics nomxtics ytics nomytics noztics nomztics nortics nomrtics \
  nox2tics nomx2tics noy2tics nomy2tics nocbtics nomcbtics
-set grid layerdefault linetype 0 linecolor 0 linewidth 0.500 dashtype solid,  linetype 0 linecolor 0 linewidth 0.500 dashtype solid
+set grid layerdefault linetype 0 linecolor 0 linewidth 0.500 dashtype solid linetype 0 linecolor 0 linewidth 0.500 dashtype solid
 
 # Set Legend (Key) above plot
 set key outside above center
@@ -137,8 +162,12 @@ replot
 # end replot
 
 # print to log file
-set print "-"
-print "Completed week plot for ".system("date -d yesterday +'%Y-%m-%d'")." at ".system("date +'%H:%M:%S'")." on ".system("date +'%A %d %B %Y'")
+print "PlotDataWeekACM0.gp    : "\
+    .system("date +'%Y/%M/%d %H:%M:%S'")\
+    .": Completed ACM0 weeks % deviation day plot from "\
+    .system("date -d 'last week' +'%Y-%m-%d'")\
+    ." to "\
+    .system("date -d yesterday +'%Y-%m-%d'")
 
 # This is important because it closes our output file.
 set output

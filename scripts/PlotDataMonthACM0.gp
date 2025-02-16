@@ -17,20 +17,45 @@ reset
 # Set terminal 
 set terminal pngcairo enhanced font "DejaVuSansCondensed, 10" rounded size 640,540 
 
+# Set print to <stdout>
+set print "-"
+
+# print to log file
+print "PlotDataMonthACM0.gp   : "\
+    .system("date +'%Y/%M/%d %H:%M:%S'")\
+    ." : Started ACM0 months % deviation plot from "\
+    .system("date -d 'last month' +'%Y-%m-%d'")\
+    ." to "\
+    .system("date -d yesterday +'%Y-%m-%d'")
+
 # Set up data paths
 pathData        = "/home/pi/UKRAA_PicoMuon/data/processed/month/ACM0"
 
 # Year folder
-YearFolder = "/".system("date -d yesterday +'%Y'")
+YearFolder      = "/".system("date -d yesterday +'%Y'")
 
 # YearMonth folder
 YearMonthFolder = "/".system("date -d yesterday +'%Y-%m'")
 
 # YearMonthDay file
-YmdFile = "/".system("date -d yesterday +'%Y-%m-%d'").".txt"
+YmdFile         = "/".system("date -d yesterday +'%Y-%m-%d'").".txt"
 
 # Path to each data file for graphing
 FileData        = pathData.YearFolder.YearMonthFolder.YmdFile
+
+# check if FileData exists - 0=exists, 1=doesn't exist, if doesn't exist then exit, with message
+is_missing = system("/home/pi/UKRAA_PicoMuon/scripts/ismissing.sh ".FileData)
+if (is_missing == 1) {print "PlotDataMonthACM0.gp   : ".system("date +'%Y/%M/%d %H:%M:%S'")." : ACM0 month data file missing, so..."; 
+    print "PlotDataMonthACM0.gp   : "\
+        .system("date +'%Y/%M/%d %H:%M:%S'")\
+        ." : **FAILED** to complete ACM0 months % deviation plot from "\
+        .system("date -d 'last month' +'%Y-%m-%d'")\
+        ." to "\
+        .system("date -d yesterday +'%Y-%m-%d'")
+    exit
+}
+
+# FileData exists - good to continue...
 
 # Set separator to ","
 set datafile separator ","
@@ -136,8 +161,12 @@ replot
 # end replot
 
 # print to log file
-set print "-"
-print "Completed month plot for ".system("date -d yesterday +'%Y-%m-%d'")." at ".system("date +'%H:%M:%S'")." on ".system("date +'%A %d %B %Y'")
+print "PlotDataMonthACM0.gp   : "\
+    .system("date +'%Y/%M/%d %H:%M:%S'")\
+    ." : Completed ACM0 months % deviation day plot from "\
+    .system("date -d 'last month' +'%Y-%m-%d'")\
+    ." to "\
+    .system("date -d yesterday +'%Y-%m-%d'")
 
 # This is important because it closes our output file.
 set output

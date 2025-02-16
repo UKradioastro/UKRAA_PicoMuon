@@ -6,10 +6,10 @@ import csv
 import os
 
 # print message to log file to say started
-print('Started processing ACM0 muon cpm data for ', \
-      datetime.strftime(datetime.now() - timedelta(1), '%Y-%m-%d'), \
-      'on', datetime.strftime(datetime.now(), '%Y-%m-%d'), \
-      'at',datetime.strftime(datetime.now(), '%H:%M:%S'))
+print('ProcessDataCpmACM0.py  :', \
+      datetime.strftime(datetime.now(), '%Y-%m-%d %H:%M:%S'), \
+      ': Started ACM0 cpm data processing for', \
+      datetime.strftime(datetime.now() - timedelta(1), '%Y-%m-%d'))
 
 # Set file headers for data file structure
 RawFieldNames    = ['RawDateTime','RawPosition', 'RawCount', 'RawADC', \
@@ -37,6 +37,10 @@ pathExists = os.path.exists(ProcessedPath)
 if not pathExists:
     # create directory structure
     os.makedirs(ProcessedPath)
+    print('ProcessDataCpmACM0.py  : ', \
+          datetime.strftime(datetime.now(), '%Y-%m-%d %H:%M:%S'), \
+          ': New directory created :', \
+          ProcessedPath)
 
 # Processed data file name
 ProcessedDataFile = "/home/pi/UKRAA_PicoMuon/data/processed/cpm/ACM0/" \
@@ -55,14 +59,14 @@ StartTime_str = datetime.strftime(datetime.now() - timedelta(1), '%Y-%m-%d') \
 
 StartTime_datetime = datetime.strptime(StartTime_str, '%Y-%m-%d %H:%M:%S.%f')
 # uncomment next lines to print the response
-print('Value of variable (StartTime_datetime): ',StartTime_datetime)
+#print('ProcessDataCpmACM0.py: Value of variable (StartTime_datetime): ',StartTime_datetime)
 
 EndTime_str = datetime.strftime(datetime.now() - timedelta(1), '%Y-%m-%d') \
               + ' 23:59:59.999999'
 
 EndTime_datetime = datetime.strptime(EndTime_str, '%Y-%m-%d %H:%M:%S.%f')
 # uncomment next lines to print the response
-print('Value of variable (EndTime_datetime): ',EndTime_datetime)
+#print('ProcessDataCpmACM0.py: Value of variable (EndTime_datetime): ',EndTime_datetime)
 
 # define what the time change will be
 minute = timedelta(
@@ -73,7 +77,7 @@ minute = timedelta(
     minutes      =  0,
     hours        =  0,
     weeks        =  0)
-print('Value of variable (minute): ', minute)
+#print('ProcessDataCpmACM0.py: Value of variable (minute): ', minute)
 
 # set up variable to use in loop
 ProcessedTime = StartTime_datetime - minute
@@ -141,10 +145,11 @@ ProcessedData.close()
 # Message to log file at end of program
 
 # print message to log file to say completed
-print('Completed processing ACM0 muon cpm data for ', \
-      datetime.strftime(datetime.now() - timedelta(1), '%Y-%m-%d'), \
-      'on',datetime.strftime(datetime.now(), '%Y-%m-%d'), \
-      'at',datetime.strftime(datetime.now(), '%H:%M:%S'))
+print('ProcessDataCpmACM0.py  : ', \
+      datetime.strftime(datetime.now(), '%Y-%m-%d %H:%M:%S'), \
+      ': Completed ACM0 cpm data processing for', \
+      datetime.strftime(datetime.now() - timedelta(1), '%Y-%m-%d'))
+      
       
 
 # =============================================================================

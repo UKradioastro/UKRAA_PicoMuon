@@ -6,10 +6,10 @@ import os
 import nest
 
 # print message to log file to say started
-print('Started getting neutron data, for', \
-      dt.datetime.strftime(dt.datetime.now() - dt.timedelta(1), '%Y-%m-%d'), \
-      'on', dt.datetime.strftime(dt.datetime.now(), '%Y-%m-%d'), \
-      'at',dt.datetime.strftime(dt.datetime.now(), '%H:%M:%S'))
+print('GetDataNeutron.py      :', \
+      dt.datetime.strftime(dt.datetime.now(), '%Y-%m-%d %H:%M:%S'), \
+      ': Started neutron data scraping for', \
+      dt.datetime.strftime(dt.datetime.now() - dt.timedelta(1), '%Y-%m-%d'))
 
 # get yesterday variable
 yesterday = dt.date.today() - dt.timedelta(days = 1)
@@ -34,7 +34,9 @@ pathExist = os.path.exists(path)
 if not pathExist:
     # Create a new directory because it does not exist
     os.makedirs(path)
-    print('New directory created')
+    print('GetDataNeutron.py      :',\
+          dt.datetime.strftime(datetime.now(), '%Y-%m-%d %H:%M:%S'), \
+          ': New directory created')
 
 # create file for yesterdays data
 outfile = '/home/pi/UKRAA_PicoMuon/data/neutrons/'\
@@ -74,8 +76,7 @@ df.to_csv(outfile,  sep=",", index=False, header=False, encoding='utf-8')
 # Message to log file at end of program
 
 # print message to log file to say completed
-print('Completed getting neutron data for', \
-      dt.datetime.strftime(dt.datetime.now() - dt.timedelta(1), '%Y-%m-%d'), \
-      'on',dt.datetime.strftime(dt.datetime.now(), '%Y-%m-%d'), \
-      'at',dt.datetime.strftime(dt.datetime.now(), '%H:%M:%S'))
-     
+print('GetDataNeutron.py      :', \
+      dt.datetime.strftime(dt.datetime.now(), '%Y-%m-%d %H:%M:%S'), \
+      ': Completed neutron data scraping for', \
+      dt.datetime.strftime(dt.datetime.now() - dt.timedelta(1), '%Y-%m-%d'))

@@ -6,10 +6,11 @@ import csv
 import os
 
 # print message to log file to say started
-print('Started processing ACM0 day data, for ', \
-      datetime.strftime(datetime.now() - timedelta(1), '%Y-%m-%d'), \
-      'on', datetime.strftime(datetime.now(), '%Y-%m-%d'), \
-      'at',datetime.strftime(datetime.now(), '%H:%M:%S'))
+
+print('ProcessDataDayACM0.py  :', \
+      datetime.strftime(datetime.now(), '%Y-%m-%d %H:%M:%S'), \
+      ': Started ACM0 days % deviation data processing for', \
+      datetime.strftime(datetime.now() - timedelta(1), '%Y-%m-%d'))
 
 # Set file headers for data file structure
 RawFieldNames    = ['RawDateTime',\
@@ -60,6 +61,10 @@ pathExists = os.path.exists(ProcessedPath)
 if not pathExists:
     # create directory structure
     os.makedirs(ProcessedPath)
+    print('ProcessDataDayACM0.py  :', \
+          datetime.strftime(datetime.now(), '%Y-%m-%d %H:%M:%S'), \
+          ': New directory created :', \
+          ProcessedPath)
 
 # Processed data file name
 ProcessedDataFile = "/home/pi/UKRAA_PicoMuon/data/processed/day/ACM0/" \
@@ -78,14 +83,14 @@ StartTime_str = datetime.strftime(datetime.now() - timedelta(1), '%Y-%m-%d') \
 
 StartTime_datetime = datetime.strptime(StartTime_str, '%Y-%m-%d %H:%M:%S.%f')
 # uncomment next lines to print the response
-print('Value of variable (StartTime_datetime): ',StartTime_datetime)
+#print('ProcessDataDayACM0.py: Value of variable (StartTime_datetime): ',StartTime_datetime)
 
 EndTime_str = datetime.strftime(datetime.now() - timedelta(1), '%Y-%m-%d') \
               + ' 23:59:59.999999'
 
 EndTime_datetime = datetime.strptime(EndTime_str, '%Y-%m-%d %H:%M:%S.%f')
 # uncomment next lines to print the response
-print('Value of variable (EndTime_datetime): ',EndTime_datetime)
+#print('ProcessDataDayACM0.py: Value of variable (EndTime_datetime): ',EndTime_datetime)
 
 # define what the time change will be
 minute = timedelta(
@@ -97,7 +102,7 @@ minute = timedelta(
     hours        =  0,
     weeks        =  0)
 # uncomment next lines to print the response
-print('Value of variable (minute): ', minute)
+#print('ProcessDataDayACM0.py: Value of variable (minute): ', minute)
 
 # set up variable to use in loop
 ProcessedTime = StartTime_datetime - minute
@@ -169,8 +174,13 @@ for i in range(1, n+1):
     ProcessedCPM_T = count_T
     ProcessedCPM_B = count_B
     ProcessedCPM_M = count_M
-    ProcessedTemp  = temperature /(count_T + count_B + count_M)
-    ProcessedPres  = pressure /(count_T + count_B + count_M)
+    # check if there is some count data
+    if ((count_T + count_B + count_M) == 0):
+        ProcessedTemp = 0.0
+        ProcessedPres = 0.0
+    else:
+        ProcessedTemp  = temperature /(count_T + count_B + count_M)
+        ProcessedPres  = pressure /(count_T + count_B + count_M)
     ProcessedCPM_N = count_N
 
 
@@ -200,10 +210,10 @@ ProcessedData.close()
 # Message to log file at end of program
 
 # print message to log file to say completed
-print('Completed processing ACM0 day data for ', \
-      datetime.strftime(datetime.now() - timedelta(1), '%Y-%m-%d'), \
-      'on',datetime.strftime(datetime.now(), '%Y-%m-%d'), \
-      'at',datetime.strftime(datetime.now(), '%H:%M:%S'))
+print('ProcessDataDayACM0.py  :', \
+      datetime.strftime(datetime.now(), '%Y-%m-%d %H:%M:%S'), \
+      ': Completed ACM0 days % deviation data processing for', \
+      datetime.strftime(datetime.now() - timedelta(1), '%Y-%m-%d'))
       
 
 # =============================================================================

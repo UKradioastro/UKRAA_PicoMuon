@@ -5,10 +5,10 @@ import csv
 import os
 
 # print message to log file to say started
-print('Started processing ACM0 muon adc data for', \
-      datetime.strftime(datetime.now() - timedelta(1), '%Y-%m-%d'), \
-      'on', datetime.strftime(datetime.now(), '%Y-%m-%d'), \
-      'at',datetime.strftime(datetime.now(), '%H:%M:%S'))
+print('ProcessDataAdcACM0.py  :', \
+      datetime.strftime(datetime.now(), '%Y-%m-%d %H:%M:%S'), \
+      ': Started ACM0 adc data processing for', \
+      datetime.strftime(datetime.now() - timedelta(1), '%Y-%m-%d'))
 
 # Set file headers for data file structure
 RawFieldNames    = ['RawDateTime','RawPosition', 'RawCount', 'RawADC', \
@@ -36,6 +36,10 @@ pathExists = os.path.exists(ProcessedPath)
 if not pathExists:
     # create directory structure
     os.makedirs(ProcessedPath)
+    print('ProcessDataAdcACM0.py  :', \
+          datetime.strftime(datetime.now(), '%Y-%m-%d %H:%M:%S'), \
+          ': New directory created :', \
+          ProcessedPath)
 
 # Processed data file name
 ProcessedDataFile = "/home/pi/UKRAA_PicoMuon/data/processed/adc/ACM0/" \
@@ -112,10 +116,11 @@ for i in range(0, n):
 ProcessedData.close()
 
 # print message to log file to say completed
-print('Completed processing ACM0 muon adc data for ', \
-      datetime.strftime(datetime.now() - timedelta(1), '%Y-%m-%d'), \
-      'on',datetime.strftime(datetime.now(), '%Y-%m-%d'), \
-      'at',datetime.strftime(datetime.now(), '%H:%M:%S'))
+print('ProcessDataAdcACM0.py  :', \
+      datetime.strftime(datetime.now(), '%Y-%m-%d %H:%M:%S'), \
+      ': Completed ACM0 adc data processing for', \
+      datetime.strftime(datetime.now() - timedelta(1), '%Y-%m-%d'))
+      
 
 # ==========================================================================================
 # END of program

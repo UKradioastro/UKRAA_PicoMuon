@@ -7,12 +7,12 @@ import os
 import shutil
 
 # print message to log file to say started
-print('Started processing ACM0 week data, from ', \
+print('ProcessDataWeekACM0.py :', \
+      datetime.strftime(datetime.now(), '%Y-%m-%d %H:%M:%S'), \
+      ': Started ACM0 weeks % deviation data processing, from', \
       datetime.strftime(datetime.now() - timedelta(7), '%Y-%m-%d'), \
-      'to', datetime.strftime(datetime.now() - timedelta(1), '%Y-%m-%d'), \
-      'on', datetime.strftime(datetime.now(), '%Y-%m-%d'), \
-      'at', datetime.strftime(datetime.now(), '%H:%M:%S'))
-
+      'to', \
+      datetime.strftime(datetime.now() - timedelta(1), '%Y-%m-%d'))
 
 # Set path for data file structure
 
@@ -48,6 +48,10 @@ pathExists = os.path.exists(WeekPath)
 if not pathExists:
     # create directory structure
     os.makedirs(WeekPath)
+    print('ProcessDataWeekACM0.py :', \
+          datetime.strftime(datetime.now(), '%Y-%m-%d %H:%M:%S'), \
+          ': New directory created :', \
+          WeekPath)
 
 # week data file name
 WeekDataFile = '/home/pi/UKRAA_PicoMuon/data/processed/week/ACM0/' \
@@ -57,17 +61,30 @@ WeekDataFile = '/home/pi/UKRAA_PicoMuon/data/processed/week/ACM0/' \
                + "/temp.txt"
 
 # merge day data to make week data file
-with open(WeekDataFile,'wb') as wfd:
-    for f in [RawDataFile7,
-              RawDataFile6,
-              RawDataFile5,
-              RawDataFile4,
-              RawDataFile3,
-              RawDataFile2,
-              RawDataFile1]:
-        with open(f,'rb') as fd:
-            shutil.copyfileobj(fd, wfd)
+if os.path.exists(RawDataFile7):
+    with open(WeekDataFile,'wb') as wfd:
+        for f in [RawDataFile7,
+                  RawDataFile6,
+                  RawDataFile5,
+                  RawDataFile4,
+                  RawDataFile3,
+                  RawDataFile2,
+                  RawDataFile1]:
+            with open(f,'rb') as fd:
+                shutil.copyfileobj(fd, wfd)
 
+else:
+    print('ProcessDataWeekACM0.py :', \
+          datetime.strftime(datetime.now(), '%Y-%m-%d %H:%M:%S'), \
+          ': Not enough ACM0 day files are available yet to process weeks % deviation data...')
+    print('ProcessDataWeekACM0.py :', \
+          datetime.strftime(datetime.now(), '%Y-%m-%d %H:%M:%S'), \
+          ': **FAILED** to process ACM0 weeks % deviation data, from', \
+          datetime.strftime(datetime.now() - timedelta(7), '%Y-%m-%d'), \
+          'to', \
+          datetime.strftime(datetime.now() - timedelta(1), '%Y-%m-%d'))
+    exit()
+    
 # Processed data path
 ProcessedPath = '/home/pi/UKRAA_PicoMuon/data/processed/week/ACM0/'\
                 + datetime.strftime(datetime.now() - timedelta(1), '%Y') \
@@ -79,6 +96,10 @@ pathExists = os.path.exists(ProcessedPath)
 if not pathExists:
     # create directory structure
     os.makedirs(ProcessedPath)
+    print('ProcessDataWeekACM0.py :', \
+          datetime.strftime(datetime.now(), '%Y-%m-%d %H:%M:%S'), \
+          ': New directory created :', \
+          ProcessedPath)
 
 # Processed data file name
 ProcessedDataFile = "/home/pi/UKRAA_PicoMuon/data/processed/week/ACM0/" \
@@ -97,14 +118,14 @@ StartTime_str = datetime.strftime(datetime.now() - timedelta(7), '%Y-%m-%d') \
 
 StartTime_datetime = datetime.strptime(StartTime_str, '%Y-%m-%d %H:%M:%S.%f')
 # uncomment next lines to print the response
-print('Value of variable (StartTime_datetime): ',StartTime_datetime)
+#print('ProcessDataWeekACM0.py: Value of variable (StartTime_datetime): ',StartTime_datetime)
 
 EndTime_str = datetime.strftime(datetime.now() - timedelta(1), '%Y-%m-%d') \
               + ' 23:59:59.999999'
 
 EndTime_datetime = datetime.strptime(EndTime_str, '%Y-%m-%d %H:%M:%S.%f')
 # uncomment next lines to print the response
-print('Value of variable (EndTime_datetime): ',EndTime_datetime)
+#print('ProcessDataWeekACM0.py: Value of variable (EndTime_datetime): ',EndTime_datetime)
 
 # define what the time change will be
 minute = timedelta(
@@ -116,7 +137,7 @@ minute = timedelta(
     hours        =  0,
     weeks        =  0)
 # uncomment next lines to print the response
-print('Value of variable (minute): ', minute)
+#print('ProcessDataWeekACM0.py: Value of variable (minute): ', minute)
 
 # set up variable to use in loop
 ProcessedTime = StartTime_datetime - minute
@@ -196,11 +217,13 @@ ProcessedData.close()
 # Message to log file at end of program
 
 # print message to log file to say completed
-print('Completed processing weeks worth of ACM0 muon count data from ', \
+print('ProcessDataWeekACM0.py :', \
+      datetime.strftime(datetime.now(), '%Y-%m-%d %H:%M:%S'), \
+      ': Completed ACM0 weeks % deviation data processing, from', \
       datetime.strftime(datetime.now() - timedelta(7), '%Y-%m-%d'), \
-      'to', datetime.strftime(datetime.now() - timedelta(1), '%Y-%m-%d'), \
-      'on', datetime.strftime(datetime.now(), '%Y-%m-%d'), \
-      'at', datetime.strftime(datetime.now(), '%H:%M:%S'))
+      'to', \
+      datetime.strftime(datetime.now() - timedelta(1), '%Y-%m-%d'))
+
 
 # =============================================================================
 # END of program

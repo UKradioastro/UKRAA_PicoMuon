@@ -17,6 +17,15 @@ reset
 # Set terminal 
 set terminal pngcairo enhanced font "DejaVuSansCondensed, 10" rounded size 640,540 
 
+# Set print to <stdout>
+set print "-"
+
+# print to log file
+print "PlotDataDayACM0.gp     : "\
+    .system("date +'%Y/%M/%d %H:%M:%S'")\
+    ." : Started ACM0 days % deviation plot for "\
+    .system("date -d yesterday +'%Y-%m-%d'")
+
 # Set up data paths
 pathData        = "/home/pi/UKRAA_PicoMuon/data/processed/day/ACM0"
 
@@ -31,6 +40,18 @@ YmdFile = "/".system("date -d yesterday +'%Y-%m-%d'").".txt"
 
 # Path to each data file for graphing
 FileData        = pathData.YearFolder.YearMonthFolder.YmdFile
+
+# check if FileData exists - 0=exists, 1=doesn't exist, if doesn't exist then exit, with message
+is_missing = system("/home/pi/UKRAA_PicoMuon/scripts/ismissing.sh ".FileData)
+if (is_missing == 1) {print "PlotDataDayACM0.gp     : ".system("date +'%Y/%M/%d %H:%M:%S'")." : ACM0 days data file missing, so..."; 
+    print "PlotDataDayACM0.gp     : "\
+        .system("date +'%Y/%M/%d %H:%M:%S'")\
+        ." : **FAILED** to complete ACM0 days % deviation plot for "\
+        .system("date -d yesterday +'%Y-%m-%d'")
+    exit
+}
+
+# FileData exists - good to continue...
 
 # Set separator to ","
 set datafile separator ","
@@ -136,8 +157,10 @@ replot
 # end replot
 
 # print to log file
-set print "-"
-print "Completed day plot for ".system("date -d yesterday +'%Y-%m-%d'")." at ".system("date +'%H:%M:%S'")." on ".system("date +'%A %d %B %Y'")
+print "PlotDataDayACM0.gp     : "\
+    .system("date +'%Y/%M/%d %H:%M:%S'")\
+    ." : Completed ACM0 days % deviation plot for "\
+    .system("date -d yesterday +'%Y-%m-%d'")
 
 # This is important because it closes our output file.
 set output

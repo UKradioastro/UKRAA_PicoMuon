@@ -7,11 +7,12 @@ import os
 import shutil
 
 # print message to log file to say started
-print('Started processing ACM0 month data, from ', \
+print('ProcessDataMonthACM0.py:', \
+      datetime.strftime(datetime.now(), '%Y-%m-%d %H:%M:%S'), \
+      ': Started ACM0 months % deviation data processing, from', \
       datetime.strftime(datetime.now() - timedelta(31), '%Y-%m-%d'), \
-      'to', datetime.strftime(datetime.now() - timedelta(1), '%Y-%m-%d'), \
-      'on', datetime.strftime(datetime.now(), '%Y-%m-%d'), \
-      'at', datetime.strftime(datetime.now(), '%H:%M:%S'))
+      'to', \
+      datetime.strftime(datetime.now() - timedelta(1), '%Y-%m-%d'))
 
 
 # Set path for data file structure
@@ -48,6 +49,10 @@ pathExists = os.path.exists(MonthPath)
 if not pathExists:
     # create directory structure
     os.makedirs(MonthPath)
+    print('ProcessDataMonthACM0.py: ', \
+          datetime.strftime(datetime.now(), '%Y-%m-%d %H:%M:%S'), \
+          ': New directory created :', \
+          MonthPath)
 
 # Month data file name
 MonthDataFile = '/home/pi/UKRAA_PicoMuon/data/processed/month/ACM0/' \
@@ -57,41 +62,54 @@ MonthDataFile = '/home/pi/UKRAA_PicoMuon/data/processed/month/ACM0/' \
                + "/temp.txt"
 
 # merge day data to make week data file
-with open(MonthDataFile,'wb') as wfd:
-    for f in [RawDataFile31,
-              RawDataFile30,
-              RawDataFile29,
-              RawDataFile28,
-              RawDataFile27,
-              RawDataFile26,
-              RawDataFile25,
-              RawDataFile24,
-              RawDataFile23,
-              RawDataFile22,
-              RawDataFile21,
-              RawDataFile20,
-              RawDataFile19,
-              RawDataFile18,
-              RawDataFile17,
-              RawDataFile16,
-              RawDataFile15,
-              RawDataFile14,
-              RawDataFile13,
-              RawDataFile12,
-              RawDataFile11,
-              RawDataFile10,
-              RawDataFile9,
-              RawDataFile8,
-              RawDataFile7,
-              RawDataFile6,
-              RawDataFile5,
-              RawDataFile4,
-              RawDataFile3,
-              RawDataFile2,
-              RawDataFile1]:
-        with open(f,'rb') as fd:
-            shutil.copyfileobj(fd, wfd)
+if os.path.exists(RawDataFile31):
+    with open(MonthDataFile,'wb') as wfd:
+        for f in [RawDataFile31,
+                  RawDataFile30,
+                  RawDataFile29,
+                  RawDataFile28,
+                  RawDataFile27,
+                  RawDataFile26,
+                  RawDataFile25,
+                  RawDataFile24,
+                  RawDataFile23,
+                  RawDataFile22,
+                  RawDataFile21,
+                  RawDataFile20,
+                  RawDataFile19,
+                  RawDataFile18,
+                  RawDataFile17,
+                  RawDataFile16,
+                  RawDataFile15,
+                  RawDataFile14,
+                  RawDataFile13,
+                  RawDataFile12,
+                  RawDataFile11,
+                  RawDataFile10,
+                  RawDataFile9,
+                  RawDataFile8,
+                  RawDataFile7,
+                  RawDataFile6,
+                  RawDataFile5,
+                  RawDataFile4,
+                  RawDataFile3,
+                  RawDataFile2,
+                  RawDataFile1]:
+            with open(f,'rb') as fd:
+                shutil.copyfileobj(fd, wfd)
 
+else:
+    print('ProcessDataMonthACM0.py:', \
+          datetime.strftime(datetime.now(), '%Y-%m-%d %H:%M:%S'), \
+          ': Not enough ACM0 day files are available yet to process months % deviation data...')
+    print('ProcessDataMonthACM0.py:', \
+          datetime.strftime(datetime.now(), '%Y-%m-%d %H:%M:%S'), \
+          ': **FAILED** to process ACM0 months % deviation data, from', \
+          datetime.strftime(datetime.now() - timedelta(31), '%Y-%m-%d'), \
+          'to', \
+          datetime.strftime(datetime.now() - timedelta(1), '%Y-%m-%d'))
+    exit()
+    
 # Processed data path
 ProcessedPath = '/home/pi/UKRAA_PicoMuon/data/processed/month/ACM0/'\
                 + datetime.strftime(datetime.now() - timedelta(1), '%Y') \
@@ -103,6 +121,10 @@ pathExists = os.path.exists(ProcessedPath)
 if not pathExists:
     # create directory structure
     os.makedirs(ProcessedPath)
+    print('ProcessDataMonthACM0.py:', \
+          datetime.strftime(datetime.now(), '%Y-%m-%d %H:%M:%S'), \
+          ': New directory created :', \
+          ProcessedPath)
 
 # Processed data file name
 ProcessedDataFile = "/home/pi/UKRAA_PicoMuon/data/processed/month/ACM0/" \
@@ -121,14 +143,14 @@ StartTime_str = datetime.strftime(datetime.now() - timedelta(31), '%Y-%m-%d') \
 
 StartTime_datetime = datetime.strptime(StartTime_str, '%Y-%m-%d %H:%M:%S.%f')
 # uncomment next lines to print the response
-print('Value of variable (StartTime_datetime): ',StartTime_datetime)
+#print('ProcessDataMonthACM0.py: Value of variable (StartTime_datetime): ',StartTime_datetime)
 
 EndTime_str = datetime.strftime(datetime.now() - timedelta(1), '%Y-%m-%d') \
               + ' 23:59:59.999999'
 
 EndTime_datetime = datetime.strptime(EndTime_str, '%Y-%m-%d %H:%M:%S.%f')
 # uncomment next lines to print the response
-print('Value of variable (EndTime_datetime): ',EndTime_datetime)
+#print('ProcessDataMonthACM0.py: Value of variable (EndTime_datetime): ',EndTime_datetime)
 
 # define what the time change will be
 minute = timedelta(
@@ -139,7 +161,7 @@ minute = timedelta(
     minutes      =  0,
     hours        =  1,
     weeks        =  0)
-print('Value of variable (minute): ', minute)
+#print('ProcessDataMonthACM0.py: Value of variable (minute): ', minute)
 
 # set up variable to use in loop
 ProcessedTime = StartTime_datetime - minute
@@ -224,11 +246,12 @@ ProcessedData.close()
 # Message to log file at end of program
 
 # print message to log file to say completed
-print('Completed processing months worth of ACM0 muon count data from ', \
+print('ProcessDataMonthACM0.py:', \
+      datetime.strftime(datetime.now(), '%Y-%m-%d %H:%M:%S'), \
+      ': Completed ACM0 months % deviation data processing, from', \
       datetime.strftime(datetime.now() - timedelta(31), '%Y-%m-%d'), \
-      'to', datetime.strftime(datetime.now() - timedelta(1), '%Y-%m-%d'), \
-      'on', datetime.strftime(datetime.now(), '%Y-%m-%d'), \
-      'at', datetime.strftime(datetime.now(), '%H:%M:%S'))
+      'to', \
+      datetime.strftime(datetime.now() - timedelta(1), '%Y-%m-%d'))
 
 # =============================================================================
 # END of program
