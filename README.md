@@ -155,7 +155,24 @@ A request will be made to [NMDB](https://www.nmdb.eu/) via NEST to get the previ
 
 These will appear as the required amount of data is recorded by the detector
 
-A simple web server and web page is set up on your RPi so that you can view your detector's results on your smart phone when connected to your home network.
+A simple web server and web page is set up on your RPi so that you can view your detector's results on your desktop PC and/or smart phone when connected to your home network.
+
+To access the webpage on your desktop PC or your smart phone…
+
+1.	Open your preferred web application (Safari, Chrome, Firefox, etc.).
+
+2.	In the search bar type the following and press enter
+```
+http://rpi4-PicoMuon.local
+```
+
+This will take you to the web page for your detector, displaying yesterday’s events graphs.
+
+NOTE: if you have a different **hostname** for your RPi, change the search bar entry to…
+
+**http://_hostname_.local**
+
+Where *hostname* is the hostname for your RPi setup.
 
 ---
 
