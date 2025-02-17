@@ -145,12 +145,11 @@ ProcessedData.close()
 # Message to log file at end of program
 
 # print message to log file to say completed
-print('ProcessDataCpmACM0.py  : ', \
+print('ProcessDataCpmACM0.py  :', \
       datetime.strftime(datetime.now(), '%Y-%m-%d %H:%M:%S'), \
       ': Completed ACM0 cpm data processing for', \
       datetime.strftime(datetime.now() - timedelta(1), '%Y-%m-%d'))
-      
-      
+
 
 # =============================================================================
 # END of program
