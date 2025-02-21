@@ -163,7 +163,7 @@ To access the webpage on your desktop PC or your smart phone…
 
 2.	In the search bar type the following and press enter
 ```
-http://rpi4-PicoMuon.local
+http://rpi4-UKRAA.local
 ```
 
 This will take you to the web page for your detector, displaying yesterday’s events graphs.
