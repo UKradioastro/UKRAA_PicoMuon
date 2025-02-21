@@ -92,7 +92,8 @@ set timefmt "%Y-%m-%d %H:%M:%S"
 # Set grid format
 set grid xtics nomxtics ytics nomytics noztics nomztics nortics nomrtics \
  nox2tics nomx2tics noy2tics nomy2tics nocbtics nomcbtics
-set grid layerdefault linetype 0 linecolor 0 linewidth 0.500 dashtype solid,  linetype 0 linecolor 0 linewidth 0.500 dashtype solid
+set grid layerdefault linetype 0 linecolor 0 linewidth 0.500 dashtype solid, \
+ linetype 0 linecolor 0 linewidth 0.500 dashtype solid
 
 # Set Legend (Key) above plot
 set key outside above center
