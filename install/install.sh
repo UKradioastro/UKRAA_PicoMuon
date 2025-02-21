@@ -35,6 +35,10 @@ sudo -u  pi mkdir -v  /home/pi/UKRAA_PicoMuon/temp
 sudo -u  pi mkdir -vp /home/pi/UKRAA_PicoMuon/WWW/temp
 echo "Directory structure created"
 
+echo "Sort out file permissions..."
+sudo -u pi chmod +x /home/pi/UKRAA_PicoMuon/scripts/*.py
+sudo -u pi chmod +x /home/pi/UKRAA_PicoMuon/scripts/*.sh
+echo "File permissions sorted out"
 
 echo "Start installing PicoMuonACM0.service..."
 sudo cp -f /home/pi/UKRAA_PicoMuon/install/PicoMuonACM0.service /etc/systemd/system
