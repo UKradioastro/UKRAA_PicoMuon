@@ -49,7 +49,7 @@ pathExists = os.path.exists(MonthPath)
 if not pathExists:
     # create directory structure
     os.makedirs(MonthPath)
-    print('ProcessDataMonthACM0.py: ', \
+    print('ProcessDataMonthACM0.py:', \
           datetime.strftime(datetime.now(), '%Y-%m-%d %H:%M:%S'), \
           ': New directory created :', \
           MonthPath)

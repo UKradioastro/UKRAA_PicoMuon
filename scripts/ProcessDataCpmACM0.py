@@ -37,7 +37,7 @@ pathExists = os.path.exists(ProcessedPath)
 if not pathExists:
     # create directory structure
     os.makedirs(ProcessedPath)
-    print('ProcessDataCpmACM0.py  : ', \
+    print('ProcessDataCpmACM0.py  :', \
           datetime.strftime(datetime.now(), '%Y-%m-%d %H:%M:%S'), \
           ': New directory created :', \
           ProcessedPath)
