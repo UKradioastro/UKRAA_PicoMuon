@@ -35,7 +35,7 @@ if not pathExist:
     # Create a new directory because it does not exist
     os.makedirs(path)
     print('GetDataNeutron.py      :',\
-          dt.datetime.strftime(datetime.now(), '%Y-%m-%d %H:%M:%S'), \
+          dt.datetime.strftime(dt.datetime.now(), '%Y-%m-%d %H:%M:%S'), \
           ': New directory created')
 
 # create file for yesterdays data
