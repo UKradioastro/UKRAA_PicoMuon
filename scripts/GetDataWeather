@@ -1,0 +1,181 @@
+#!/usr/bin/env python3
+
+# ==========================================================================================
+#
+# INFORMATION
+#
+# ==========================================================================================
+
+# Program to scrape the current weather parameters for N15 
+# From https://openweathermap.org/current
+
+# What the JSON data will look like
+#
+#{
+#    "coord": {
+#       "lon": 7.367,
+#       "lat": 45.133
+#    },
+#    "weather": [
+#       {
+#          "id": 501,
+#          "main": "Rain",
+#          "description": "moderate rain",
+#          "icon": "10d"
+#       }
+#    ],
+#    "base": "stations",
+#    "main": {
+#       "temp": 284.2,
+#       "feels_like": 282.93,
+#       "temp_min": 283.06,
+#       "temp_max": 286.82,
+#       "pressure": 1021,
+#       "humidity": 60,
+#       "sea_level": 1021,
+#       "grnd_level": 910
+#    },
+#    "visibility": 10000,
+#    "wind": {
+#       "speed": 4.09,
+#       "deg": 121,
+#       "gust": 3.47
+#    },
+#    "rain": {
+#       "1h": 2.73
+#    },
+#    "clouds": {
+#       "all": 83
+#    },
+#    "dt": 1726660758,
+#    "sys": {
+#       "type": 1,
+#       "id": 6736,
+#       "country": "IT",
+#       "sunrise": 1726636384,
+#       "sunset": 1726680975
+#    },
+#    "timezone": 7200,
+#    "id": 3165523,
+#    "name": "Province of Turin",
+#    "cod": 200
+# }                    
+
+# ============
+# PROGRAM CODE
+# ============
+
+# import 
+import time
+import requests
+import json
+from datetime import date, datetime, timezone
+import os
+
+# Set up the parameters we want to pass to the API.
+#
+# This is my latitude and longitude.
+#
+# Latitude (deg) = xx.xxxxxx
+# Latitude (DMS) = xx° xx' xx" N/S
+#
+# Longitude (deg) = xx.xxxxxx
+# Longitude (DMS) = xx° xx' xx" E/W
+#
+# mode=json file format
+#
+# units=metric, so temp in degC
+#
+# lang=en, English
+#
+# appid={my api key}
+#
+# Make a get request with the parameters.
+#
+
+# ===========
+# DEFINITIONS
+# ===========
+
+def main():
+    while True:
+        # path for data storage
+        path = '/home/pi/UKRAA_PicoMuon/data/weather/'\
+                + datetime.strftime(datetime.now(timezone.utc), '%Y')\
+                + '/'\
+                + datetime.strftime(datetime.now(timezone.utc), '%Y-%m')
+        
+        # check if the specific path exists
+        pathExists = os.path.exists(path)
+        if not pathExists:
+            # create directory structure
+            os.makedirs(path)
+        
+        # output file to write data to
+        outfile = open('/home/pi/UKRAA_PicoMuon/data/weather/'
+                    + datetime.strftime(datetime.now(timezone.utc), '%Y')
+                    + '/'
+                    + datetime.strftime(datetime.now(timezone.utc), '%Y-%m')
+                    + '/'
+                    + datetime.strftime(datetime.now(timezone.utc), '%Y-%m-%d')
+                    + '.txt', 'a')
+
+        # get data
+        url = 'https://api.openweathermap.org/data/2.5/weather?lat=MY_LAT&lon=MY_LONG&mode=json&units=metric&lang=en&appid=MY_KEY'
+
+        #create variable response
+        response = requests.get(url)
+
+        #create variable data
+        data = json.loads(response.content)
+        
+        # extract temperature data from JSON
+        Temperature_now_c = data['main']['temp']
+        Temperature_now_c_str = str("%.1f" % Temperature_now_c)
+
+        # extract pressure data from JSON
+        Pressure_now = data['main']['pressure']
+        Pressure_now_str = str("%.1f" % Pressure_now)
+        
+        # extract humidity data from JSON
+        Humidity_now = data['main']['humidity']
+        Humidity_now_str = str("%.1f" % Humidity_now)
+        
+        # calculate STP
+        STP_now = (((273.15 + Temperature_now_c) / (273.15 + 20.0)) * (1013.25 / Pressure_now))
+        STP_now_str = str("%.3f" % STP_now)
+
+        # timestamp for the data to be written to file
+        timetowrite = (datetime.strftime(datetime.now(timezone.utc), '%Y-%m-%d')
+                    + " "
+                    + datetime.strftime(datetime.now(timezone.utc), '%H:%M:%S'))
+
+        # data to be written to file
+        texttowrite = (Temperature_now_c_str
+                       + ","
+                       + Pressure_now_str
+                       + ","
+                       + Humidity_now_str
+                       + ","
+                       + STP_now_str)
+        
+        # write data to file
+        print(timetowrite
+            + ','
+            + texttowrite
+            , file = outfile)
+
+        # wait 60 seconds, get data every 1 minute on the minute...
+        time.sleep(60.0 - ((time.time()) % 60.0)) 
+
+
+# =========
+# MAIN CODE
+# =========
+
+if __name__ == "__main__":
+    main()
+    
+# ===========
+# END OF CODE
+# ===========
