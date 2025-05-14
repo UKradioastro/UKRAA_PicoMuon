@@ -194,8 +194,8 @@ for i in range(1, n+1):
 
     # check if there is some count data
     if ((count_T + count_B + count_M) != 0):
-        ProcessedTemp  = temperature /(count_T + count_B + count_M)
-        ProcessedPres  = pressure /(count_T + count_B + count_M)
+        ProcessedTemp  = '{:.1f}'.format(temperature /(count_T + count_B + count_M))
+        ProcessedPres  = '{:.1f}'.format(pressure /(count_T + count_B + count_M))
     else:
         ProcessedTemp = float('nan')
         ProcessedPres = float('nan')
@@ -215,9 +215,9 @@ for i in range(1, n+1):
     ProcessedData.write(",")                         # "," separator
     ProcessedData.write(str(ProcessedCPM_M))         # Muon count over 5 minutes
     ProcessedData.write(",")                         # "," separator
-    ProcessedData.write("%.1f" % (ProcessedTemp))    # Detector temperature over 5 minutes
+    ProcessedData.write(str(ProcessedTemp))          # Detector temperature over 5 minutes
     ProcessedData.write(",")                         # "," separator
-    ProcessedData.write("%.1f" % (ProcessedPres))    # Detector pressure over 5 minutes
+    ProcessedData.write(str(ProcessedPres))          # Detector pressure over 5 minutes
     ProcessedData.write(",")                         # "," separator
     ProcessedData.write(str(ProcessedCPM_N))         # Neutron count over 5 minutes
     ProcessedData.write("\n")                        # new line
