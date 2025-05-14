@@ -125,10 +125,6 @@ for i in range(1, n+1):
     RawFile = open(file=RawDataFile, mode='r', encoding='UTF-8')
     RawCSV_reader = csv.DictReader(RawFile,RawFieldNames)
 
-    # using csv.DictReader
-    NeutronFile = open(file=NeutronDataFile, mode='r', encoding='UTF-8')
-    NeutronCSV_reader = csv.DictReader(NeutronFile,NeutronFieldNames)
-
     # set counters to zero
     count_T     = 0
     count_B     = 0
@@ -159,6 +155,13 @@ for i in range(1, n+1):
                 pressure = pressure + float(RawLine['RawPicoPres'])
                 count_M +=1
 
+    # close open RawFile
+    RawFile.close()
+
+    # using csv.DictReader
+    NeutronFile = open(file=NeutronDataFile, mode='r', encoding='UTF-8')
+    NeutronCSV_reader = csv.DictReader(NeutronFile,NeutronFieldNames)
+
     for NeutronLine in NeutronCSV_reader:
         # try to get raw data after start StartBinTime
         # convert string to datetime.datetime format
@@ -170,19 +173,38 @@ for i in range(1, n+1):
             # increase relevant counter
             count_N = count_N + float(NeutronLine['EfficiencyCorrected'])
   
+    # close open NeutronFile
+    NeutronFile.close()
 
-    ProcessedCPM_T = count_T
-    ProcessedCPM_B = count_B
-    ProcessedCPM_M = count_M
-    # check if there is some count data
-    if ((count_T + count_B + count_M) == 0):
-        ProcessedTemp = 0.0
-        ProcessedPres = 0.0
+    # check if there is some top counts data
+    if (count_T != 0):
+        ProcessedCPM_T = '{:.0f}'.format(count_T)
     else:
-        ProcessedTemp  = temperature /(count_T + count_B + count_M)
-        ProcessedPres  = pressure /(count_T + count_B + count_M)
-    ProcessedCPM_N = count_N
+        ProcessedCPM_T = float('nan')
+    # check if there is some bottom counts data
+    if (count_B != 0):
+        ProcessedCPM_B = '{:.0f}'.format(count_B)
+    else:
+        ProcessedCPM_B = float('nan')
+    # check if there is some coincidence counts data
+    if (count_M != 0):
+        ProcessedCPM_M = '{:.0f}'.format(count_M)
+    else:
+        ProcessedCPM_M = float('nan')
 
+    # check if there is some count data
+    if ((count_T + count_B + count_M) != 0):
+        ProcessedTemp  = '{:.1f}'.format(temperature /(count_T + count_B + count_M))
+        ProcessedPres  = '{:.1f}'.format(pressure /(count_T + count_B + count_M))
+    else:
+        ProcessedTemp = float('nan')
+        ProcessedPres = float('nan')
+
+    # check if there is some neutron counts data
+    if (count_N > 400):
+        ProcessedCPM_N = '{:.3f}'.format(count_N)
+    else:
+        ProcessedCPM_N = float('nan')
 
     # write to file
     ProcessedData.write(str(ProcessedTime))          # Data time date
@@ -193,15 +215,12 @@ for i in range(1, n+1):
     ProcessedData.write(",")                         # "," separator
     ProcessedData.write(str(ProcessedCPM_M))         # Muon count over 5 minutes
     ProcessedData.write(",")                         # "," separator
-    ProcessedData.write("%.1f" % (ProcessedTemp))    # Detector temperature over 5 minutes
+    ProcessedData.write(str(ProcessedTemp))          # Detector temperature over 5 minutes
     ProcessedData.write(",")                         # "," separator
-    ProcessedData.write("%.1f" % (ProcessedPres))    # eeDetector pressure over 5 minutes
+    ProcessedData.write(str(ProcessedPres))          # Detector pressure over 5 minutes
     ProcessedData.write(",")                         # "," separator
-    ProcessedData.write("%.3f" % (ProcessedCPM_N))   # Neutron count over 5 minutes
+    ProcessedData.write(str(ProcessedCPM_N))         # Neutron count over 5 minutes
     ProcessedData.write("\n")                        # new line
-
-    # close open RawFile
-    RawFile.close()
 
 # close open ProcessedData file
 ProcessedData.close()

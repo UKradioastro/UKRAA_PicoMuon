@@ -183,13 +183,15 @@ for i in range(1, n + 1):
             pressure = pressure + float(WeekLine['pressure'])
             count_N = count_N + float(WeekLine['neutrons'])
 
+    # close open WeekFile
+    WeekFile.close()
 
-    ProcessedCPM_T = count_T
-    ProcessedCPM_B = count_B
-    ProcessedCPM_M = count_M
-    ProcessedTemp  = temperature / 2.0
-    ProcessedPres  = pressure / 2.0
-    ProcessedCPM_N = count_N
+    ProcessedCPM_T = '{:.0f}'.format(count_T)
+    ProcessedCPM_B = '{:.0f}'.format(count_B)
+    ProcessedCPM_M = '{:.0f}'.format(count_M)
+    ProcessedTemp  = '{:.1f}'.format(temperature / 2.0)
+    ProcessedPres  = '{:.1f}'.format(pressure / 2.0)
+    ProcessedCPM_N = '{:.3f}'.format(count_N)
 
     # write to file
     ProcessedData.write(str(ProcessedTime))          # Data time date
@@ -200,15 +202,12 @@ for i in range(1, n + 1):
     ProcessedData.write(",")                         # "," separator
     ProcessedData.write(str(ProcessedCPM_M))         # Muon count over 10 minutes
     ProcessedData.write(",")                         # "," separator
-    ProcessedData.write("%.1f" % (ProcessedTemp))    # Detector temperature over 10 minutes
+    ProcessedData.write(str(ProcessedTemp))          # Detector temperature over 10 minutes
     ProcessedData.write(",")                         # "," separator
-    ProcessedData.write("%.1f" % (ProcessedPres))    # Detector pressure over 10 minutes
+    ProcessedData.write(str(ProcessedPres))          # Detector pressure over 10 minutes
     ProcessedData.write(",")                         # "," separator
-    ProcessedData.write("%.3f" % (ProcessedCPM_N))   # Neutron count over 10 minutes
+    ProcessedData.write(str(ProcessedCPM_N))         # Neutron count over 10 minutes
     ProcessedData.write("\n")                        # new line
-
-    # close open RawFile
-    WeekFile.close()
 
 # close open ProcessedData file
 ProcessedData.close()

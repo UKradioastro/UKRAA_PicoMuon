@@ -1,3 +1,3 @@
 
-# cron entry to upload plot files to www
-00 08 * * * cp -r /home/pi/UKRAA_PicoMuon/temp /var/www/html/
+# cron entry to upload plot files to local website on RPi
+30 09 * * * cp -r /home/pi/UKRAA_PicoMuon/temp /var/www/html/
