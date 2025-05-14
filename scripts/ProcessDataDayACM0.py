@@ -42,7 +42,7 @@ NeutronFieldNames    = ['NeutronDateTime', \
                         'EfficiencyCorrected']
 
 # Neutron data file source
-NeutronDataFile   = "/home/pi/UKRAA_PicoMuon/data/neutrons/" \
+NeutronDataFile   = "/home/pi/UKRAA_PicoMuon/data/NMDB/" \
                  + datetime.strftime(datetime.now() - timedelta(1), '%Y') \
                  + "/" \
                  + datetime.strftime(datetime.now() - timedelta(1), '%Y-%m') \
