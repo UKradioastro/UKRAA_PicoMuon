@@ -176,9 +176,9 @@ for i in range(1, n + 1):
         # search file for data between two time points
         if (WeekDatetime >= StartBinTime) and (WeekDatetime < EndBinTime):
             # increase relevant counter
-            count_T = count_T + int(WeekLine['Position_T'])
-            count_B = count_B + int(WeekLine['Position_B'])
-            count_M = count_M + int(WeekLine['Position_M'])
+            count_T = count_T + float(WeekLine['Position_T'])
+            count_B = count_B + float(WeekLine['Position_B'])
+            count_M = count_M + float(WeekLine['Position_M'])
             temperature = temperature + float(WeekLine['temperature'])
             pressure = pressure + float(WeekLine['pressure'])
             count_N = count_N + float(WeekLine['neutrons'])

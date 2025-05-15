@@ -205,9 +205,9 @@ for i in range(1, n + 1):
         # search file for data between two time points
         if (MonthDatetime >= StartBinTime) and (MonthDatetime < EndBinTime):
             # increase relevant counter
-            count_T = count_T + int(MonthLine['Position_T'])
-            count_B = count_B + int(MonthLine['Position_B'])
-            count_M = count_M + int(MonthLine['Position_M'])
+            count_T = count_T + float(MonthLine['Position_T'])
+            count_B = count_B + float(MonthLine['Position_B'])
+            count_M = count_M + float(MonthLine['Position_M'])
             temperature = temperature + float(MonthLine['temperature'])
             pressure = pressure + float(MonthLine['pressure'])
             count_N = count_N + float(MonthLine['neutrons'])
