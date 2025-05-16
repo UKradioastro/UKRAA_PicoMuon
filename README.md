@@ -234,7 +234,7 @@ sudo systemctl disable PicoMuonACM0.service
 1. Log into your Raspberry Pi4/5 using VNC.
 
 
-2. Open your web browser, type the following command and press enter
+2. Open your web browser, type the following command into the URL window and press enter
 ```
 https://download-directory.github.io/?url=https%3A%2F%2Fgithub.com%2FUKradioastro%2FUKRAA_PicoMuon%2Ftree%2Fmain%2Fupdate
 ```
@@ -242,6 +242,8 @@ https://download-directory.github.io/?url=https%3A%2F%2Fgithub.com%2FUKradioastr
 ![img_05](images/RPi_imager_05.PNG)
 
 This will download a zip file of the updated code to your RPi Downloads folder.
+
+Close your web browser.
 
 
 3. Open a terminal window and type the following command and press enter
