@@ -243,15 +243,32 @@ https://download-directory.github.io/?url=https%3A%2F%2Fgithub.com%2FUKradioastr
 
 This will download a zip file of the updated code to your RPi Downloads folder.
 
+![img_06](images/RPi_imager_06.PNG)
+
 Close your web browser.
 
 
-3. Open a terminal window and type the following command and press enter
-```
-cd ~/UKRAA_PicoMuon/update
-```
+3. Open **File Manager** and navigate to **/home/pi/Downloads**. You should see the zip folder you just downloaded.
 
-![img_02](images/RPi_imager_02.PNG)
+![img_07](images/RPi_imager_07.PNG)
+
+4. Double click on the downloaded zip folder **UKradioastro UKRAA_PicoMuon main update.zip**.  This will open the RPi xarchiver utility.
+
+![img_08](images/RPi_imager_08.PNG)
+
+5. Now click on the **extract** icon on the menu ribbon.
+
+![img_09](images/RPi_imager_09.PNG)
+
+6. Change **Extract to:** from **/tmp** to **/home/pi/Downloads**, then click on the **Extract** button
+
+![img_10](images/RPi_imager_10.PNG)
+
+Close the RPi xarchiver utility.
+
+7. You should now see a new unzipped folder in the Downloads folder
+
+![img_11](images/RPi_imager_11.PNG)
 
 This will take you to the **update** directory inside **/home/pi/UKRAA_PicoMuon**
 
