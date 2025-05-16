@@ -314,7 +314,7 @@ This will run the update script.
 
 ![img_18](images/RPi_imager_18.PNG)
 
-The updated code is now set up to run automatically; it will get the data from the detector, process yesterdays data, plot yesterdays data and post yesterdays plots to your intranet web page once per day, at 9.30am in the morning.
+The updated code is now set; it will get the data from the detector, process yesterdays data, plot yesterdays data and post yesterdays plots to your intranet web page once per day, at 9.30am in the morning.
 
 &nbsp;
 
