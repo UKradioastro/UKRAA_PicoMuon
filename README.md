@@ -270,11 +270,11 @@ Close the RPi xarchiver utility.
 
 ![img_11](images/RPi_imager_11.PNG)
 
-8. Select this folder, **UKradioastro UKRAA_PicoMuon main update**, and rename **update**
+8. Select **UKradioastro UKRAA_PicoMuon main update** folder and rename **update** (Right click mouse to bring up function).
 
 ![img_12](images/RPi_imager_12.PNG)
 
-9. Select this folder, **update** and copy.
+9. Select the **update** folder and copy (Right click mouse to bring up function).
 
 10. Navigate to the PicoMuon directory, **/home/pi/UKRAA_PicoMuon**, and paste the **update** folder
 
@@ -282,42 +282,39 @@ Close the RPi xarchiver utility.
 
 Close the **File Manager** window
 
-Type the following command and press enter
+11. Open a terminal window and type the following command and press enter
+```
+cd ~/UKRAA_PicoMuon/update
+```
+
+![img_15](images/RPi_imager_15.PNG)
+
+This will take you to the **update** directory inside **/home/pi/UKRAA_PicoMuon**
+
+12. Type the following command and press enter
 ```
 chmod +x *.sh
 ```
 
-![img_03](images/RPi_imager_03.PNG)
+![img_16](images/RPi_imager_16.PNG)
 
 This will make the **update.sh** script executable.
 
 
-5. Type the following command and press enter
+13. Type the following command and press enter
 ```
 sudo bash update.sh
 ```
 
-![img_04](images/RPi_imager_04.PNG)
+![img_17](images/RPi_imager_17.PNG)
 
 This will run the update script.
 
-There will be occasions during the running of the install script that require you to make a keyboard entry.
+14. That's it!  You should see the following...
 
-When asked **Do you want to continue? [Y/n]** - type **Y** or **y** and press **enter** 
+![img_18](images/RPi_imager_18.PNG)
 
-During **mysql_secure_installation** you will be asked a number of questions.  
-
-* Enter current password for root (enter for none): ------> press **enter**
-* Switch to unix_socket authentication [Y/n] -------------> type **n** and press **enter**
-* Change the root password? [Y/n] -----------------------> type **n** and press **enter**
-* Remove anonymous users? [Y/n] -----------------------> type **y** and press **enter**
-* Disallow root login remotely? [Y/n] ---------------------> type **y** and press **enter**
-* Remove test database and access to it? [Y/n] ----------> type **y** and press **enter**
-* Reload privilege tables now? [Y/n] ----------------------> type **y** and press **enter**
-
-That's it!
-
-The code is now set up to run automatically; it will get the data from the detector, process yesterdays data, plot yesterdays data and post yesterdays plots to your intranet web page once per day, at 9.30am in the morning.
+The updated code is now set up to run automatically; it will get the data from the detector, process yesterdays data, plot yesterdays data and post yesterdays plots to your intranet web page once per day, at 9.30am in the morning.
 
 &nbsp;
 
