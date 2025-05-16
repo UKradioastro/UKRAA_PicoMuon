@@ -229,8 +229,7 @@ sudo systemctl disable PicoMuonACM0.service
 
 &nbsp;
 <!-- =============================================================================== --> 
-### Updating your software
-
+## Updating your software
 
 1. Log into your Raspberry Pi4/5 using VNC.
 
