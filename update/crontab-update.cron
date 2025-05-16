@@ -18,3 +18,5 @@
 
 # cron entry to upload plot files to local website on RPi
 30 09 * * * cp -r /home/pi/UKRAA_PicoMuon/temp /var/www/html/
+
+# end of cron entry
