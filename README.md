@@ -144,7 +144,7 @@ During **mysql_secure_installation** you will be asked a number of questions.
 
 That's it!
 
-The code is now set up to run automatically; it will get the data from the detector, process yesterdays data, plot yesterdays data and post yesterdays plots to your intranet web page once per day, at 8.00am in the morning.
+The code is now set up to run automatically; it will get the data from the detector, process yesterdays data, plot yesterdays data and post yesterdays plots to your intranet web page once per day, at 9.30am in the morning.
 
 ---
 
@@ -222,6 +222,75 @@ sudo systemctl enable PicoMuonACM0.service
 ```
 sudo systemctl disable PicoMuonACM0.service
 ```
+
+&nbsp;
+
+---
+
+&nbsp;
+<!-- =============================================================================== --> 
+### Updating your software
+
+
+1. Log into your Raspberry Pi4/5 using VNC.
+
+&nbsp;
+
+2. Open a terminal window, type the following command and press enter
+```
+git clone https://github.com/UKradioastro/UKRAA_PicoMuon
+```
+
+![img_01](images/RPi_imager_01.PNG)
+
+This will download all of the code, including updates, to the directory **UKRAA_PicoMuon** inside **/home/pi**
+
+3. Open a terminal window and type the following command and press enter
+```
+cd ~/UKRAA_PicoMuon/update
+```
+
+![img_02](images/RPi_imager_02.PNG)
+
+This will take you to the **update** directory inside **/home/pi/UKRAA_PicoMuon**
+
+
+4. Type the following command and press enter
+```
+chmod +x *.sh
+```
+
+![img_03](images/RPi_imager_03.PNG)
+
+This will make the **update.sh** script executable.
+
+
+5. Type the following command and press enter
+```
+sudo bash update.sh
+```
+
+![img_04](images/RPi_imager_04.PNG)
+
+This will run the update script.
+
+There will be occasions during the running of the install script that require you to make a keyboard entry.
+
+When asked **Do you want to continue? [Y/n]** - type **Y** or **y** and press **enter** 
+
+During **mysql_secure_installation** you will be asked a number of questions.  
+
+* Enter current password for root (enter for none): ------> press **enter**
+* Switch to unix_socket authentication [Y/n] -------------> type **n** and press **enter**
+* Change the root password? [Y/n] -----------------------> type **n** and press **enter**
+* Remove anonymous users? [Y/n] -----------------------> type **y** and press **enter**
+* Disallow root login remotely? [Y/n] ---------------------> type **y** and press **enter**
+* Remove test database and access to it? [Y/n] ----------> type **y** and press **enter**
+* Reload privilege tables now? [Y/n] ----------------------> type **y** and press **enter**
+
+That's it!
+
+The code is now set up to run automatically; it will get the data from the detector, process yesterdays data, plot yesterdays data and post yesterdays plots to your intranet web page once per day, at 9.30am in the morning.
 
 &nbsp;
 
