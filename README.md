@@ -241,18 +241,18 @@ https://download-directory.github.io/?url=https%3A%2F%2Fgithub.com%2FUKradioastr
 
 ![img_05](images/RPi_imager_05.PNG)
 
-This will download a zip file of the updated code to your RPi Downloads folder.
+This will download a zip file of the updated code to your RPi **/home/pi/Downloads** folder.
 
 ![img_06](images/RPi_imager_06.PNG)
 
 Close your web browser.
 
 
-3. Open **File Manager** and navigate to **/home/pi/Downloads**. You should see the zip folder you just downloaded.
+3. Open **File Manager** and navigate to **/home/pi/Downloads**. You should see the zip file you just downloaded.
 
 ![img_07](images/RPi_imager_07.PNG)
 
-4. Double click on the downloaded zip folder **UKradioastro UKRAA_PicoMuon main update.zip**.  This will open the RPi xarchiver utility.
+4. Double click on the downloaded zip file **UKradioastro UKRAA_PicoMuon main update.zip**.  This will open the RPi **xarchiver** utility.
 
 ![img_08](images/RPi_imager_08.PNG)
 
@@ -270,10 +270,19 @@ Close the RPi xarchiver utility.
 
 ![img_11](images/RPi_imager_11.PNG)
 
-This will take you to the **update** directory inside **/home/pi/UKRAA_PicoMuon**
+8. Select this folder, **UKradioastro UKRAA_PicoMuon main update**, and rename **update**
 
+![img_12](images/RPi_imager_12.PNG)
 
-4. Type the following command and press enter
+9. Select this folder, **update** and copy.
+
+10. Navigate to the PicoMuon directory, **/home/pi/UKRAA_PicoMuon**, and paste the **update** folder
+
+![img_14](images/RPi_imager_14.PNG)
+
+Close the **File Manager** window
+
+Type the following command and press enter
 ```
 chmod +x *.sh
 ```
