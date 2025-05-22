@@ -6,6 +6,7 @@ echo "Start updating UKRAA PicoMuon software..."
 
 echo "Updating PicoMuon crontab entry..."
 echo "Clearing current crontab entry..."
+echo "NOTE: if you have edited your sudo crontab - this will be deleted.  You will need to reedit sudo crontab post update."
 sudo crontab -r
 echo "Now creating new crontab entry..."
 sudo crontab -l -u root | cat - /home/pi/UKRAA_PicoMuon/update/crontab-update.cron | crontab -u root -
@@ -21,6 +22,7 @@ echo "Finished moving updated python scripts to /UKRAA_PicoMuon/scripts"
 
 echo "Moving new bash script to /UKRAA_PicoMuon/scripts..."
 sudo -u pi cp /home/pi/UKRAA_PicoMuon/update/process.sh /home/pi/UKRAA_PicoMuon/scripts/process.sh
+sudo -u pi cp /home/pi/UKRAA_PicoMuon/update/plots.sh /home/pi/UKRAA_PicoMuon/scripts/plots.sh
 echo "Finished moving new bash script to /UKRAA_PicoMuon/scripts"
 
 
@@ -42,3 +44,4 @@ echo "Finished final update cleanup"
 
 
 echo "Completed updating UKRAA PicoMuon software."
+echo "REMEMBER: if you had your own edits to sudo crontab, you will need to reappy them."
