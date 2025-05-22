@@ -37,11 +37,5 @@ sudo cp /home/pi/UKRAA_PicoMuon/update/index.html /var/www/html/index.html
 echo "Finished moving updated index.html file to /var/www/html"
 
 
-echo "Final update cleanup..."
-rm -rfv /home/pi/UKRAA_PicoMuon/images
-rm -v /home/pi/UKRAA_PicoMuon/README.md
-echo "Finished final update cleanup"
-
-
 echo "Completed updating UKRAA PicoMuon software."
 echo "REMEMBER: if you had your own edits to sudo crontab, you will need to reappy them."
