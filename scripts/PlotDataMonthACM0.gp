@@ -75,7 +75,7 @@ EndXaxis = system("date +'%Y-%m-%d'")." 00:00:00"
 
 # Path to directory to store file
 # week data
-pathPlot3 = "/home/pi/UKRAA_PicoMuon/plots/month/ACM0/".date."_week_plot.png"
+pathPlot3 = "/home/pi/UKRAA_PicoMuon/plots/month/ACM0/".date."_month_plot.png"
 
 # Title for graph
 GraphTitle3 = "% change of muon and neutron count rate from mean count rate for the last month.\n Graph is updated every day at 9.30am \n"

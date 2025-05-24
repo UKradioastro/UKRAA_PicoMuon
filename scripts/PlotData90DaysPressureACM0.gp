@@ -28,21 +28,34 @@ print "PlotData90DaysPressureACM0.gp: "\
     ." to "\
     .system("date -d yesterday +'%Y-%m-%d'")
 
-
 # Set up data paths
-pathData        = "/home/pi/UKRAA_muons/data/processed/3month/ACM0"
+pathData        = "/home/pi/UKRAA_PicoMuon/data/processed/3month/ACM0"
 
 # Year folder
-YearFolder = "/".system("date -d yesterday +'%Y'")
+YearFolder      = "/".system("date -d yesterday +'%Y'")
 
 # YearMonth folder
 YearMonthFolder = "/".system("date -d yesterday +'%Y-%m'")
 
 # YearMonthDay file
-YmdFile = "/".system("date -d yesterday +'%Y-%m-%d'").".txt"
+YmdFile         = "/".system("date -d yesterday +'%Y-%m-%d'").".txt"
 
 # Path to each data file for graphing
 FileData        = pathData.YearFolder.YearMonthFolder.YmdFile
+
+# check if FileData exists - 0=exists, 1=doesn't exist, if doesn't exist then exit, with message
+is_missing = system("/home/pi/UKRAA_PicoMuon/scripts/ismissing.sh ".FileData)
+if (is_missing == 1) {print "PlotData90DaysPressureACM0.gp   : ".system("date +'%Y/%M/%d %H:%M:%S'")." : ACM0 3month data file missing, so..."; 
+    print "PlotData90DaysPressureACM0.gp   : "\
+        .system("date +'%Y/%M/%d %H:%M:%S'")\
+        ." : **FAILED** to complete ACM0 90 days pressure coefficient plot from "\
+        .system("date -d '90 days ago' +'%Y-%m-%d'")\
+        ." to "\
+        .system("date -d yesterday +'%Y-%m-%d'")
+    exit
+}
+
+# FileData exists - good to continue...
 
 # Set separator to ","
 set datafile separator ","
@@ -57,13 +70,11 @@ stats FileData using 7 output prefix "NEUTRON" nooutput
 date = system("date -d yesterday +'%Y-%m-%d'")
 
 # setting output path to include data stamp
-# Path to directory to store file
-# week data
-pathPlot3 = "/home/pi/UKRAA_muons/plots/3month/ACM0/".date."_90_days_pressure_plot.png"
+# 90 days pressure coefficient data
+pathPlot3 = "/home/pi/UKRAA_PicoMuon/plots/3month/ACM0/".date."_90_days_pressure_coefficient_plot.png"
 
 # Title for graph
-# muons detected
-GraphTitle3 = "Pressure correction factor for the last 90 days.\n Graph is updated every day at 8.00am \n"
+GraphTitle3 = "Pressure correction factor for the last 90 days.\n Graph is updated every day at 9.30am \n"
 
 # Set format types
 set format x "%.1f"
@@ -104,11 +115,11 @@ set yrange [*:*] noreverse nowriteback
 
 
 # least square fit
-set print "/home/pi/UKRAA_muons/data/environment/coefficient/".date."_90_days_pressure_coefficient.txt"            # Define a filename to save the values
+set print "/home/pi/UKRAA_PicoMuon/data/environment/coefficient/".date."_90_days_pressure_coefficient.txt"            # Define a filename to save the values
 c = 0
 f(x) = a0*x + c
 set fit nolog quiet
-#set fit logfile "/home/pi/UKRAA_muons/data/environment/coefficient/".date."_pressure_coefficient.txt" quiet
+#set fit logfile "/home/pi/UKRAA_PicoMuon/data/environment/coefficient/".date."_pressure_coefficient.txt" quiet
 fit f(x) FileData using ($6-PRESSURE_mean):((($4-MUON_mean)/MUON_mean)*100) via a0
 print sprintf("%s,%0.6f,%0.6f,%4.2f", date, a0, a0_err, PRESSURE_mean)              # Print the gradient into file
 unset print                          # Turn off the print
@@ -136,7 +147,7 @@ set terminal pngcairo enhanced font "DejaVuSansCondensed, 10" rounded size 640,5
 # setting output path to include data stamp
 
 # Path to directory to store file
-pathPlot = "/home/pi/UKRAA_muons/temp/ACM0_90_days_pressure_plot"
+pathPlot = "/home/pi/UKRAA_PicoMuon/temp/ACM0_90_days_pressure_coefficient_plot"
 
 # set output path to Plot folder
 set output pathPlot.".png"

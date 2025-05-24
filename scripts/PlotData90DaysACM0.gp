@@ -29,19 +29,33 @@ print "PlotData90DaysACM0.gp      : "\
     .system("date -d yesterday +'%Y-%m-%d'")
 
 # Set up data paths
-pathData        = "/home/pi/UKRAA_muons/data/processed/3month/ACM0"
+pathData        = "/home/pi/UKRAA_PicoMuon/data/processed/3month/ACM0"
 
 # Year folder
-YearFolder = "/".system("date -d yesterday +'%Y'")
+YearFolder      = "/".system("date -d yesterday +'%Y'")
 
 # YearMonth folder
 YearMonthFolder = "/".system("date -d yesterday +'%Y-%m'")
 
 # YearMonthDay file
-YmdFile = "/".system("date -d yesterday +'%Y-%m-%d'").".txt"
+YmdFile         = "/".system("date -d yesterday +'%Y-%m-%d'").".txt"
 
 # Path to each data file for graphing
 FileData        = pathData.YearFolder.YearMonthFolder.YmdFile
+
+# check if FileData exists - 0=exists, 1=doesn't exist, if doesn't exist then exit, with message
+is_missing = system("/home/pi/UKRAA_PicoMuon/scripts/ismissing.sh ".FileData)
+if (is_missing == 1) {print "PlotData90DaysACM0.gp   : ".system("date +'%Y/%M/%d %H:%M:%S'")." : ACM0 3month data file missing, so..."; 
+    print "PlotData90DaysACM0.gp   : "\
+        .system("date +'%Y/%M/%d %H:%M:%S'")\
+        ." : **FAILED** to complete ACM0 90 days % deviation plot from "\
+        .system("date -d '90 days ago' +'%Y-%m-%d'")\
+        ." to "\
+        .system("date -d yesterday +'%Y-%m-%d'")
+    exit
+}
+
+# FileData exists - good to continue...
 
 # Set separator to ","
 set datafile separator ","
@@ -60,12 +74,10 @@ StartXaxis = system("date -d '90 days ago' +'%Y-%m-%d'")." 00:00:00"
 EndXaxis = system("date +'%Y-%m-%d'")." 00:00:00"
 
 # setting output path to include data stamp
-# Path to directory to store file
-# week data
-pathPlot3 = "/home/pi/UKRAA_muons/plots/3month/ACM0/".date."_90_days_plot.png"
+# 90 days data
+pathPlot3 = "/home/pi/UKRAA_PicoMuon/plots/3month/ACM0/".date."_90_days_plot.png"
 
 # Title for graph
-# muons detected
 GraphTitle3 = "% change of muon and neutron count rate from mean count rate for the last 90 days.\n Graph is updated every day at 9.30am \n"
 
 # Set data types
@@ -80,7 +92,8 @@ set timefmt "%Y-%m-%d %H:%M:%S"
 # Set grid format
 set grid xtics nomxtics ytics nomytics noztics nomztics nortics nomrtics \
  nox2tics nomx2tics noy2tics nomy2tics nocbtics nomcbtics
-set grid layerdefault linetype 0 linecolor 0 linewidth 0.500 dashtype solid,  linetype 0 linecolor 0 linewidth 0.500 dashtype solid
+set grid layerdefault linetype 0 linecolor 0 linewidth 0.500 dashtype solid, \
+ linetype 0 linecolor 0 linewidth 0.500 dashtype solid
 
 # Set Legend (Key) above plot
 set key outside above center
@@ -128,7 +141,7 @@ set label 2 at graph 0.02, 0.90 tc default
 
 
 # Plot command 
-# for last month
+# for last 90 days
 GraphTitle = GraphTitle3
 set key title GraphTitle
 set output pathPlot3
@@ -138,10 +151,8 @@ plot FileData using 1:(((($4/MUON_mean)*100)-100)) linetype 1 linewidth 1 lineco
 # Replot to terminal and create .png image with data tag for future upload to web page
 set terminal pngcairo enhanced font "DejaVuSansCondensed, 10" rounded size 640,540 
 
-# setting output path to include data stamp
-
 # Path to directory to store file
-pathPlot = "/home/pi/UKRAA_muons/temp/ACM0_90_days_plot"
+pathPlot = "/home/pi/UKRAA_PicoMuon/temp/ACM0_90_days_plot"
 
 # set output path to Plot folder
 set output pathPlot.".png"
