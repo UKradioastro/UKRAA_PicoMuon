@@ -120,7 +120,7 @@ set xlabel textcolor rgb "black" norotate
 set xrange [ StartXaxis : EndXaxis ] noreverse nowriteback
 
 # Y-axis labels and ranges
-set ylabel "% change in muon flux N15 London UK" 
+set ylabel "% change in muon flux" 
 set ylabel textcolor rgb "dark-violet" rotate
 set yrange [ (((MUON_min/MUON_mean)*100)-100)-5 : (((MUON_max/MUON_mean)*100)-100)+5 ] noreverse nowriteback
 

@@ -109,7 +109,7 @@ set xlabel textcolor rgb "black" norotate
 set xrange [*:*] noreverse nowriteback
 
 # Y-axis labels and ranges
-set ylabel "Change of pressure/mean pressure (%) N15 London UK" 
+set ylabel "Change of pressure/mean pressure (%)" 
 set ylabel textcolor rgb "dark-violet" rotate
 set yrange [*:*] noreverse nowriteback
 
