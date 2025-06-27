@@ -121,9 +121,22 @@ for i in range(1, n+1):
             elif RawLine['RawPosition'] == 'C':
                 count_M +=1
 
-    ProcessedCPM_T = count_T
-    ProcessedCPM_B = count_B
-    ProcessedCPM_M = count_M
+    # check if there is some top counts data
+    if (count_T != 0):
+        ProcessedCPM_T = '{:.0f}'.format(count_T)
+    else:
+        ProcessedCPM_T = float('nan')
+    # check if there is some bottom counts data
+    if (count_B != 0):
+        ProcessedCPM_B = '{:.0f}'.format(count_B)
+    else:
+        ProcessedCPM_B = float('nan')
+    # check if there is some coincidence counts data
+    if (count_M != 0):
+        ProcessedCPM_M = '{:.0f}'.format(count_M)
+    else:
+        ProcessedCPM_M = float('nan')
+
 
     # write to file
     ProcessedData.write(str(ProcessedTime))          # Data time date
