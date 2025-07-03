@@ -1,16 +1,15 @@
 #!/usr/bin/env python3
 
 #imports
-from datetime import datetime, timedelta
+import datetime as dt
 import csv
 import os
 
 # print message to log file to say started
-
-print('ProcessDataDayACM0.py  :', \
-      datetime.strftime(datetime.now(), '%Y-%m-%d %H:%M:%S'), \
+print('ProcessDataDayACM0.py    :', \
+      dt.datetime.strftime(dt.datetime.now(), '%Y-%m-%d %H:%M:%S'), \
       ': Started ACM0 days % deviation data processing for', \
-      datetime.strftime(datetime.now() - timedelta(1), '%Y-%m-%d'))
+      dt.datetime.strftime(dt.datetime.now() - dt.timedelta(1), '%Y-%m-%d'))
 
 # Set file headers for data file structure
 RawFieldNames    = ['RawDateTime',\
@@ -27,11 +26,11 @@ RawFieldNames    = ['RawDateTime',\
 
 # raw data file source
 RawDataFile   = "/home/pi/UKRAA_PicoMuon/data/raw/ACM0/" \
-                 + datetime.strftime(datetime.now() - timedelta(1), '%Y') \
+                 + dt.datetime.strftime(dt.datetime.now() - dt.timedelta(1), '%Y') \
                  + "/" \
-                 + datetime.strftime(datetime.now() - timedelta(1), '%Y-%m') \
+                 + dt.datetime.strftime(dt.datetime.now() - dt.timedelta(1), '%Y-%m') \
                  + "/" \
-                 + datetime.strftime(datetime.now() - timedelta(1), '%Y-%m-%d') \
+                 + dt.datetime.strftime(dt.datetime.now() - dt.timedelta(1), '%Y-%m-%d') \
                  + ".txt"
 
 # Set file headers for data file structure
@@ -42,58 +41,54 @@ NeutronFieldNames    = ['NeutronDateTime', \
                         'EfficiencyCorrected']
 
 # Neutron data file source
-NeutronDataFile   = "/home/pi/UKRAA_PicoMuon/data/neutrons/" \
-                 + datetime.strftime(datetime.now() - timedelta(1), '%Y') \
+NeutronDataFile   = "/home/pi/UKRAA_PicoMuon/data/NMDB/neutrons/" \
+                 + dt.datetime.strftime(dt.datetime.now() - dt.timedelta(1), '%Y') \
                  + "/" \
-                 + datetime.strftime(datetime.now() - timedelta(1), '%Y-%m') \
+                 + dt.datetime.strftime(dt.datetime.now() - dt.timedelta(1), '%Y-%m') \
                  + "/" \
-                 + datetime.strftime(datetime.now() - timedelta(1), '%Y-%m-%d') \
+                 + dt.datetime.strftime(dt.datetime.now() - dt.timedelta(1), '%Y-%m-%d') \
                  + ".txt"
 
 # Processed data path
 ProcessedPath = '/home/pi/UKRAA_PicoMuon/data/processed/day/ACM0/'\
-                + datetime.strftime(datetime.now() - timedelta(1), '%Y') \
+                + dt.datetime.strftime(dt.datetime.now() - dt.timedelta(1), '%Y') \
                 + "/" \
-                + datetime.strftime(datetime.now() - timedelta(1), '%Y-%m')
+                + dt.datetime.strftime(dt.datetime.now() - dt.timedelta(1), '%Y-%m')
 
 # check if the specific path exists
 pathExists = os.path.exists(ProcessedPath)
 if not pathExists:
     # create directory structure
     os.makedirs(ProcessedPath)
-    print('ProcessDataDayACM0.py  :', \
-          datetime.strftime(datetime.now(), '%Y-%m-%d %H:%M:%S'), \
-          ': New directory created :', \
+    print('ProcessDataDayACM0.py    :', \
+          dt.datetime.strftime(dt.datetime.now(), '%Y-%m-%d %H:%M:%S'), \
+          ': New ACM0 day directory created :', \
           ProcessedPath)
 
 # Processed data file name
 ProcessedDataFile = "/home/pi/UKRAA_PicoMuon/data/processed/day/ACM0/" \
-                     + datetime.strftime(datetime.now() - timedelta(1), '%Y') \
+                     + dt.datetime.strftime(dt.datetime.now() - dt.timedelta(1), '%Y') \
                      + "/" \
-                     + datetime.strftime(datetime.now() - timedelta(1), '%Y-%m') \
+                     + dt.datetime.strftime(dt.datetime.now() - dt.timedelta(1), '%Y-%m') \
                      + "/" \
-                     + datetime.strftime(datetime.now() - timedelta(1), '%Y-%m-%d') \
+                     + dt.datetime.strftime(dt.datetime.now() - dt.timedelta(1), '%Y-%m-%d') \
                      + ".txt"
 
 # =============================================================================
 # Main program
 
-StartTime_str = datetime.strftime(datetime.now() - timedelta(1), '%Y-%m-%d') \
+StartTime_str = dt.datetime.strftime(dt.datetime.now() - dt.timedelta(1), '%Y-%m-%d') \
                 + ' 00:00:00.000000'
 
-StartTime_datetime = datetime.strptime(StartTime_str, '%Y-%m-%d %H:%M:%S.%f')
-# uncomment next lines to print the response
-#print('ProcessDataDayACM0.py: Value of variable (StartTime_datetime): ',StartTime_datetime)
+StartTime_datetime = dt.datetime.strptime(StartTime_str, '%Y-%m-%d %H:%M:%S.%f')
 
-EndTime_str = datetime.strftime(datetime.now() - timedelta(1), '%Y-%m-%d') \
+EndTime_str = dt.datetime.strftime(dt.datetime.now() - dt.timedelta(1), '%Y-%m-%d') \
               + ' 23:59:59.999999'
 
-EndTime_datetime = datetime.strptime(EndTime_str, '%Y-%m-%d %H:%M:%S.%f')
-# uncomment next lines to print the response
-#print('ProcessDataDayACM0.py: Value of variable (EndTime_datetime): ',EndTime_datetime)
+EndTime_datetime = dt.datetime.strptime(EndTime_str, '%Y-%m-%d %H:%M:%S.%f')
 
 # define what the time change will be
-minute = timedelta(
+minute = dt.timedelta(
     days         =  0,
     seconds      =  0,
     microseconds =  0,
@@ -101,8 +96,6 @@ minute = timedelta(
     minutes      =  5,
     hours        =  0,
     weeks        =  0)
-# uncomment next lines to print the response
-#print('ProcessDataDayACM0.py: Value of variable (minute): ', minute)
 
 # set up variable to use in loop
 ProcessedTime = StartTime_datetime - minute
@@ -111,10 +104,12 @@ ProcessedTime = StartTime_datetime - minute
 n = 288
 
 # open file to store data in and append to end
-ProcessedData = open(file=ProcessedDataFile, mode='a', encoding='UTF-8')
+ProcessedData = open(file=ProcessedDataFile, \
+                     mode='a', \
+                     encoding='UTF-8')
 
 for i in range(1, n+1):
-    # add a minute to each time value from 00:00:00 to 23:59:00
+    # add a timedelta to each time value from 00:00:00 to 23:59:00
     ProcessedTime = ProcessedTime + minute
     
     StartBinTime = ProcessedTime
@@ -122,8 +117,12 @@ for i in range(1, n+1):
     EndBinTime = StartBinTime + minute
 
     # using csv.DictReader
-    RawFile = open(file=RawDataFile, mode='r', encoding='UTF-8')
-    RawCSV_reader = csv.DictReader(RawFile,RawFieldNames)
+    RawFile = open(file=RawDataFile, \
+                   mode='r', \
+                   encoding='UTF-8')
+    
+    RawCSV_reader = csv.DictReader(RawFile, \
+                                   RawFieldNames)
 
     # set counters to zero
     count_T     = 0
@@ -135,8 +134,8 @@ for i in range(1, n+1):
 
     for RawLine in RawCSV_reader:
         # try to get raw data after start StartBinTime
-        # convert string to datetime.datetime format
-        RawDatetime = datetime.strptime(RawLine['RawDateTime'], 
+        # convert string to dt.datetime.datetime format
+        RawDatetime = dt.datetime.strptime(RawLine['RawDateTime'], 
                                         '%Y-%m-%d %H:%M:%S.%f')
         
         # search file for data between two time points
@@ -159,13 +158,17 @@ for i in range(1, n+1):
     RawFile.close()
 
     # using csv.DictReader
-    NeutronFile = open(file=NeutronDataFile, mode='r', encoding='UTF-8')
-    NeutronCSV_reader = csv.DictReader(NeutronFile,NeutronFieldNames)
+    NeutronFile = open(file=NeutronDataFile, \
+                       mode='r', \
+                       encoding='UTF-8')
+    
+    NeutronCSV_reader = csv.DictReader(NeutronFile, \
+                                       NeutronFieldNames)
 
     for NeutronLine in NeutronCSV_reader:
-        # try to get raw data after start StartBinTime
-        # convert string to datetime.datetime format
-        NeutronDatetime = datetime.strptime(NeutronLine['NeutronDateTime'], 
+        # try to get neutron data after start StartBinTime
+        # convert string to dt.datetime.datetime format
+        NeutronDatetime = dt.datetime.strptime(NeutronLine['NeutronDateTime'], 
                                         '%Y-%m-%d %H:%M:%S')
         
         # search file for data between two time points
@@ -230,9 +233,9 @@ ProcessedData.close()
 
 # print message to log file to say completed
 print('ProcessDataDayACM0.py  :', \
-      datetime.strftime(datetime.now(), '%Y-%m-%d %H:%M:%S'), \
+      dt.datetime.strftime(dt.datetime.now(), '%Y-%m-%d %H:%M:%S'), \
       ': Completed ACM0 days % deviation data processing for', \
-      datetime.strftime(datetime.now() - timedelta(1), '%Y-%m-%d'))
+      dt.datetime.strftime(dt.datetime.now() - dt.timedelta(1), '%Y-%m-%d'))
       
 
 # =============================================================================
