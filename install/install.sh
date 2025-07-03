@@ -5,26 +5,28 @@ echo "Start installing UKRAA PicoMuon software..."
 
 
 echo "Start installing pandas software..."
-sudo apt install python3-pandas
+sudo apt install python3-pandas -y
 echo "pandas software installed"
 
 
 echo "Start installing gnuplot software..."
-sudo apt-get install gnuplot
-sudo apt-get install gnuplot-doc
-sudo apt-get install gnuplot-x11
+sudo apt install gnuplot -y
+sudo apt install gnuplot-doc -y
+sudo apt install gnuplot-x11 -y
 echo "gnuplot software installed"
 
 
 echo "Creating directory structure..."
+sudo -u  pi mkdir -vp /home/pi/UKRAA_PicoMuon/data/environment/coefficient
+sudo -u  pi mkdir -vp /home/pi/UKRAA_PicoMuon/data/NMDB/neutrons
 sudo -u  pi mkdir -vp /home/pi/UKRAA_PicoMuon/data/processed/adc/ACM0
 sudo -u  pi mkdir -vp /home/pi/UKRAA_PicoMuon/data/processed/cpm/ACM0
 sudo -u  pi mkdir -vp /home/pi/UKRAA_PicoMuon/data/processed/day/ACM0
 sudo -u  pi mkdir -vp /home/pi/UKRAA_PicoMuon/data/processed/month/ACM0
 sudo -u  pi mkdir -vp /home/pi/UKRAA_PicoMuon/data/processed/week/ACM0
 sudo -u  pi mkdir -vp /home/pi/UKRAA_PicoMuon/data/raw/ACM0
-sudo -u  pi mkdir -vp /home/pi/UKRAA_PicoMuon/data/neutrons
 sudo -u  pi mkdir -v  /home/pi/UKRAA_PicoMuon/logfiles
+sudo -u  pi mkdir -vp /home/pi/UKRAA_PicoMuon/plots/3month/ACM0
 sudo -u  pi mkdir -vp /home/pi/UKRAA_PicoMuon/plots/adc/ACM0
 sudo -u  pi mkdir -vp /home/pi/UKRAA_PicoMuon/plots/cpm/ACM0
 sudo -u  pi mkdir -vp /home/pi/UKRAA_PicoMuon/plots/day/ACM0
@@ -56,16 +58,16 @@ echo "PicoMuon crontab entry installed"
 echo "Start installing web server on RPi..."
 
 echo "Update packages..."
-sudo apt-get update
+sudo apt update
 
 echo "Install apache2..."
-sudo apt-get install apache2 -y
+sudo apt install apache2 -y
 
 echo "Install php..."
-sudo apt-get install php libapache2-mod-php -y
+sudo apt install php libapache2-mod-php -y
 
 echo "Install mariadb..."
-sudo apt-get install mariadb-server
+sudo get install mariadb-server
 sudo mysql_secure_installation
 
 echo "Install the php-mysql connector..."
