@@ -94,10 +94,10 @@ for i in range(0, n):
     count_M = 0
 
     for RawLine in RawCSV_reader:
-        # try to get raw data after start StartBinTime
+        # try to get raw data for ADC value
         RawAdc = int(RawLine['RawADC'])
         
-        # search file for data between two time points
+        # search file for data between two ADC points
         if (RawAdc >= StartBinAdc) and (RawAdc < EndBinAdc):
             # add counts to positions
             if RawLine['RawPosition'] == 'T':
@@ -110,21 +110,9 @@ for i in range(0, n):
     # close open RawFile
     RawFile.close()
 
-    # check if there is some top counts data
-    if (count_T != 0):
-        CountADC_T = '{:.0f}'.format(count_T)
-    else:
-        CountADC_T = float("nan")
-    # check if there is some bottom counts data
-    if (count_B != 0):
-        CountADC_B = '{:.0f}'.format(count_B)
-    else:
-        CountADC_B = float("nan")
-    # check if there is some coincidence counts data
-    if (count_M != 0):
-        CountADC_M = '{:.0f}'.format(count_M)
-    else:
-        CountADC_M = float("nan")
+    CountADC_T = '{:.0f}'.format(count_T)
+    CountADC_B = '{:.0f}'.format(count_B)
+    CountADC_M = '{:.0f}'.format(count_M)
 
     # write to file
     ProcessedData.write(str(ProcessedAdc))         # ADC value
