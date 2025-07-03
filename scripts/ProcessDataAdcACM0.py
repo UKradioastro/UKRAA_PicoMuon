@@ -44,7 +44,7 @@ if not pathExists:
     os.makedirs(ProcessedPath)
     print('ProcessDataAdcACM0.py    :', \
           dt.datetime.strftime(dt.datetime.now(), '%Y-%m-%d %H:%M:%S'), \
-          ': New ADC directory created :', \
+          ': New ACM0 ADC directory created :', \
           ProcessedPath)
 
 # Processed data file name
