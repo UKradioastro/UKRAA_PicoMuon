@@ -21,7 +21,7 @@ set terminal pngcairo enhanced font "DejaVuSansCondensed, 10" rounded size 640,5
 set print "-"
 
 # print to log file
-print "PlotData90DaysSTPACM0.gp   : "\
+print "PlotData90DaysSTPACM0.gp : "\
     .system("date +'%Y-%m-%d %H:%M:%S'")\
     ." : Started ACM0 90 days STP plot from "\
     .system("date -d '90 days ago' +'%Y-%m-%d'")\
@@ -45,8 +45,8 @@ FileData        = pathData.YearFolder.YearMonthFolder.YmdFile
 
 # check if FileData exists - 0=exists, 1=doesn't exist, if doesn't exist then exit, with message
 is_missing = system("/home/pi/UKRAA_PicoMuon/scripts/ismissing.sh ".FileData)
-if (is_missing == 1) {print "PlotData90DaysSTPACM0.gp   : ".system("date +'%Y/%M/%d %H:%M:%S'")." : ACM0 3month data file missing, so..."; 
-    print "PlotData90DaysSTPACM0.gp   : "\
+if (is_missing == 1) {print "PlotData90DaysSTPACM0.gp : ".system("date +'%Y/%M/%d %H:%M:%S'")." : ACM0 3month data file missing, so..."; 
+    print "PlotData90DaysSTPACM0.gp : "\
         .system("date +'%Y/%M/%d %H:%M:%S'")\
         ." : **FAILED** to complete ACM0 90 days STP plot from "\
         .system("date -d '90 days ago' +'%Y-%m-%d'")\
@@ -162,7 +162,7 @@ replot
 # end replot
 
 # print to log file
-print "PlotData90DaysSTPACM0.gp   : "\
+print "PlotData90DaysSTPACM0.gp : "\
     .system("date +'%Y-%m-%d %H:%M:%S'")\
     ." : Completed ACM0 90 days STP plot from "\
     .system("date -d '90 days ago' +'%Y-%m-%d'")\
