@@ -1,53 +1,59 @@
 #!/usr/bin/env python3
 
-from datetime import datetime, timedelta
+import datetime as dt
 import csv
 import os
 
 # print message to log file to say started
-print('ProcessDataAdcACM0.py  :', \
-      datetime.strftime(datetime.now(), '%Y-%m-%d %H:%M:%S'), \
-      ': Started ACM0 adc data processing for', \
-      datetime.strftime(datetime.now() - timedelta(1), '%Y-%m-%d'))
+print('ProcessDataAdcACM0.py    :', \
+      dt.datetime.strftime(dt.datetime.now(), '%Y-%m-%d %H:%M:%S'), \
+      ': Started ADC ACM0 data processing for', \
+      dt.datetime.strftime(dt.datetime.now() - dt.timedelta(1), '%Y-%m-%d'))
 
 # Set file headers for data file structure
-RawFieldNames    = ['RawDateTime','RawPosition', 'RawCount', 'RawADC', \
-                    'RawPicoTime', 'RawDeadTime', 'RawPicoTemp', 'RawPicoPres']
+RawFieldNames    = ['RawDateTime', \
+                    'RawPosition', \
+                    'RawCount', \
+                    'RawADC', \
+                    'RawPicoTime', \
+                    'RawDeadTime', \
+                    'RawPicoTemp', \
+                    'RawPicoPres']
 
 # Set path for data file structure
 
 # raw data file source
 RawDataFile   = "/home/pi/UKRAA_PicoMuon/data/raw/ACM0/" \
-                 + datetime.strftime(datetime.now() - timedelta(1), '%Y') \
+                 + dt.datetime.strftime(dt.datetime.now() - dt.timedelta(1), '%Y') \
                  + "/" \
-                 + datetime.strftime(datetime.now() - timedelta(1), '%Y-%m') \
+                 + dt.datetime.strftime(dt.datetime.now() - dt.timedelta(1), '%Y-%m') \
                  + "/" \
-                 + datetime.strftime(datetime.now() - timedelta(1), '%Y-%m-%d') \
+                 + dt.datetime.strftime(dt.datetime.now() - dt.timedelta(1), '%Y-%m-%d') \
                  + ".txt"
 
 # Processed data path
 ProcessedPath = '/home/pi/UKRAA_PicoMuon/data/processed/adc/ACM0/'\
-                + datetime.strftime(datetime.now() - timedelta(1), '%Y') \
+                + dt.datetime.strftime(dt.datetime.now() - dt.timedelta(1), '%Y') \
                 + "/" \
-                + datetime.strftime(datetime.now() - timedelta(1), '%Y-%m')
+                + dt.datetime.strftime(dt.datetime.now() - dt.timedelta(1), '%Y-%m')
 
 # check if the specific path exists
 pathExists = os.path.exists(ProcessedPath)
 if not pathExists:
     # create directory structure
     os.makedirs(ProcessedPath)
-    print('ProcessDataAdcACM0.py  :', \
-          datetime.strftime(datetime.now(), '%Y-%m-%d %H:%M:%S'), \
-          ': New directory created :', \
+    print('ProcessDataAdcACM0.py    :', \
+          dt.datetime.strftime(dt.datetime.now(), '%Y-%m-%d %H:%M:%S'), \
+          ': New ADC directory created :', \
           ProcessedPath)
 
 # Processed data file name
 ProcessedDataFile = "/home/pi/UKRAA_PicoMuon/data/processed/adc/ACM0/" \
-                     + datetime.strftime(datetime.now() - timedelta(1), '%Y') \
+                     + dt.datetime.strftime(dt.datetime.now() - dt.timedelta(1), '%Y') \
                      + "/" \
-                     + datetime.strftime(datetime.now() - timedelta(1), '%Y-%m') \
+                     + dt.datetime.strftime(dt.datetime.now() - dt.timedelta(1), '%Y-%m') \
                      + "/" \
-                     + datetime.strftime(datetime.now() - timedelta(1), '%Y-%m-%d') \
+                     + dt.datetime.strftime(dt.datetime.now() - dt.timedelta(1), '%Y-%m-%d') \
                      + ".txt"
 
 # =============================================================================
@@ -59,14 +65,16 @@ BinAdc = 1
 # set up variable to use in loop
 ProcessedAdc = -1
 
-# number of adc values - 0 to 4095 (2^12)
+# number of adc values - 0 to 1023 (2^10)
 n = 1024
 
 # open file to store data in and append data
-ProcessedData = open(file=ProcessedDataFile, mode='a', encoding='UTF-8')
+ProcessedData = open(file=ProcessedDataFile, \
+                     mode='a', \
+                     encoding='UTF-8')
 
 for i in range(0, n):
-    # add bin size to Adc value from 0 to 4095
+    # add bin size to Adc value from 0 to 1023
     ProcessedAdc = ProcessedAdc + BinAdc
     
     StartBinAdc = ProcessedAdc
@@ -74,8 +82,12 @@ for i in range(0, n):
     EndBinAdc = StartBinAdc + BinAdc
 
     # using csv.DictReader
-    RawFile = open(file=RawDataFile, mode='r', encoding='UTF-8')
-    RawCSV_reader = csv.DictReader(RawFile,RawFieldNames)
+    RawFile = open(file=RawDataFile, \
+                   mode='r', \
+                   encoding='UTF-8')
+    
+    RawCSV_reader = csv.DictReader(RawFile, \
+                                   RawFieldNames)
 
     count_T = 0
     count_B = 0
@@ -94,32 +106,47 @@ for i in range(0, n):
                 count_B +=1
             elif RawLine['RawPosition'] == 'C':
                 count_M +=1
-            
-    CountADC_T = count_T
-    CountADC_B = count_B
-    CountADC_M = count_M
-   
-    # write to file
-    ProcessedData.write(str(ProcessedAdc))         # Data time date
-    ProcessedData.write(",")                       # "," separator
-    ProcessedData.write(str(CountADC_T))           # top SiPM ADC values
-    ProcessedData.write(",")                       # "," separator
-    ProcessedData.write(str(CountADC_B))           # bottom ADC value
-    ProcessedData.write(",")                       # "," separator
-    ProcessedData.write(str(CountADC_M))           # muon ADC value
-    ProcessedData.write("\n")                      # new line
-
+    
     # close open RawFile
     RawFile.close()
+
+    # check if there is some top counts data
+    if (count_T != 0):
+        CountADC_T = '{:.0f}'.format(count_T)
+    else:
+        CountADC_T = float("nan")
+    # check if there is some bottom counts data
+    if (count_B != 0):
+        CountADC_B = '{:.0f}'.format(count_B)
+    else:
+        CountADC_B = float("nan")
+    # check if there is some coincidence counts data
+    if (count_M != 0):
+        CountADC_M = '{:.0f}'.format(count_M)
+    else:
+        CountADC_M = float("nan")
+
+    # write to file
+    ProcessedData.write(str(ProcessedAdc))         # ADC value
+    ProcessedData.write(",")                       # "," separator
+    ProcessedData.write(str(CountADC_T))           # top SiPM ADC count value
+    ProcessedData.write(",")                       # "," separator
+    ProcessedData.write(str(CountADC_B))           # bottom ADC count value
+    ProcessedData.write(",")                       # "," separator
+    ProcessedData.write(str(CountADC_M))           # muon ADC count value
+    ProcessedData.write("\n")                      # new line
 
 # close open ProcessedData file
 ProcessedData.close()
 
+# =============================================================================
+# Message to log file at end of program
+
 # print message to log file to say completed
-print('ProcessDataAdcACM0.py  :', \
-      datetime.strftime(datetime.now(), '%Y-%m-%d %H:%M:%S'), \
-      ': Completed ACM0 adc data processing for', \
-      datetime.strftime(datetime.now() - timedelta(1), '%Y-%m-%d'))
+print('ProcessDataAdcACM0.py    :', \
+      dt.datetime.strftime(dt.datetime.now(), '%Y-%m-%d %H:%M:%S'), \
+      ': Completed ADC ACM0 data processing for', \
+      dt.datetime.strftime(dt.datetime.now() - dt.timedelta(1), '%Y-%m-%d'))
       
 
 # ==========================================================================================
