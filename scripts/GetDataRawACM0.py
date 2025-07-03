@@ -18,11 +18,13 @@ def main():
                 + dt.datetime.strftime(dt.datetime.now(dt.timezone.utc), '%Y')\
                 + '/'\
                 + dt.datetime.strftime(dt.datetime.now(dt.timezone.utc), '%Y-%m')
+        
         # check if the specific path exists
         pathExists = os.path.exists(path)
         if not pathExists:
             # create directory structure
             os.makedirs(path)
+
         # output file to write data to
         outfile = open('/home/pi/UKRAA_PicoMuon/data/raw/ACM0/'
                     + dt.datetime.strftime(dt.datetime.now(dt.timezone.utc), '%Y')
@@ -31,7 +33,8 @@ def main():
                     + '/'
                     + dt.datetime.strftime(dt.datetime.now(dt.timezone.utc), '%Y-%m-%d')
                     + '.txt', 'a')
-        # if data write to file
+        
+        # if data, write to file
         if line:
             timetowrite = (dt.datetime.strftime(dt.datetime.now(dt.timezone.utc), '%Y-%m-%d')
                         + " "
