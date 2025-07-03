@@ -6,20 +6,20 @@ import csv
 import os
 
 # print message to log file to say started
-print('ProcessDataDayACM0.py    :', \
-      dt.datetime.strftime(dt.datetime.now(), '%Y-%m-%d %H:%M:%S'), \
-      ': Started ACM0 days % deviation data processing for', \
+print('ProcessDataDayACM0.py    :',
+      dt.datetime.strftime(dt.datetime.now(), '%Y-%m-%d %H:%M:%S'),
+      ': Started ACM0 days % deviation data processing for',
       dt.datetime.strftime(dt.datetime.now() - dt.timedelta(1), '%Y-%m-%d'))
 
 # Set file headers for data file structure
-RawFieldNames    = ['RawDateTime',\
-                    'RawPosition', \
-                    'RawCount', \
-                    'RawADC', \
-                    'RawPicoTime', \
-                    'RawPicoDeadTime', \
-                    'RawPicoTemp', \
-                    'RawPicoPres', \
+RawFieldNames    = ['RawDateTime',
+                    'RawPosition',
+                    'RawCount',
+                    'RawADC',
+                    'RawPicoTime',
+                    'RawPicoDeadTime',
+                    'RawPicoTemp',
+                    'RawPicoPres',
                     'RawPicoName']
 
 # Set path for data file structure
@@ -34,10 +34,10 @@ RawDataFile   = "/home/pi/UKRAA_PicoMuon/data/raw/ACM0/" \
                  + ".txt"
 
 # Set file headers for data file structure
-NeutronFieldNames    = ['NeutronDateTime', \
-                        'NeutronPressure', \
-                        'Uncorrected', \
-                        'PressureCorrected', \
+NeutronFieldNames    = ['NeutronDateTime',
+                        'NeutronPressure',
+                        'Uncorrected',
+                        'PressureCorrected',
                         'EfficiencyCorrected']
 
 # Neutron data file source
@@ -60,9 +60,9 @@ pathExists = os.path.exists(ProcessedPath)
 if not pathExists:
     # create directory structure
     os.makedirs(ProcessedPath)
-    print('ProcessDataDayACM0.py    :', \
-          dt.datetime.strftime(dt.datetime.now(), '%Y-%m-%d %H:%M:%S'), \
-          ': New ACM0 day directory created :', \
+    print('ProcessDataDayACM0.py    :',
+          dt.datetime.strftime(dt.datetime.now(), '%Y-%m-%d %H:%M:%S'),
+          ': New ACM0 day directory created :',
           ProcessedPath)
 
 # Processed data file name
@@ -104,8 +104,8 @@ ProcessedTime = StartTime_datetime - minute
 n = 288
 
 # open file to store data in and append to end
-ProcessedData = open(file=ProcessedDataFile, \
-                     mode='a', \
+ProcessedData = open(file=ProcessedDataFile,
+                     mode='a',
                      encoding='UTF-8')
 
 for i in range(1, n+1):
@@ -117,11 +117,11 @@ for i in range(1, n+1):
     EndBinTime = StartBinTime + minute
 
     # using csv.DictReader
-    RawFile = open(file=RawDataFile, \
-                   mode='r', \
+    RawFile = open(file=RawDataFile,
+                   mode='r',
                    encoding='UTF-8')
     
-    RawCSV_reader = csv.DictReader(RawFile, \
+    RawCSV_reader = csv.DictReader(RawFile,
                                    RawFieldNames)
 
     # set counters to zero
@@ -135,8 +135,8 @@ for i in range(1, n+1):
     for RawLine in RawCSV_reader:
         # try to get raw data after start StartBinTime
         # convert string to dt.datetime.datetime format
-        RawDatetime = dt.datetime.strptime(RawLine['RawDateTime'], 
-                                        '%Y-%m-%d %H:%M:%S.%f')
+        RawDatetime = dt.datetime.strptime(RawLine['RawDateTime'],
+                                           '%Y-%m-%d %H:%M:%S.%f')
         
         # search file for data between two time points
         if (RawDatetime >= StartBinTime) and (RawDatetime < EndBinTime):
@@ -158,11 +158,11 @@ for i in range(1, n+1):
     RawFile.close()
 
     # using csv.DictReader
-    NeutronFile = open(file=NeutronDataFile, \
-                       mode='r', \
+    NeutronFile = open(file=NeutronDataFile,
+                       mode='r',
                        encoding='UTF-8')
     
-    NeutronCSV_reader = csv.DictReader(NeutronFile, \
+    NeutronCSV_reader = csv.DictReader(NeutronFile,
                                        NeutronFieldNames)
 
     for NeutronLine in NeutronCSV_reader:
@@ -232,9 +232,9 @@ ProcessedData.close()
 # Message to log file at end of program
 
 # print message to log file to say completed
-print('ProcessDataDayACM0.py  :', \
-      dt.datetime.strftime(dt.datetime.now(), '%Y-%m-%d %H:%M:%S'), \
-      ': Completed ACM0 days % deviation data processing for', \
+print('ProcessDataDayACM0.py  :',
+      dt.datetime.strftime(dt.datetime.now(), '%Y-%m-%d %H:%M:%S'),
+      ': Completed ACM0 days % deviation data processing for',
       dt.datetime.strftime(dt.datetime.now() - dt.timedelta(1), '%Y-%m-%d'))
       
 
