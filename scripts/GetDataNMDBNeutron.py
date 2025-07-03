@@ -6,7 +6,7 @@ import os
 import nest
 
 # print message to log file to say started
-print('GetDataNMDBNeutron.py    :', \
+print('GetDataNMDBneutron.py    :', \
       dt.datetime.strftime(dt.datetime.now(), '%Y-%m-%d %H:%M:%S'), \
       ': Started scraping NMDB Oulu neutron data for', \
       dt.datetime.strftime(dt.datetime.now() - dt.timedelta(1), '%Y-%m-%d'))
@@ -22,7 +22,7 @@ pathExist = os.path.exists(path)
 if not pathExist:
     # Create a new directory because it does not exist
     os.makedirs(path)
-    print('GetDataNMDBNeutron.py    :',\
+    print('GetDataNMDBneutron.py    :',\
           dt.datetime.strftime(dt.datetime.now(), '%Y-%m-%d %H:%M:%S'), \
           ': New NMDB Oulu neutron directory created')
 
@@ -86,7 +86,7 @@ df.to_csv(outfile, \
 # Message to log file at end of program
 
 # print message to log file to say completed
-print('GetDataNMDBNeutron.py    :', \
+print('GetDataNMDBneutron.py    :', \
       dt.datetime.strftime(dt.datetime.now(), '%Y-%m-%d %H:%M:%S'), \
       ': Completed scraping NMDB Oulu neutron data for', \
       dt.datetime.strftime(dt.datetime.now() - dt.timedelta(1), '%Y-%m-%d'))
