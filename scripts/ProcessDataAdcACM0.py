@@ -5,19 +5,19 @@ import csv
 import os
 
 # print message to log file to say started
-print('ProcessDataAdcACM0.py    :', \
-      dt.datetime.strftime(dt.datetime.now(), '%Y-%m-%d %H:%M:%S'), \
-      ': Started ADC ACM0 data processing for', \
+print('ProcessDataAdcACM0.py    :',
+      dt.datetime.strftime(dt.datetime.now(), '%Y-%m-%d %H:%M:%S'),
+      ': Started ADC ACM0 data processing for',
       dt.datetime.strftime(dt.datetime.now() - dt.timedelta(1), '%Y-%m-%d'))
 
 # Set file headers for data file structure
-RawFieldNames    = ['RawDateTime', \
-                    'RawPosition', \
-                    'RawCount', \
-                    'RawADC', \
-                    'RawPicoTime', \
-                    'RawDeadTime', \
-                    'RawPicoTemp', \
+RawFieldNames    = ['RawDateTime',
+                    'RawPosition',
+                    'RawCount',
+                    'RawADC',
+                    'RawPicoTime',
+                    'RawDeadTime',
+                    'RawPicoTemp',
                     'RawPicoPres']
 
 # Set path for data file structure
@@ -42,9 +42,9 @@ pathExists = os.path.exists(ProcessedPath)
 if not pathExists:
     # create directory structure
     os.makedirs(ProcessedPath)
-    print('ProcessDataAdcACM0.py    :', \
-          dt.datetime.strftime(dt.datetime.now(), '%Y-%m-%d %H:%M:%S'), \
-          ': New ACM0 ADC directory created :', \
+    print('ProcessDataAdcACM0.py    :',
+          dt.datetime.strftime(dt.datetime.now(), '%Y-%m-%d %H:%M:%S'),
+          ': New ACM0 ADC directory created :',
           ProcessedPath)
 
 # Processed data file name
@@ -69,8 +69,8 @@ ProcessedAdc = -1
 n = 1024
 
 # open file to store data in and append data
-ProcessedData = open(file=ProcessedDataFile, \
-                     mode='a', \
+ProcessedData = open(file=ProcessedDataFile,
+                     mode='a',
                      encoding='UTF-8')
 
 for i in range(0, n):
@@ -82,11 +82,11 @@ for i in range(0, n):
     EndBinAdc = StartBinAdc + BinAdc
 
     # using csv.DictReader
-    RawFile = open(file=RawDataFile, \
-                   mode='r', \
+    RawFile = open(file=RawDataFile,
+                   mode='r',
                    encoding='UTF-8')
     
-    RawCSV_reader = csv.DictReader(RawFile, \
+    RawCSV_reader = csv.DictReader(RawFile,
                                    RawFieldNames)
 
     count_T = 0
@@ -131,9 +131,9 @@ ProcessedData.close()
 # Message to log file at end of program
 
 # print message to log file to say completed
-print('ProcessDataAdcACM0.py    :', \
-      dt.datetime.strftime(dt.datetime.now(), '%Y-%m-%d %H:%M:%S'), \
-      ': Completed ADC ACM0 data processing for', \
+print('ProcessDataAdcACM0.py    :',
+      dt.datetime.strftime(dt.datetime.now(), '%Y-%m-%d %H:%M:%S'),
+      ': Completed ADC ACM0 data processing for',
       dt.datetime.strftime(dt.datetime.now() - dt.timedelta(1), '%Y-%m-%d'))
       
 

@@ -6,19 +6,19 @@ import csv
 import os
 
 # print message to log file to say started
-print('ProcessDataCpmACM0.py    :', \
-      dt.datetime.strftime(dt.datetime.now(), '%Y-%m-%d %H:%M:%S'), \
-      ': Started cpm ACM0 data processing for', \
+print('ProcessDataCpmACM0.py    :',
+      dt.datetime.strftime(dt.datetime.now(), '%Y-%m-%d %H:%M:%S'),
+      ': Started cpm ACM0 data processing for',
       dt.datetime.strftime(dt.datetime.now() - dt.timedelta(1), '%Y-%m-%d'))
 
 # Set file headers for data file structure
-RawFieldNames    = ['RawDateTime', \
-                    'RawPosition', \
-                    'RawCount', \
-                    'RawADC', \
-                    'RawPicoTime', \
-                    'RawDeadTime', \
-                    'RawPicoTemp', \
+RawFieldNames    = ['RawDateTime',
+                    'RawPosition',
+                    'RawCount',
+                    'RawADC',
+                    'RawPicoTime',
+                    'RawDeadTime',
+                    'RawPicoTemp',
                     'RawPicoPres']
 
 # Set path for data file structure
@@ -43,9 +43,9 @@ pathExists = os.path.exists(ProcessedPath)
 if not pathExists:
     # create directory structure
     os.makedirs(ProcessedPath)
-    print('ProcessDataCpmACM0.py    :', \
-          dt.datetime.strftime(dt.datetime.now(), '%Y-%m-%d %H:%M:%S'), \
-          ': New ACM0 cpm directory created :', \
+    print('ProcessDataCpmACM0.py    :',
+          dt.datetime.strftime(dt.datetime.now(), '%Y-%m-%d %H:%M:%S'),
+          ': New ACM0 cpm directory created :',
           ProcessedPath)
 
 # Processed data file name
@@ -87,8 +87,8 @@ ProcessedTime = StartTime_datetime - minute
 n = 1440
 
 # open file to store data in and append to end
-ProcessedData = open(file=ProcessedDataFile, \
-                     mode='a', \
+ProcessedData = open(file=ProcessedDataFile,
+                     mode='a',
                      encoding='UTF-8')
 
 for i in range(1, n+1):
@@ -100,11 +100,11 @@ for i in range(1, n+1):
     EndBinTime = StartBinTime + minute
 
     # using csv.DictReader
-    RawFile = open(file=RawDataFile, \
-                   mode='r', \
+    RawFile = open(file=RawDataFile,
+                   mode='r',
                    encoding='UTF-8')
     
-    RawCSV_reader = csv.DictReader(RawFile, \
+    RawCSV_reader = csv.DictReader(RawFile,
                                    RawFieldNames)
 
     # set counters to zero
@@ -115,7 +115,7 @@ for i in range(1, n+1):
     for RawLine in RawCSV_reader:
         # try to get raw data after start StartBinTime
         # convert string to dt.datetime.datetime format
-        RawDatetime = dt.datetime.strptime(RawLine['RawDateTime'], \
+        RawDatetime = dt.datetime.strptime(RawLine['RawDateTime'],
                                            '%Y-%m-%d %H:%M:%S.%f')
         
         # search file for data between two time points
@@ -153,9 +153,9 @@ ProcessedData.close()
 # Message to log file at end of program
 
 # print message to log file to say completed
-print('ProcessDataCpmACM0.py    :', \
-      dt.datetime.strftime(dt.datetime.now(), '%Y-%m-%d %H:%M:%S'), \
-      ': Completed cpm ACM0 data processing for', \
+print('ProcessDataCpmACM0.py    :',
+      dt.datetime.strftime(dt.datetime.now(), '%Y-%m-%d %H:%M:%S'),
+      ': Completed cpm ACM0 data processing for',
       dt.datetime.strftime(dt.datetime.now() - dt.timedelta(1), '%Y-%m-%d'))
 
 
