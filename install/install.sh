@@ -17,24 +17,24 @@ echo "gnuplot software installed"
 
 
 echo "Creating directory structure..."
-sudo -u  pi mkdir -vp /home/pi/UKRAA_PicoMuon/data/environment/coefficient
-sudo -u  pi mkdir -vp /home/pi/UKRAA_PicoMuon/data/NMDB/neutrons
-sudo -u  pi mkdir -vp /home/pi/UKRAA_PicoMuon/data/processed/adc/ACM0
-sudo -u  pi mkdir -vp /home/pi/UKRAA_PicoMuon/data/processed/cpm/ACM0
-sudo -u  pi mkdir -vp /home/pi/UKRAA_PicoMuon/data/processed/day/ACM0
-sudo -u  pi mkdir -vp /home/pi/UKRAA_PicoMuon/data/processed/month/ACM0
-sudo -u  pi mkdir -vp /home/pi/UKRAA_PicoMuon/data/processed/week/ACM0
-sudo -u  pi mkdir -vp /home/pi/UKRAA_PicoMuon/data/raw/ACM0
-sudo -u  pi mkdir -v  /home/pi/UKRAA_PicoMuon/logfiles
-sudo -u  pi mkdir -vp /home/pi/UKRAA_PicoMuon/plots/3month/ACM0
-sudo -u  pi mkdir -vp /home/pi/UKRAA_PicoMuon/plots/adc/ACM0
-sudo -u  pi mkdir -vp /home/pi/UKRAA_PicoMuon/plots/cpm/ACM0
-sudo -u  pi mkdir -vp /home/pi/UKRAA_PicoMuon/plots/day/ACM0
-sudo -u  pi mkdir -vp /home/pi/UKRAA_PicoMuon/plots/freq/ACM0
-sudo -u  pi mkdir -vp /home/pi/UKRAA_PicoMuon/plots/month/ACM0
-sudo -u  pi mkdir -vp /home/pi/UKRAA_PicoMuon/plots/week/ACM0
-sudo -u  pi mkdir -v  /home/pi/UKRAA_PicoMuon/temp
-sudo -u  pi mkdir -vp /home/pi/UKRAA_PicoMuon/WWW/temp
+sudo -u pi mkdir -vp /home/pi/UKRAA_PicoMuon/data/environment/coefficient
+sudo -u pi mkdir -vp /home/pi/UKRAA_PicoMuon/data/NMDB/neutrons
+sudo -u pi mkdir -vp /home/pi/UKRAA_PicoMuon/data/processed/adc/ACM0
+sudo -u pi mkdir -vp /home/pi/UKRAA_PicoMuon/data/processed/cpm/ACM0
+sudo -u pi mkdir -vp /home/pi/UKRAA_PicoMuon/data/processed/day/ACM0
+sudo -u pi mkdir -vp /home/pi/UKRAA_PicoMuon/data/processed/month/ACM0
+sudo -u pi mkdir -vp /home/pi/UKRAA_PicoMuon/data/processed/week/ACM0
+sudo -u pi mkdir -vp /home/pi/UKRAA_PicoMuon/data/raw/ACM0
+sudo -u pi mkdir -v  /home/pi/UKRAA_PicoMuon/logfiles
+sudo -u pi mkdir -vp /home/pi/UKRAA_PicoMuon/plots/3month/ACM0
+sudo -u pi mkdir -vp /home/pi/UKRAA_PicoMuon/plots/adc/ACM0
+sudo -u pi mkdir -vp /home/pi/UKRAA_PicoMuon/plots/cpm/ACM0
+sudo -u pi mkdir -vp /home/pi/UKRAA_PicoMuon/plots/day/ACM0
+sudo -u pi mkdir -vp /home/pi/UKRAA_PicoMuon/plots/freq/ACM0
+sudo -u pi mkdir -vp /home/pi/UKRAA_PicoMuon/plots/month/ACM0
+sudo -u pi mkdir -vp /home/pi/UKRAA_PicoMuon/plots/week/ACM0
+sudo -u pi mkdir -v  /home/pi/UKRAA_PicoMuon/temp
+sudo -u pi mkdir -vp /home/pi/UKRAA_PicoMuon/WWW/temp
 echo "Directory structure created"
 
 echo "Sort out file permissions..."

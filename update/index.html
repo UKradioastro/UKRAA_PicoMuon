@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+<title>UKRAA PicoMuon</title>
+<link rel="icon" type="image/x-icon" href="./images/favicon.ico">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<style>
+body {font-family: "Lato", sans-serif}
+.mySlides {display: none}
+</style>
+</head>
+
+
+<body>
+
+<!-- Navbar -->
+<div class="w3-top">
+  <div class="w3-bar w3-black w3-card">
+    <a class="w3-bar-item w3-button w3-padding-large w3-hide-medium w3-hide-large w3-right" href="javascript:void(0)" onclick="myFunction()" title="Toggle Navigation Menu"><i class="fa fa-bars"></i></a>
+    <a href="#home" class="w3-bar-item w3-button w3-padding-large">HOME</a>
+    <a href="#who" class="w3-bar-item w3-button w3-padding-large w3-hide-small">ABOUT US</a>
+    <a href="#detector" class="w3-bar-item w3-button w3-padding-large w3-hide-small">DETECTOR</a>
+    <div class="w3-dropdown-hover w3-hide-small">
+      <button class="w3-padding-large w3-button" title="More">GRAPHS <i class="fa fa-caret-down"></i></button>     
+      <div class="w3-dropdown-content w3-bar-block w3-card-4">
+        <a href="#daily_cpm" class="w3-bar-item w3-button">DAY raw</a>
+        <a href="#daily_%" class="w3-bar-item w3-button">DAY % variation</a>
+        <a href="#weekly_%" class="w3-bar-item w3-button">WEEK % variation</a>
+        <a href="#monthly_%" class="w3-bar-item w3-button">MONTH % variation</a>
+        <a href="#90_days_%" class="w3-bar-item w3-button">90 DAY % variation</a>
+        <a href="#90_days_STP" class="w3-bar-item w3-button">90 DAY STP variation</a>
+        <a href="#90_days_P" class="w3-bar-item w3-button">90 DAY pressure coefficient</a>
+      </div>
+    </div>
+    <a href="#contact" class="w3-bar-item w3-button w3-padding-large w3-hide-small">CONTACT</a>
+  </div>
+</div>
+
+<!-- Navbar on small screens (remove the onclick attribute if you want the navbar to always show on top of the content when clicking on the links) -->
+<div id="navDemo" class="w3-bar-block w3-black w3-hide w3-hide-large w3-hide-medium w3-top" style="margin-top:46px">
+  <a href="#who" class="w3-bar-item w3-button w3-padding-large" onclick="myFunction()">ABOUT US</a>
+  <a href="#detector" class="w3-bar-item w3-button w3-padding-large" onclick="myFunction()">DETECTOR</a>
+  <a href="#daily_cpm" class="w3-bar-item w3-button w3-padding-large" onclick="myFunction()">DAY raw GRAPH</a>
+  <a href="#daily_%" class="w3-bar-item w3-button w3-padding-large" onclick="myFunction()">DAY % variation GRAPH</a>
+  <a href="#weekly_%" class="w3-bar-item w3-button w3-padding-large" onclick="myFunction()">WEEK % variation GRAPH</a>
+  <a href="#monthly_%" class="w3-bar-item w3-button w3-padding-large" onclick="myFunction()">MONTH % variation GRAPH</a>
+  <a href="#90_days_%" class="w3-bar-item w3-button w3-padding-large" onclick="myFunction()">90 DAY % variation GRAPH</a>
+  <a href="#90_days_STP" class="w3-bar-item w3-button w3-padding-large" onclick="myFunction()">90 DAY STP variation GRAPH</a>
+  <a href="#90_days_P" class="w3-bar-item w3-button w3-padding-large" onclick="myFunction()">90 DAY pressure coefficient GRAPH</a>
+</div>
+
+
+<!-- Page content -->
+<div class="w3-content" style="max-width:2000px;margin-top:46px" id="home">
+
+  <!-- Automatic Slideshow Images -->
+  <div class="mySlides w3-display-container w3-center">
+    <img src="./images/SunHeader.png" alt="banner" style="width:100%">
+    <div class="w3-display-bottommiddle w3-container w3-text-white w3-padding-32 w3-hide-small">
+      <h3>Solar image</h3>
+      <p><b>Stephen Heliczer of Hertford Astronomy Group</b></p>   
+    </div>
+  </div>
+
+  <!-- Who we are... -->
+  <div class="w3-white" id="who">
+    <div class="w3-container w3-content w3-center w3-padding-64" style="max-width:800px">
+      <h2 class="w3-wide">UKRAA</h2>
+      <h3 class="w3-left-align">About us</h3>
+      <p class="w3-left-align"><b><i>Origins</i></b></p>
+      <p class="w3-justify">The UK Radio Astronomy Association was established in 2008 as a registered charity (registration no 1123866) in the United Kingdom. UKRAA’s objectives are to promote the science of radio astronomy and all branches of radio astronomical research. Prior to UKRAA’s formation, British Astronomical Association’s Radio Astronomy Group (RAG) members had designed and built working protypes of a VLF Receiver and Magnetometer. UKRAA was set up to handle the manufacture and sale of these products and the production of technical manuals covering the use of the products and the background science.</p>
+      <p class="w3-left-align"><b><i>Not for profit</i></b></p>
+      <p class="w3-justify">UKRAA is a not for profit business. Any surplus income funds the development of new products and our outreach activities. To keep our prices low UKRAA relies on the volunteers and Trustees giving their time.</p>
+      <p class="w3-left-align"><b><i>Activities</i></b>
+      <p class="w3-justify">Our primary activity is to supply equipment to amateur astronomers and other interested researchers. The design of new products and the manufacture of equipment for sale is all carried out by volunteers. To promote radio astronomy to amateur astronomers we give talks to local Astronomical Societies and amateur radio clubs and have provided support to schools and university departments on educational projects.</p>
+    </div>
+  </div>
+  
+  <!-- Detector Section -->
+  <div class="w3-black" id="detector"> 
+    <div class="w3-container w3-content w3-center w3-padding-64" style="max-width:800px">
+      <h2 class="w3-wide">THE DETECTOR</h2>
+      <p class="w3-opacity"><i>Detecting muons from the comfort of your armchair</i></p>
+      <p class="w3-justify"><b>UKRAA</b> is pleased to announce that the first batch of our new <b>PicoMuon</b> muon detectors will soon be available for sale on our website.</p>
+      <p class="w3-justify">We will be launching the detector at <a href="https://europeanastrofest.com/" target="_blank"><b>AstroFest 2025</b></a>, held at the <a href="https://www.rbkc.gov.uk/venues-in-kensington-and-chelsea/kensington-conference-and-events-centre" target="_blank"><b>Kensington Conference Centre</b></a>, on 7th and 8th February 2025.</p>
+      <p class="w3-justify">We will be introducing the finished device. This will be fully tested and provided with the operating software loaded.</p>
+      <p class="w3-justify">As supplied, the detector will detect β-particles, ϒ-rays and cosmic muons.</p>
+      <p class="w3-justify">The new detector uses two separated scintillator detectors to eliminate the random β-particles and ϒ-rays from cosmic muons.</p>
+      <p class="w3-justify">All events (β-particles, ϒ-rays and cosmic muons) are output as a CSV file on a micro-SD card or to serial via USB connected to a PC</p>
+      <p class="w3-justify">Full software is available to record, process and plot events and display on your local intranet using a Raspberry Pi4/5</p>
+      <p class="w3-justify">For ongoing support, there is a <a href="https://groups.io/g/muondetector/messages" target="_blank"><b>user forum</b></a> - where discussion, questions and ideas can be shared.</p>
+      <div class="w3-row w3-padding-32">
+        <div class="w3-third">
+          <p>PicoMuon family</p>
+          <img src="./images/PicoMuon_1.png" class="w3-round w3-margin-bottom" alt="banner" style="width:60%">
+        </div>
+        <div class="w3-third">
+          <p>Front view</p>
+          <img src="./images/PicoMuon_2.png" class="w3-round w3-margin-bottom" alt="banner" style="width:60%">
+        </div>
+        <div class="w3-third">
+          <p>Rear view</p>
+          <img src="./images/PicoMuon_3.png" class="w3-round" alt="banner" style="width:60%">
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- Graphs Section -->
+  <!-- Daily cpm plots -->
+  <div class="w3-white" id="daily_cpm">
+    <div class="w3-container w3-content w3-center w3-padding-64" style="max-width:800px">
+      <h2 class="w3-wide">MY DAILY RAW RESULTS</h2>
+      <p class="w3-center">This data is from my <b>PicoMuon</b> detector</p>
+      <p class="w3-center">No accuracy is claimed for any published data</p>
+      <div class="w3-row w3-padding-32">
+        <div class="w3-third">
+          <p>Top detector cpm</p>
+          <img src="./temp/ACM0_T-Cpm.png" onerror="this.src='./images/default.png';"  class="w3-round w3-margin-bottom" alt="cpm" style="width:100%">
+        </div>
+        <div class="w3-third">
+          <p>Top detector cpm frequency</p>
+          <img src="./temp/ACM0_T-Freq.png" onerror="this.src='./images/default.png';"  class="w3-round w3-margin-bottom" alt="freq" style="width:100%">
+        </div>
+        <div class="w3-third">
+          <p>Top detector adc frequency</p>
+          <img src="./temp/ACM0_T-Adc.png" onerror="this.src='./images/default.png';"  class="w3-round" alt="adc" style="width:100%">
+        </div>
+      </div>
+      <div class="w3-row w3-padding-32">
+        <div class="w3-third">
+          <p>Bottom detector cpm</p>
+          <img src="./temp/ACM0_B-Cpm.png" onerror="this.src='./images/default.png';"  class="w3-round w3-margin-bottom" alt="cpm" style="width:100%">
+        </div>
+        <div class="w3-third">
+          <p>Bottom detector cpm frequency</p>
+          <img src="./temp/ACM0_B-Freq.png" onerror="this.src='./images/default.png';"  class="w3-round w3-margin-bottom" alt="freq" style="width:100%">
+        </div>
+        <div class="w3-third">
+          <p>Bottom detector adc frequency</p>
+          <img src="./temp/ACM0_B-Adc.png" onerror="this.src='./images/default.png';"  class="w3-round" alt="adc" style="width:100%">
+        </div>
+      </div>
+      <div class="w3-row w3-padding-32">
+        <div class="w3-third">
+          <p>Muons cpm</p>
+          <img src="./temp/ACM0_C-Cpm.png" onerror="this.src='./images/default.png';"  class="w3-round w3-margin-bottom" alt="cpm" style="width:100%">
+        </div>
+        <div class="w3-third">
+          <p>Muons cpm frequency</p>
+          <img src="./temp/ACM0_C-Freq.png" onerror="this.src='./images/default.png';"  class="w3-round w3-margin-bottom" alt="freq" style="width:100%">
+        </div>
+        <div class="w3-third">
+          <p>Muons adc frequency</p>
+          <img src="./temp/ACM0_C-Adc.png" onerror="this.src='./images/default.png';"  class="w3-round" alt="adc" style="width:100%">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- daily % plots -->
+  <div class="w3-black" id="daily_%">
+    <div class="w3-container w3-content w3-center w3-padding-64" style="max-width:800px">
+    <h2 class="w3-wide">MY DAILY % variation RESULTS</h2>
+    <p class="w3-center">This data is from my <b>PicoMuon</b> detector</p>
+    <p class="w3-center">No accuracy is claimed for any published data</p>
+    <div class="w3-row w3-padding-32">
+      <div class="w3-auto">
+        <p>Muons counted for last day</p>
+        <img src="./temp/ACM0_day_plot.png" onerror="this.src='./images/default.png';" class="w3-round w3-margin-bottom" alt="daily variation plot" style="width:100%">
+      </div>
+    </div>
+    <p class="w3-center">We acknowledge the NMDB database (www.nmdb.eu) founded under the European Union's FP7 programme (contract no. 213007), and the PIs of individual neutron monitors at: Oulu (Sodankyla Geophysical Observatory of the University of Oulu, Finland)</p>
+  </div>
+
+  <!-- Weekly plots -->
+  <div class="w3-white" id="weekly_%">
+    <div class="w3-container w3-content w3-center w3-padding-64" style="max-width:800px">
+    <h2 class="w3-wide">MY WEEKLY % variation RESULTS</h2>
+    <p class="w3-center">This data is from my <b>PicoMuon</b> detector</p>
+    <p class="w3-center">No accuracy is claimed for any published data</p>
+    <div class="w3-row w3-padding-32">
+      <div class="w3-auto">
+        <p>Muons counted for last 7 days</p>
+        <img src="./temp/ACM0_week_plot.png" onerror="this.src='./images/default.png';" class="w3-round w3-margin-bottom" alt="weekly variation plot" style="width:100%">
+      </div>
+    </div>
+    <p class="w3-center">We acknowledge the NMDB database (www.nmdb.eu) founded under the European Union's FP7 programme (contract no. 213007), and the PIs of individual neutron monitors at: Oulu (Sodankyla Geophysical Observatory of the University of Oulu, Finland)</p>
+  </div>
+
+  <!-- Monthly plots -->
+  <div class="w3-black" id="monthly_%">
+    <div class="w3-container w3-content w3-center w3-padding-64" style="max-width:800px">
+      <h2 class="w3-wide">MY MONTHLY % variation RESULTS</h2>
+      <p class="w3-center">This data is from my <b>PicoMuon</b> detector</p>
+      <p class="w3-center">No accuracy is claimed for any published data</p>
+      <div class="w3-row w3-padding-32">
+        <div class="w3-auto">
+          <p>Muons counted for last 31 days</p>
+          <img src="./temp/ACM0_month_plot.png" onerror="this.src='./images/default.png';" class="w3-round w3-margin-bottom" alt="monthly variation plot" style="width:100%">
+        </div>
+      </div>
+      <p class="w3-center">We acknowledge the NMDB database (www.nmdb.eu) founded under the European Union's FP7 programme (contract no. 213007), and the PIs of individual neutron monitors at: Oulu (Sodankyla Geophysical Observatory of the University of Oulu, Finland)</p>
+    </div>
+  </div>
+
+  <!-- 90 days plots -->
+  <div class="w3-white"  id="90_days_%">
+    <div class="w3-container w3-content w3-center w3-padding-64" style="max-width:800px">
+      <h2 class="w3-wide">MY 90 DAYS % variation RESULTS</h2>
+      <p class="w3-center">This data is from my <b>PicoMuon</b> detector</p>
+      <p class="w3-center">No accuracy is claimed for any published data</p>
+      <div class="w3-row w3-padding-32">
+        <div class="w3-auto">
+          <p>Muons counted for last 90 days</p>
+          <img src="./temp/ACM0_90_days_plot.png"  onerror="this.src='./images/default.png';" class="w3-round w3-margin-bottom" alt="cpm" style="width:100%">
+        </div>
+      </div>
+      <p class="w3-center">We acknowledge the NMDB database (www.nmdb.eu) founded under the European Union's FP7 programme (contract no. 213007), and the PIs of individual neutron monitors at: Oulu (Sodankyla Geophysical Observatory of the University of Oulu, Finland)</p>
+    </div>
+  </div>
+
+  <!-- 90 days STP plots -->
+  <div class="w3-black"  id="90_days_STP">
+    <div class="w3-container w3-content w3-center w3-padding-64" style="max-width:800px">
+      <h2 class="w3-wide">MY 90 DAYS STP variation RESULTS</h2>
+      <p class="w3-center">This data is from my <b>PicoMuon</b> detector</p>
+      <p class="w3-center">No accuracy is claimed for any published data</p>
+      <div class="w3-row w3-padding-32">
+        <div class="w3-auto">
+          <p>Muons counted for last 90 days</p>
+          <img src="./temp/ACM0_90_days_STP_plot.png"  onerror="this.src='./images/default.png';" class="w3-round w3-margin-bottom" alt="cpm" style="width:100%">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 90 days pressure coefficient -->
+  <div class="w3-white"  id="90_days_P">
+    <div class="w3-container w3-content w3-center w3-padding-64" style="max-width:800px">
+      <h2 class="w3-wide">MY 90 DAYS pressure coefficient RESULTS</h2>
+      <p class="w3-center">This data is from my <b>PicoMuon</b> detector</p>
+      <p class="w3-center">No accuracy is claimed for any published data</p>
+      <div class="w3-row w3-padding-32">
+        <div class="w3-auto">
+          <p>Muons counted for last 90 days</p>
+          <img src="./temp/ACM0_90_days_pressure_coefficient_plot.png"  onerror="this.src='./images/default.png';" class="w3-round w3-margin-bottom" alt="cpm" style="width:100%">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- The Contact Section -->
+  <div class="w3-grey" id="contact">
+    <div class="w3-container w3-content w3-padding-64" style="max-width:800px" >
+      <h2 class="w3-wide w3-center">CONTACT</h2>
+      <p class="w3-opacity w3-center"><i>Want more info? Contact us!</i></p>
+      <div class="w3-row w3-padding-32">
+        <div class="w3-col m6 w3-large w3-margin-bottom">
+          <i class="fa fa-map-marker" style="width:30px"></i>Location:  UK<br>
+          <i class="fa fa-search" style="width:30px"></i> WWW:  <a href="https://ukraa.com/" target="_blank">ukraa.com</a><br>
+          <i class="fa fa-envelope" style="width:30px"> </i> Email:  <a href="mailto:picomuon@ukraa.com">picomuon@ukraa.com</a><br>
+        </div>
+        <div class="w3-col m6">
+          <div class="w3-third">
+            <img src="./images/UKRAA_logo_black.png" class="w3-round" alt="logo" style="width:100%">
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+  
+<!-- End Page Content -->
+</div>
+
+
+<script>
+// Automatic Slideshow - change image every 4 seconds
+var myIndex = 0;
+carousel();
+
+function carousel() {
+  var i;
+  var x = document.getElementsByClassName("mySlides");
+  for (i = 0; i < x.length; i++) {
+    x[i].style.display = "none";  
+  }
+  myIndex++;
+  if (myIndex > x.length) {myIndex = 1}    
+  x[myIndex-1].style.display = "block";  
+  setTimeout(carousel, 4000);    
+}
+
+// Used to toggle the menu on small screens when clicking on the menu button
+function myFunction() {
+  var x = document.getElementById("navDemo");
+  if (x.className.indexOf("w3-show") == -1) {
+    x.className += " w3-show";
+  } else { 
+    x.className = x.className.replace(" w3-show", "");
+  }
+}
+
+// When the user clicks anywhere outside of the modal, close it
+var modal = document.getElementById('ticketModal');
+window.onclick = function(event) {
+  if (event.target == modal) {
+    modal.style.display = "none";
+  }
+}
+</script>
+
+</body>
+</html>
