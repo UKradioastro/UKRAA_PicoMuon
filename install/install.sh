@@ -67,11 +67,11 @@ echo "Install php..."
 sudo apt install php libapache2-mod-php -y
 
 echo "Install mariadb..."
-sudo get install mariadb-server
+sudo apt install mariadb-server -y
 sudo mysql_secure_installation
 
 echo "Install the php-mysql connector..."
-sudo apt install php-mysql
+sudo apt install php-mysql -y
 
 echo "Restart apache2..."
 sudo service apache2 restart
