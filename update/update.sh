@@ -57,6 +57,7 @@ echo "Finished moving new and updated gnuplot scripts to /UKRAA_PicoMuon/scripts
 echo "Moving neutron data to new folder structure..."
 sudo -u pi mkdir -vp /home/pi/UKRAA_PicoMuon/data/NMDB/neutrons
 sudo -u pi cp -r /home/pi/UKRAA_PicoMuon/data/neutrons /home/pi/UKRAA_PicoMuon/data/NMDB/neutrons
+sudo -u pi rm -rfv /home/pi/UKRAA_PicoMuon/data/neutrons
 echo "Finished moving neutron data to new folder structure"
 
 
