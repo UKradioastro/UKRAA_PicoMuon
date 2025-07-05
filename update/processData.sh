@@ -53,6 +53,6 @@ su pi -c "/usr/bin/gnuplot /home/pi/UKRAA_PicoMuon/scripts/PlotData90DaysSTPACM0
                         2>>/home/pi/UKRAA_PicoMuon/logfiles/log-error.txt"
 
 # entry to plot last 90 days pressure coefficient
-su pi -c "/usr/bin/gnuplot /home/pi/UKRAA_PicoMuon/scripts/PlotData90DaysPcoffACM0.gp\
+su pi -c "/usr/bin/gnuplot /home/pi/UKRAA_PicoMuon/scripts/PlotData90DaysPcoeffACM0.gp\
                         >> /home/pi/UKRAA_PicoMuon/logfiles/log-PicoMuonACM0.txt \
                         2>>/home/pi/UKRAA_PicoMuon/logfiles/log-error.txt"
