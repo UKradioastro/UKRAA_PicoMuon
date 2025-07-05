@@ -90,6 +90,12 @@ sudo crontab -l -u root | cat - /home/pi/UKRAA_PicoMuon/install/crontab-webpage-
 echo "webpage update crontab entry installed"
 
 
+echo "Changing wallpaper...
+sudo -u pi cp /home/pi/UKRAA_CW/images/UKRAA-wallpaper.png /home/pi/Pictures/UKRAA-wallpaper.png
+sudo -u pi pcmanfm --set-wallpaper /home/pi/Pictures/UKRAA-wallpaper.png --wallpaper-mode=fit
+echo "Wallpaper changed
+
+
 echo "Final cleanup..."
 rm -rfv /home/pi/UKRAA_PicoMuon/images
 rm -v /home/pi/UKRAA_PicoMuon/README.md
