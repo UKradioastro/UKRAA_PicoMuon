@@ -232,7 +232,7 @@ ProcessedData.close()
 # Message to log file at end of program
 
 # print message to log file to say completed
-print('ProcessDataDayACM0.py  :',
+print('ProcessDataDayACM0.py    :',
       dt.datetime.strftime(dt.datetime.now(), '%Y-%m-%d %H:%M:%S'),
       ': Completed ACM0 days % deviation data processing for',
       dt.datetime.strftime(dt.datetime.now() - dt.timedelta(1), '%Y-%m-%d'))
