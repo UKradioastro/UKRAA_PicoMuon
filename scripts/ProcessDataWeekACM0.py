@@ -7,7 +7,7 @@ import os
 import shutil
 
 # print message to log file to say started
-print('ProcessDataWeekACM0.py :', \
+print('ProcessDataWeekACM0.py   :', \
       dt.datetime.strftime(dt.datetime.now(), '%Y-%m-%d %H:%M:%S'), 
       ': Started ACM0 weeks % deviation data processing, from', 
       dt.datetime.strftime(dt.datetime.now() - dt.timedelta(7), '%Y-%m-%d'), 
@@ -48,7 +48,7 @@ pathExists = os.path.exists(WeekPath)
 if not pathExists:
     # create directory structure
     os.makedirs(WeekPath)
-    print('ProcessDataWeekACM0.py :', 
+    print('ProcessDataWeekACM0.py   :', 
           dt.datetime.strftime(dt.datetime.now(), '%Y-%m-%d %H:%M:%S'), 
           ': New ACM0 week directory created :', 
           WeekPath)
