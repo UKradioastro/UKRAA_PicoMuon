@@ -56,7 +56,7 @@ echo "Finished moving new and updated gnuplot scripts to /UKRAA_PicoMuon/scripts
 
 echo "Moving neutron data to new folder structure..."
 sudo -u pi mkdir -vp /home/pi/UKRAA_PicoMuon/data/NMDB/neutrons
-sudo -u pi cp -r /home/pi/UKRAA_PicoMuon/data/neutrons /home/pi/UKRAA_PicoMuon/data/NMDB/neutrons
+sudo -u pi cp -r /home/pi/UKRAA_PicoMuon/data/neutrons /home/pi/UKRAA_PicoMuon/data/NMDB
 sudo -u pi rm -rfv /home/pi/UKRAA_PicoMuon/data/neutrons
 echo "Finished moving neutron data to new folder structure"
 
@@ -71,6 +71,16 @@ echo "Moving updated index.html file to /var/www/html..."
 sudo cp /home/pi/UKRAA_PicoMuon/update/index.html /var/www/html/index.html
 echo "Finished moving updated index.html file to /var/www/html"
 
+echo "Final cleanup, removing unneeded directories..."
+sudo -u pi rm -rvf /home/pi/UKRAA_PicoMuon/WWW
+sudo -u pi rm -rvf /home/pi/UKRAA_PicoMuon/install
+echo "Finished final cleanup, removed unneeded directories"
+
 
 echo "Completed updating UKRAA PicoMuon software."
 echo "REMEMBER: if you had your own edits to sudo crontab, you will need to reapply them."
+sleep 10
+
+# if successful
+echo "Removing update directory and exiting..."
+exec rm -rvf /home/pi/UKRAA_PicoMuon/update
