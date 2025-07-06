@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -e
 
 
 echo "Start installing UKRAA PicoMuon software..."
@@ -98,8 +98,13 @@ echo "Wallpaper changed
 
 echo "Final cleanup..."
 rm -rfv /home/pi/UKRAA_PicoMuon/images
+rm -rvf /home/pi/UKRAA_PicoMuon/WWW
+rm -rvf /home/pi/UKRAA_PicoMuon/update
 rm -v /home/pi/UKRAA_PicoMuon/README.md
 echo "Finished final cleanup"
 
 
 echo "Completed installing UKRAA PicoMuon software."
+
+# if successful
+rm -rvf /home/pi/UKRAA_PicoMuon/install
