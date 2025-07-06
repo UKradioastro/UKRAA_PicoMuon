@@ -90,13 +90,6 @@ crontab -l -u root | cat - /home/pi/UKRAA_PicoMuon/install/crontab-webpage-updat
 echo "webpage update crontab entry installed"
 
 
-echo "Changing wallpaper..."
-sudo -u pi cp /home/pi/UKRAA_PicoMuon/images/UKRAA_wallpaper.png /home/pi/Pictures/UKRAA_wallpaper.png
-#sudo -u pi pcmanfm --set-wallpaper /home/pi/Pictures/UKRAA_wallpaper.png --wallpaper-mode=fit
-sudo -u pi cp /home/pi/UKRAA_PicoMuon/install/desktop-items-NOOP-1.conf /home/pi/.config/pcmanfm/LXDE-pi/desktop-items-NOOP-1.conf
-echo "Wallpaper changed"
-
-
 echo "Final cleanup..."
 sudo -u pi rm -rfv /home/pi/UKRAA_PicoMuon/images
 sudo -u pi rm -rvf /home/pi/UKRAA_PicoMuon/WWW
