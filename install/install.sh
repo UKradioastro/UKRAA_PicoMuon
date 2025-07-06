@@ -5,14 +5,14 @@ echo "Start installing UKRAA PicoMuon software..."
 
 
 echo "Start installing pandas software..."
-sudo apt install python3-pandas -y
+apt install python3-pandas -y
 echo "pandas software installed"
 
 
 echo "Start installing gnuplot software..."
-sudo apt install gnuplot -y
-sudo apt install gnuplot-doc -y
-sudo apt install gnuplot-x11 -y
+apt install gnuplot -y
+apt install gnuplot-doc -y
+apt install gnuplot-x11 -y
 echo "gnuplot software installed"
 
 
@@ -43,64 +43,65 @@ sudo -u pi chmod +x /home/pi/UKRAA_PicoMuon/scripts/*.sh
 echo "File permissions sorted out"
 
 echo "Start installing PicoMuonACM0.service..."
-sudo cp -f /home/pi/UKRAA_PicoMuon/install/PicoMuonACM0.service /etc/systemd/system
-sudo chmod 644 /etc/systemd/system/PicoMuonACM0.service
-sudo systemctl daemon-reload
-sudo systemctl enable PicoMuonACM0.service
-sudo systemctl start PicoMuonACM0.service
+cp -f /home/pi/UKRAA_PicoMuon/install/PicoMuonACM0.service /etc/systemd/system
+chmod 644 /etc/systemd/system/PicoMuonACM0.service
+systemctl daemon-reload
+systemctl enable PicoMuonACM0.service
+systemctl start PicoMuonACM0.service
 echo "PicoMuonACM0.service installed and started"
 
 
 echo "Start installing PicoMuon crontab entry..."
-sudo crontab -l -u root | cat - /home/pi/UKRAA_PicoMuon/install/crontab-PicoMuonACM0-entry.cron | crontab -u root -
+crontab -l -u root | cat - /home/pi/UKRAA_PicoMuon/install/crontab-PicoMuonACM0-entry.cron | crontab -u root -
 echo "PicoMuon crontab entry installed"
 
 echo "Start installing web server on RPi..."
 
 echo "Update packages..."
-sudo apt update
+apt update
 
 echo "Install apache2..."
-sudo apt install apache2 -y
+apt install apache2 -y
 
 echo "Install php..."
-sudo apt install php libapache2-mod-php -y
+apt install php libapache2-mod-php -y
 
 echo "Install mariadb..."
-sudo apt install mariadb-server -y
-sudo mysql_secure_installation
+apt install mariadb-server -y
+mysql_secure_installation
 
 echo "Install the php-mysql connector..."
-sudo apt install php-mysql -y
+apt install php-mysql -y
 
 echo "Restart apache2..."
-sudo service apache2 restart
+service apache2 restart
 echo "web server installed on RPi"
 
 
 echo "Move files to /var/www/html..."
-sudo cp /home/pi/UKRAA_PicoMuon/WWW/index.html /var/www/html/index.html
-sudo cp -r /home/pi/UKRAA_PicoMuon/WWW/images /var/www/html/
-sudo cp -r /home/pi/UKRAA_PicoMuon/WWW/temp /var/www/html/
+cp /home/pi/UKRAA_PicoMuon/WWW/index.html /var/www/html/index.html
+cp -r /home/pi/UKRAA_PicoMuon/WWW/images /var/www/html/
+cp -r /home/pi/UKRAA_PicoMuon/WWW/temp /var/www/html/
 echo "Files moved to /var/www/html"
 
 
 echo "Start installing webpage update crontab entry..."
-sudo crontab -l -u root | cat - /home/pi/UKRAA_PicoMuon/install/crontab-webpage-update-entry.cron | crontab -u root -
+crontab -l -u root | cat - /home/pi/UKRAA_PicoMuon/install/crontab-webpage-update-entry.cron | crontab -u root -
 echo "webpage update crontab entry installed"
 
 
 echo "Changing wallpaper..."
 sudo -u pi cp /home/pi/UKRAA_PicoMuon/images/UKRAA_wallpaper.png /home/pi/Pictures/UKRAA_wallpaper.png
-pcmanfm --set-wallpaper /home/pi/Pictures/UKRAA_wallpaper.png --wallpaper-mode=fit
+#sudo -u pi pcmanfm --set-wallpaper /home/pi/Pictures/UKRAA_wallpaper.png --wallpaper-mode=fit
+sudo -u pi cp /home/pi/UKRAA_PicoMuon/install/desktop-items-NOOP-1.conf /home/pi/.config/pcmanfm/LXDE-pi/desktop-items-NOOP-1.conf
 echo "Wallpaper changed"
 
 
 echo "Final cleanup..."
-rm -rfv /home/pi/UKRAA_PicoMuon/images
-rm -rvf /home/pi/UKRAA_PicoMuon/WWW
-rm -rvf /home/pi/UKRAA_PicoMuon/update
-rm -v /home/pi/UKRAA_PicoMuon/README.md
+sudo -u pi rm -rfv /home/pi/UKRAA_PicoMuon/images
+sudo -u pi rm -rvf /home/pi/UKRAA_PicoMuon/WWW
+sudo -u pi rm -rvf /home/pi/UKRAA_PicoMuon/update
+sudo -u pi rm -v /home/pi/UKRAA_PicoMuon/README.md
 echo "Finished final cleanup"
 
 
