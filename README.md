@@ -51,6 +51,22 @@ ls /dev/tty*
 
 &nbsp;
 <!-- =============================================================================== --> 
+## Using the code
+
+The code assumes that your UKRAA PicoMuon detector is connected to the RPi4/5 via supplied USB cable and that it is /dev/ttyACM0 - you can check this by using **ls /dev/tty*** in a terminal window on the RPi4/5 and reviewing the response.
+
+The code assumes username is **pi**.  If **pi** is not the username, then you will need to change all occurances of '/home/pi' to '/home/*username*' in the python and gnuplot scripts, where *username* is the username you have selected for your RPi4/5.
+
+The code assumes one detector connected to the RPi4/5 USB and that it will be connected via **/dev/ttyACM0**, if there are other devices connected to the RPi and your detector is not **/dev/ttyACM0**, then you will need to change **/dev/ttyACM0** to **/dev/*ttyACMx*** in the **GetDataRawACM0.py** python script, where *ttyACMx* is the tty address of you connected detector.
+
+**GetDataRawACM0.py** is run as a service.
+
+Other scripts (Python and gnuplot) are run from **cron**
+
+---
+
+&nbsp;
+<!-- =============================================================================== --> 
 ## Install the software onto your RPi
 
 1. Log into your Raspberry Pi4/5 using VNC.
@@ -65,22 +81,6 @@ git clone https://github.com/UKradioastro/UKRAA_PicoMuon
 ![img_01](images/RPi_imager_01.PNG)
 
 This will download all of the code to the directory **UKRAA_PicoMuon** inside **/home/pi**
-
----
-
-&nbsp;
-<!-- =============================================================================== --> 
-## Using the code
-
-The code assumes that your UKRAA PicoMuon detector is connected to the RPi4/5 via supplied USB cable and that it is /dev/ttyACM0 - you can check this by using **ls /dev/tty*** in a terminal window on the RPi4/5 and reviewing the response.
-
-The code assumes username is **pi**.  If **pi** is not the username, then you will need to change all occurances of '/home/pi' to '/home/*username*' in the python and gnuplot scripts, where *username* is the username you have selected for your RPi4/5.
-
-The code assumes one detector connected to the RPi4/5 USB and that it will be connected via **/dev/ttyACM0**, if there are other devices connected to the RPi and your detector is not **/dev/ttyACM0**, then you will need to change **/dev/ttyACM0** to **/dev/*ttyACMx*** in the **GetDataRawACM0.py** python script, where *ttyACMx* is the tty address of you connected detector.
-
-**GetDataRawACM0.py** is run as a service.
-
-Other scripts (Python and gnuplot) are run from **cron**
 
 ---
 
