@@ -90,10 +90,10 @@ sudo crontab -l -u root | cat - /home/pi/UKRAA_PicoMuon/install/crontab-webpage-
 echo "webpage update crontab entry installed"
 
 
-echo "Changing wallpaper...
+echo "Changing wallpaper..."
 sudo -u pi cp /home/pi/UKRAA_CW/images/UKRAA-wallpaper.png /home/pi/Pictures/UKRAA-wallpaper.png
 sudo -u pi pcmanfm --set-wallpaper /home/pi/Pictures/UKRAA-wallpaper.png --wallpaper-mode=fit
-echo "Wallpaper changed
+echo "Wallpaper changed"
 
 
 echo "Final cleanup..."
@@ -107,4 +107,5 @@ echo "Finished final cleanup"
 echo "Completed installing UKRAA PicoMuon software."
 
 # if successful
-rm -rvf /home/pi/UKRAA_PicoMuon/install
+echo "Removing install directory and exiting..."
+exec rm -rvf /home/pi/UKRAA_PicoMuon/install
