@@ -61,7 +61,7 @@ The code assumes one detector connected to the RPi4/5 USB and that it will be co
 
 **GetDataRawACM0.py** is run as a service.
 
-Other scripts (Python and gnuplot) are run from **cron**
+Other scripts (Python, gnuplot and shell) are run from **cron**
 
 ---
 
@@ -134,7 +134,7 @@ During **mysql_secure_installation** you will be asked a number of questions.
 
 That's it!
 
-The code is now set up to run automatically; it will get the data from the detector, process yesterdays data, plot yesterdays data and post yesterdays plots to your intranet web page once per day, at 8.00am in the morning.
+The code is now set up to run automatically; it will get the data from the detector, process yesterdays data, plot yesterdays data and post yesterdays plots to your intranet web page once per day, at 9.30am in the morning.
 
 ---
 
@@ -146,12 +146,12 @@ The code receives the event data from the UKRAA PicoMuon detector via serial ove
 
 The raw data will be processed overnight, via CRON, to get counts per minute, the frequency of the counts per minute and the frequency of the adc values for your previous day's data.
 
-Three plots will be created:
+A number of plots will be created:
 * counts per minute
 * frequency of counts per minute
 * frequency of ADC values recorded
 
-A request will be made to [NMDB](https://www.nmdb.eu/) via NEST to get the previous days recorded neutron count, this data will be overlaid onto the day / week / month % deviation counts per minute graphs.
+The raw data will also be processed overnight, via CRON, to produce % deviation of muon counts, this data is supplemented by a request  to [NMDB](https://www.nmdb.eu/) via NEST to get the previous days recorded neutron count, which will be overlaid onto the day / week / month / etc % deviation counts graphs.
 
 These will appear as the required amount of data is recorded by the detector
 
