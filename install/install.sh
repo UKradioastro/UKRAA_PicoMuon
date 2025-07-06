@@ -105,6 +105,7 @@ echo "Finished final cleanup"
 
 
 echo "Completed installing UKRAA PicoMuon software."
+sleep 10
 
 # if successful
 echo "Removing install directory and exiting..."
