@@ -39,13 +39,13 @@ sudo -u pi mkdir -vp /home/pi/UKRAA_PicoMuon/WWW/temp
 echo "Directory structure created"
 
 echo "Sort out file permissions..."
-sudo -u pi chmod +x /home/pi/UKRAA_PicoMuon/scripts/*.py
-sudo -u pi chmod +x /home/pi/UKRAA_PicoMuon/scripts/*.sh
+sudo -u pi chmod -v +x /home/pi/UKRAA_PicoMuon/scripts/*.py
+sudo -u pi chmod -v +x /home/pi/UKRAA_PicoMuon/scripts/*.sh
 echo "File permissions sorted out"
 
 echo "Start installing PicoMuonACM0.service..."
-cp -f /home/pi/UKRAA_PicoMuon/install/PicoMuonACM0.service /etc/systemd/system
-chmod 644 /etc/systemd/system/PicoMuonACM0.service
+cp -vf /home/pi/UKRAA_PicoMuon/install/PicoMuonACM0.service /etc/systemd/system
+chmod -v 644 /etc/systemd/system/PicoMuonACM0.service
 systemctl daemon-reload
 systemctl enable PicoMuonACM0.service
 systemctl start PicoMuonACM0.service
@@ -53,7 +53,10 @@ echo "PicoMuonACM0.service installed and started"
 
 
 echo "Start installing PicoMuon crontab entry..."
-crontab -l -u root | cat - /home/pi/UKRAA_PicoMuon/install/crontab-PicoMuonACM0-entry.cron | crontab -u root -
+echo "Clearing current crontab entry..."
+echo "NOTE: if you have edited your sudo crontab - this will be deleted.  You will need to reedit sudo crontab post update."
+sudo crontab -u root -r
+crontab -u root -l  | cat - /home/pi/UKRAA_PicoMuon/install/crontab-PicoMuonACM0-entry.cron | crontab -u root -
 echo "PicoMuon crontab entry installed"
 
 echo "Start installing web server on RPi..."
@@ -80,21 +83,21 @@ echo "web server installed on RPi"
 
 
 echo "Move files to /var/www/html..."
-cp /home/pi/UKRAA_PicoMuon/WWW/index.html /var/www/html/index.html
-cp -r /home/pi/UKRAA_PicoMuon/WWW/images /var/www/html/
-cp -r /home/pi/UKRAA_PicoMuon/WWW/temp /var/www/html/
+cp -v /home/pi/UKRAA_PicoMuon/WWW/index.html /var/www/html/index.html
+cp -vr /home/pi/UKRAA_PicoMuon/WWW/images /var/www/html/
+cp -vr /home/pi/UKRAA_PicoMuon/WWW/temp /var/www/html/
 echo "Files moved to /var/www/html"
 
 
 echo "Start installing webpage update crontab entry..."
-crontab -l -u root | cat - /home/pi/UKRAA_PicoMuon/install/crontab-webpage-update-entry.cron | crontab -u root -
+crontab -u root -l | cat - /home/pi/UKRAA_PicoMuon/install/crontab-webpage-update-entry.cron | crontab -u root -
 echo "webpage update crontab entry installed"
 
 
 echo "Final cleanup..."
-sudo -u pi rm -rfv /home/pi/UKRAA_PicoMuon/images
-sudo -u pi rm -rvf /home/pi/UKRAA_PicoMuon/WWW
-sudo -u pi rm -rvf /home/pi/UKRAA_PicoMuon/update
+sudo -u pi rm -vrf /home/pi/UKRAA_PicoMuon/images
+sudo -u pi rm -vrf /home/pi/UKRAA_PicoMuon/WWW
+sudo -u pi rm -vrf /home/pi/UKRAA_PicoMuon/update
 sudo -u pi rm -v /home/pi/UKRAA_PicoMuon/README.md
 echo "Finished final cleanup"
 
@@ -104,4 +107,4 @@ sleep 10
 
 # if successful
 echo "Removing install directory and exiting..."
-exec rm -rvf /home/pi/UKRAA_PicoMuon/install
+exec rm -vrf /home/pi/UKRAA_PicoMuon/install
