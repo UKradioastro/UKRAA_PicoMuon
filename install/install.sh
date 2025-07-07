@@ -19,6 +19,7 @@ echo "gnuplot software installed"
 echo "Creating directory structure..."
 sudo -u pi mkdir -vp /home/pi/UKRAA_PicoMuon/data/environment/coefficient
 sudo -u pi mkdir -vp /home/pi/UKRAA_PicoMuon/data/NMDB/neutrons
+sudo -u pi mkdir -vp /home/pi/UKRAA_PicoMuon/data/processed/3month/ACM0
 sudo -u pi mkdir -vp /home/pi/UKRAA_PicoMuon/data/processed/adc/ACM0
 sudo -u pi mkdir -vp /home/pi/UKRAA_PicoMuon/data/processed/cpm/ACM0
 sudo -u pi mkdir -vp /home/pi/UKRAA_PicoMuon/data/processed/day/ACM0

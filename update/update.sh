@@ -4,6 +4,10 @@
 echo "Start updating UKRAA PicoMuon software..."
 
 
+echo "Start updating packages..."
+sudo apt update && sudo apt upgrade -y && sudo apt autoremove -y
+echo "Finished updating packages"
+
 echo "Updating PicoMuon crontab entry..."
 echo "Clearing current crontab entry..."
 echo "NOTE: if you have edited your sudo crontab - this will be deleted.  You will need to reedit sudo crontab post update."
@@ -11,6 +15,13 @@ sudo crontab -r
 echo "Now creating new crontab entry..."
 sudo crontab -l -u root | cat - /home/pi/UKRAA_PicoMuon/update/crontab-update.cron | crontab -u root -
 echo "Finished updating PicoMuon crontab entry"
+
+
+echo "Creating additional directory structure..."
+sudo -u pi mkdir -vp /home/pi/UKRAA_PicoMuon/data/environment/coefficient
+sudo -u pi mkdir -vp /home/pi/UKRAA_PicoMuon/data/processed/3month/ACM0
+sudo -u pi mkdir -vp /home/pi/UKRAA_PicoMuon/plots/3month/ACM0
+echo "Additional directory structure created"
 
 
 echo "Moving new and updated Python scripts to /UKRAA_PicoMuon/scripts..."
