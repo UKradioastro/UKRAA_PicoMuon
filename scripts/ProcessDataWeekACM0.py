@@ -7,7 +7,7 @@ import os
 import shutil
 
 # print message to log file to say started
-print('ProcessDataWeekACM0.py   :', \
+print('ProcessDataWeekACM0.py      :', \
       dt.datetime.strftime(dt.datetime.now(), '%Y-%m-%d %H:%M:%S'), 
       ': Started ACM0 weeks % deviation data processing, from', 
       dt.datetime.strftime(dt.datetime.now() - dt.timedelta(7), '%Y-%m-%d'), 
@@ -48,7 +48,7 @@ pathExists = os.path.exists(WeekPath)
 if not pathExists:
     # create directory structure
     os.makedirs(WeekPath)
-    print('ProcessDataWeekACM0.py   :', 
+    print('ProcessDataWeekACM0.py      :', 
           dt.datetime.strftime(dt.datetime.now(), '%Y-%m-%d %H:%M:%S'), 
           ': New ACM0 week directory created :', 
           WeekPath)
@@ -69,10 +69,10 @@ if os.path.exists(RawDataFile7):
                 shutil.copyfileobj(fd, wfd)
 
 else:
-    print('ProcessDataWeekACM0.py   :', 
+    print('ProcessDataWeekACM0.py      :', 
           dt.datetime.strftime(dt.datetime.now(), '%Y-%m-%d %H:%M:%S'), 
           ': Not enough ACM0 day files are available yet to process weeks % deviation data...')
-    print('ProcessDataWeekACM0.py   :', 
+    print('ProcessDataWeekACM0.py      :', 
           dt.datetime.strftime(dt.datetime.now(), '%Y-%m-%d %H:%M:%S'), 
           ': **FAILED** to process ACM0 weeks % deviation data, from', 
           dt.datetime.strftime(dt.datetime.now() - dt.timedelta(7), '%Y-%m-%d'), 
@@ -91,7 +91,7 @@ pathExists = os.path.exists(ProcessedPath)
 if not pathExists:
     # create directory structure
     os.makedirs(ProcessedPath)
-    print('ProcessDataWeekACM0.py   :', 
+    print('ProcessDataWeekACM0.py      :', 
           dt.datetime.strftime(dt.datetime.now(), '%Y-%m-%d %H:%M:%S'), 
           ': New ACM0 week directory created :', 
           ProcessedPath)
@@ -214,7 +214,7 @@ ProcessedData.close()
 # Message to log file at end of program
 
 # print message to log file to say completed
-print('ProcessDataWeekACM0.py   :', 
+print('ProcessDataWeekACM0.py      :', 
       dt.datetime.strftime(dt.datetime.now(), '%Y-%m-%d %H:%M:%S'), 
       ': Completed ACM0 weeks % deviation data processing, from', 
       dt.datetime.strftime(dt.datetime.now() - dt.timedelta(7), '%Y-%m-%d'), 

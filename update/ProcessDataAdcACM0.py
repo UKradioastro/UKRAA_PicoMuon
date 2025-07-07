@@ -5,7 +5,7 @@ import csv
 import os
 
 # print message to log file to say started
-print('ProcessDataAdcACM0.py    :',
+print('ProcessDataAdcACM0.py       :',
       dt.datetime.strftime(dt.datetime.now(), '%Y-%m-%d %H:%M:%S'),
       ': Started ADC ACM0 data processing for',
       dt.datetime.strftime(dt.datetime.now() - dt.timedelta(1), '%Y-%m-%d'))
@@ -42,7 +42,7 @@ pathExists = os.path.exists(ProcessedPath)
 if not pathExists:
     # create directory structure
     os.makedirs(ProcessedPath)
-    print('ProcessDataAdcACM0.py    :',
+    print('ProcessDataAdcACM0.py       :',
           dt.datetime.strftime(dt.datetime.now(), '%Y-%m-%d %H:%M:%S'),
           ': New ACM0 ADC directory created :',
           ProcessedPath)
@@ -131,7 +131,7 @@ ProcessedData.close()
 # Message to log file at end of program
 
 # print message to log file to say completed
-print('ProcessDataAdcACM0.py    :',
+print('ProcessDataAdcACM0.py       :',
       dt.datetime.strftime(dt.datetime.now(), '%Y-%m-%d %H:%M:%S'),
       ': Completed ADC ACM0 data processing for',
       dt.datetime.strftime(dt.datetime.now() - dt.timedelta(1), '%Y-%m-%d'))

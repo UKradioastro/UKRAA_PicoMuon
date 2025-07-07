@@ -7,7 +7,7 @@ import os
 import shutil
 
 # print message to log file to say started
-print('ProcessData90DaysACM0.py :',
+print('ProcessData90DaysACM0.py    :',
       dt.datetime.strftime(dt.datetime.now(), '%Y-%m-%d %H:%M:%S'),
       ': Started ACM0 90 days % deviation data processing, from',
       dt.datetime.strftime(dt.datetime.now() - dt.timedelta(90), '%Y-%m-%d'),
@@ -49,7 +49,7 @@ pathExists = os.path.exists(ThreeMonthPath)
 if not pathExists:
     # create directory structure
     os.makedirs(ThreeMonthPath)
-    print('ProcessData90DaysACM0.py :',
+    print('ProcessData90DaysACM0.py    :',
           dt.datetime.strftime(dt.datetime.now(), '%Y-%m-%d %H:%M:%S'),
           ': New ACM0 3month directory created :',
           ThreeMonthPath)
@@ -87,10 +87,10 @@ if os.path.exists(RawDataFile90):
                 shutil.copyfileobj(fd, wfd)
 
 else:
-    print('ProcessData90DaysACM0.py :',
+    print('ProcessData90DaysACM0.py    :',
           dt.datetime.strftime(dt.datetime.now(), '%Y-%m-%d %H:%M:%S'),
           ': Not enough ACM0 day files are available yet to process 90 days % deviation data...')
-    print('ProcessData90DaysACM0.py :',
+    print('ProcessData90DaysACM0.py    :',
           dt.datetime.strftime(dt.datetime.now(), '%Y-%m-%d %H:%M:%S'),
           ': **FAILED** to process ACM0 90 days % deviation data, from',
           dt.datetime.strftime(dt.datetime.now() - dt.timedelta(90), '%Y-%m-%d'),
@@ -109,7 +109,7 @@ pathExists = os.path.exists(ProcessedPath)
 if not pathExists:
     # create directory structure
     os.makedirs(ProcessedPath)
-    print('ProcessData90DaysACM0.py :',
+    print('ProcessData90DaysACM0.py    :',
           dt.datetime.strftime(dt.datetime.now(), '%Y-%m-%d %H:%M:%S'),
           ': New ACM0 3month directory created :',
           ProcessedPath)

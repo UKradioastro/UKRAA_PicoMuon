@@ -6,7 +6,7 @@ import csv
 import os
 
 # print message to log file to say started
-print('ProcessDataCpmACM0.py    :',
+print('ProcessDataCpmACM0.py       :',
       dt.datetime.strftime(dt.datetime.now(), '%Y-%m-%d %H:%M:%S'),
       ': Started cpm ACM0 data processing for',
       dt.datetime.strftime(dt.datetime.now() - dt.timedelta(1), '%Y-%m-%d'))
@@ -43,7 +43,7 @@ pathExists = os.path.exists(ProcessedPath)
 if not pathExists:
     # create directory structure
     os.makedirs(ProcessedPath)
-    print('ProcessDataCpmACM0.py    :',
+    print('ProcessDataCpmACM0.py       :',
           dt.datetime.strftime(dt.datetime.now(), '%Y-%m-%d %H:%M:%S'),
           ': New ACM0 cpm directory created :',
           ProcessedPath)
@@ -153,7 +153,7 @@ ProcessedData.close()
 # Message to log file at end of program
 
 # print message to log file to say completed
-print('ProcessDataCpmACM0.py    :',
+print('ProcessDataCpmACM0.py       :',
       dt.datetime.strftime(dt.datetime.now(), '%Y-%m-%d %H:%M:%S'),
       ': Completed cpm ACM0 data processing for',
       dt.datetime.strftime(dt.datetime.now() - dt.timedelta(1), '%Y-%m-%d'))

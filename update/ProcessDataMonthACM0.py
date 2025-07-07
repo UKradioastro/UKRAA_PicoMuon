@@ -7,7 +7,7 @@ import os
 import shutil
 
 # print message to log file to say started
-print('ProcessDataMonthACM0.py  :', 
+print('ProcessDataMonthACM0.py     :', 
       dt.datetime.strftime(dt.datetime.now(), '%Y-%m-%d %H:%M:%S'), 
       ': Started ACM0 months % deviation data processing, from', 
       dt.datetime.strftime(dt.datetime.now() - dt.timedelta(31), '%Y-%m-%d'), 
@@ -49,7 +49,7 @@ pathExists = os.path.exists(MonthPath)
 if not pathExists:
     # create directory structure
     os.makedirs(MonthPath)
-    print('ProcessDataMonthACM0.py  :', 
+    print('ProcessDataMonthACM0.py     :', 
           dt.datetime.strftime(dt.datetime.now(), '%Y-%m-%d %H:%M:%S'), 
           ': New ACM0 month directory created :', 
           MonthPath)
@@ -76,10 +76,10 @@ if os.path.exists(RawDataFile31):
                 shutil.copyfileobj(fd, wfd)
 
 else:
-    print('ProcessDataMonthACM0.py  :', 
+    print('ProcessDataMonthACM0.py     :', 
           dt.datetime.strftime(dt.datetime.now(), '%Y-%m-%d %H:%M:%S'), 
           ': Not enough ACM0 day files are available yet to process months % deviation data...')
-    print('ProcessDataMonthACM0.py  :', 
+    print('ProcessDataMonthACM0.py     :', 
           dt.datetime.strftime(dt.datetime.now(), '%Y-%m-%d %H:%M:%S'), 
           ': **FAILED** to process ACM0 months % deviation data, from', 
           dt.datetime.strftime(dt.datetime.now() - dt.timedelta(31), '%Y-%m-%d'), 
@@ -98,7 +98,7 @@ pathExists = os.path.exists(ProcessedPath)
 if not pathExists:
     # create directory structure
     os.makedirs(ProcessedPath)
-    print('ProcessDataMonthACM0.py  :', 
+    print('ProcessDataMonthACM0.py     :', 
           dt.datetime.strftime(dt.datetime.now(), '%Y-%m-%d %H:%M:%S'), 
           ': New directory created :', 
           ProcessedPath)
@@ -221,7 +221,7 @@ ProcessedData.close()
 # Message to log file at end of program
 
 # print message to log file to say completed
-print('ProcessDataMonthACM0.py  :', \
+print('ProcessDataMonthACM0.py     :', \
       dt.datetime.strftime(dt.datetime.now(), '%Y-%m-%d %H:%M:%S'), \
       ': Completed ACM0 months % deviation data processing, from', \
       dt.datetime.strftime(dt.datetime.now() - dt.timedelta(31), '%Y-%m-%d'), \
