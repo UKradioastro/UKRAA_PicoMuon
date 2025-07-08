@@ -165,7 +165,7 @@ replot
 # print to log file
 print "PlotDataWeekACM0.gp         : "\
     .system("date +'%Y/%M/%d %H:%M:%S'")\
-    .": Completed ACM0 weeks % deviation day plot from "\
+    ." : Completed ACM0 weeks % deviation day plot from "\
     .system("date -d 'last week' +'%Y-%m-%d'")\
     ." to "\
     .system("date -d yesterday +'%Y-%m-%d'")
