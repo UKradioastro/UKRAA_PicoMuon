@@ -219,6 +219,122 @@ sudo systemctl disable PicoMuonACM0.service
 
 &nbsp;
 <!-- =============================================================================== --> 
+## Updating your software
+
+1. Log into your Raspberry Pi4/5 using VNC.
+
+
+2. We need to do a bit of house-keeping prior to installing the latest update...
+
+
+3. Open **File Manager** and navigate to **/home/pi/UKRAA_PicoMuon**. You should see something like the following.
+
+![img_20](images/RPi_imager_20.PNG)
+
+4. Right mouse click on the **update** folder and select **Move to Wastebasket**
+
+![img_21](images/RPi_imager_21.PNG)
+
+5. If you have undertaken a previous update open **File Manager** and navigate to **/home/pi/Downloads**. You should see the file you previously downloaded.
+
+![img_22](images/RPi_imager_22.PNG)
+
+6. Right mouse click on the **update** folder and select **Move to Wastebasket**
+
+![img_23](images/RPi_imager_23.PNG)
+
+7. Right mouse click on the **UKradioastro zip folder** folder and select **Move to Wastebasket**
+
+![img_24](images/RPi_imager_24.PNG)
+
+7. Open your web browser, type the following command into the URL window and press enter
+```
+https://download-directory.github.io/?url=https%3A%2F%2Fgithub.com%2FUKradioastro%2FUKRAA_PicoMuon%2Ftree%2Fmain%2Fupdate
+```
+
+![img_05](images/RPi_imager_05.PNG)
+
+This will download a zip file of the updated code to your RPi **/home/pi/Downloads** folder.
+
+![img_06](images/RPi_imager_06.PNG)
+
+Close your web browser.
+
+
+3. Open **File Manager** and navigate to **/home/pi/Downloads**. You should see the zip file you just downloaded.
+
+![img_07](images/RPi_imager_07.PNG)
+
+4. Double click on the downloaded zip file **UKradioastro UKRAA_PicoMuon main update.zip**.  This will open the RPi **xarchiver** utility.
+
+![img_08](images/RPi_imager_08.PNG)
+
+5. Now click on the **extract** icon on the menu ribbon.
+
+![img_09](images/RPi_imager_09.PNG)
+
+6. Change **Extract to:** from **/tmp** to **/home/pi/Downloads**, then click on the **Extract** button
+
+![img_10](images/RPi_imager_10.PNG)
+
+Close the RPi xarchiver utility.
+
+7. You should now see a new unzipped folder in the Downloads folder
+
+![img_11](images/RPi_imager_11.PNG)
+
+8. Select **UKradioastro UKRAA_PicoMuon main update** folder and rename **update** (Right click mouse to bring up function).
+
+![img_12](images/RPi_imager_12.PNG)
+
+9. Select the **update** folder and copy (Right click mouse to bring up function).
+
+10. Navigate to the PicoMuon directory, **/home/pi/UKRAA_PicoMuon**, and paste the **update** folder
+
+![img_14](images/RPi_imager_14.PNG)
+
+Close the **File Manager** window
+
+11. Open a terminal window and type the following command and press enter
+```
+cd ~/UKRAA_PicoMuon/update
+```
+
+![img_15](images/RPi_imager_15.PNG)
+
+This will take you to the **update** directory inside **/home/pi/UKRAA_PicoMuon**
+
+12. Type the following command and press enter
+```
+chmod +x *.sh
+```
+
+![img_16](images/RPi_imager_16.PNG)
+
+This will make the **update.sh** script executable.
+
+
+13. Type the following command and press enter
+```
+sudo bash update.sh
+```
+
+![img_17](images/RPi_imager_17.PNG)
+
+This will run the update script.
+
+14. That's it!  You should see the following...
+
+![img_18](images/RPi_imager_18.PNG)
+
+The updated code is now set; it will get the data from the detector, process yesterdays data, plot yesterdays data and post yesterdays plots to your intranet web page once per day, at 9.30am in the morning.
+
+&nbsp;
+
+---
+
+&nbsp;
+<!-- =============================================================================== --> 
 ### License
 
 MIT License
