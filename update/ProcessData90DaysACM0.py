@@ -7,18 +7,18 @@ import os
 import shutil
 
 # print message to log file to say started
-print('ProcessDataMonthACM0.py     :', 
-      dt.datetime.strftime(dt.datetime.now(), '%Y-%m-%d %H:%M:%S'), 
-      ': Started ACM0 months % deviation data processing, from', 
-      dt.datetime.strftime(dt.datetime.now() - dt.timedelta(31), '%Y-%m-%d'), 
-      'to', 
+print('ProcessData90DaysACM0.py    :',
+      dt.datetime.strftime(dt.datetime.now(), '%Y-%m-%d %H:%M:%S'),
+      ': Started ACM0 90 days % deviation data processing, from',
+      dt.datetime.strftime(dt.datetime.now() - dt.timedelta(90), '%Y-%m-%d'),
+      'to',
       dt.datetime.strftime(dt.datetime.now() - dt.timedelta(1), '%Y-%m-%d'))
 
 
 # Set path for data file structure
 
 # raw data file source
-for i in range(1, 32):
+for i in range(1, 91):
     globals()['RawDataFile%s' % i] = '/home/pi/UKRAA_PicoMuon/data/processed/day/ACM0/' \
                                      + dt.datetime.strftime(dt.datetime.now() - dt.timedelta(i), '%Y') \
                                      + '/' \
@@ -29,43 +29,54 @@ for i in range(1, 32):
  
 
 # Set file headers for data file structure
-MonthFieldNames    = ['DateTime', 
-                      'Position_T', 
-                      'Position_B', 
-                      'Position_M', 
-                      'temperature', 
-                      'pressure', 
-                      'neutrons']
+ThreeMonthFieldNames = ['DateTime',
+                        'Position_T',
+                        'Position_B',
+                        'Position_M',
+                        'temperature',
+                        'pressure',
+                        'neutrons']
 
 
-# create months worth of data
-MonthPath = '/home/pi/UKRAA_PicoMuon/data/processed/month/ACM0/' \
-           + dt.datetime.strftime(dt.datetime.now() - dt.timedelta(1), '%Y') \
-           + "/" \
-           + dt.datetime.strftime(dt.datetime.now() - dt.timedelta(1), '%Y-%m')
+# create 90 days worth of data
+ThreeMonthPath = '/home/pi/UKRAA_PicoMuon/data/processed/3month/ACM0/' \
+                + dt.datetime.strftime(dt.datetime.now() - dt.timedelta(1), '%Y') \
+                + "/" \
+                + dt.datetime.strftime(dt.datetime.now() - dt.timedelta(1), '%Y-%m')
 
 # check if the specific path exists
-pathExists = os.path.exists(MonthPath)
+pathExists = os.path.exists(ThreeMonthPath)
 if not pathExists:
     # create directory structure
-    os.makedirs(MonthPath)
-    print('ProcessDataMonthACM0.py     :', 
-          dt.datetime.strftime(dt.datetime.now(), '%Y-%m-%d %H:%M:%S'), 
-          ': New ACM0 month directory created :', 
-          MonthPath)
+    os.makedirs(ThreeMonthPath)
+    print('ProcessData90DaysACM0.py    :',
+          dt.datetime.strftime(dt.datetime.now(), '%Y-%m-%d %H:%M:%S'),
+          ': New ACM0 3month directory created :',
+          ThreeMonthPath)
 
 
-# Month data file name
-MonthDataFile = '/home/pi/UKRAA_PicoMuon/data/processed/month/ACM0/' \
+# 90 days data file name
+ThreeMonthDataFile = '/home/pi/UKRAA_PicoMuon/data/processed/3month/ACM0/' \
                + dt.datetime.strftime(dt.datetime.now() - dt.timedelta(1), '%Y') \
                + "/" \
                + dt.datetime.strftime(dt.datetime.now() - dt.timedelta(1), '%Y-%m') \
                + "/temp.txt"
 
-# merge day data to make month data file
-if os.path.exists(RawDataFile31):
-    with open(MonthDataFile,'wb') as wfd:
-        for f in [RawDataFile31,
+# merge day data to make 90 days data file
+if os.path.exists(RawDataFile90):
+    with open(ThreeMonthDataFile,'wb') as wfd:
+        for f in [RawDataFile90,RawDataFile89,RawDataFile88,RawDataFile87,RawDataFile86,
+                  RawDataFile85,RawDataFile84,RawDataFile83,RawDataFile82,RawDataFile81,
+                  RawDataFile80,RawDataFile79,RawDataFile78,RawDataFile77,RawDataFile76,
+                  RawDataFile75,RawDataFile74,RawDataFile73,RawDataFile72,RawDataFile71,
+                  RawDataFile70,RawDataFile69,RawDataFile68,RawDataFile67,RawDataFile66,
+                  RawDataFile65,RawDataFile64,RawDataFile63,RawDataFile62,RawDataFile61,
+                  RawDataFile60,RawDataFile59,RawDataFile58,RawDataFile57,RawDataFile56,
+                  RawDataFile55,RawDataFile54,RawDataFile53,RawDataFile52,RawDataFile51,
+                  RawDataFile50,RawDataFile49,RawDataFile48,RawDataFile47,RawDataFile46,
+                  RawDataFile45,RawDataFile44,RawDataFile43,RawDataFile42,RawDataFile41,
+                  RawDataFile40,RawDataFile39,RawDataFile38,RawDataFile37,RawDataFile36,
+                  RawDataFile35,RawDataFile34,RawDataFile33,RawDataFile32,RawDataFile31,
                   RawDataFile30,RawDataFile29,RawDataFile28,RawDataFile27,RawDataFile26,
                   RawDataFile25,RawDataFile24,RawDataFile23,RawDataFile22,RawDataFile21,
                   RawDataFile20,RawDataFile19,RawDataFile18,RawDataFile17,RawDataFile16,
@@ -76,19 +87,19 @@ if os.path.exists(RawDataFile31):
                 shutil.copyfileobj(fd, wfd)
 
 else:
-    print('ProcessDataMonthACM0.py     :', 
-          dt.datetime.strftime(dt.datetime.now(), '%Y-%m-%d %H:%M:%S'), 
-          ': Not enough ACM0 day files are available yet to process months % deviation data...')
-    print('ProcessDataMonthACM0.py     :', 
-          dt.datetime.strftime(dt.datetime.now(), '%Y-%m-%d %H:%M:%S'), 
-          ': **FAILED** to process ACM0 months % deviation data, from', 
-          dt.datetime.strftime(dt.datetime.now() - dt.timedelta(31), '%Y-%m-%d'), 
-          'to', 
+    print('ProcessData90DaysACM0.py    :',
+          dt.datetime.strftime(dt.datetime.now(), '%Y-%m-%d %H:%M:%S'),
+          ': Not enough ACM0 day files are available yet to process 90 days % deviation data...')
+    print('ProcessData90DaysACM0.py    :',
+          dt.datetime.strftime(dt.datetime.now(), '%Y-%m-%d %H:%M:%S'),
+          ': **FAILED** to process ACM0 90 days % deviation data, from',
+          dt.datetime.strftime(dt.datetime.now() - dt.timedelta(90), '%Y-%m-%d'),
+          'to',
           dt.datetime.strftime(dt.datetime.now() - dt.timedelta(1), '%Y-%m-%d'))
     exit()
-    
+  
 # Processed data path
-ProcessedPath = '/home/pi/UKRAA_PicoMuon/data/processed/month/ACM0/'\
+ProcessedPath = '/home/pi/UKRAA_PicoMuon/data/processed/3month/ACM0/'\
                 + dt.datetime.strftime(dt.datetime.now() - dt.timedelta(1), '%Y') \
                 + "/" \
                 + dt.datetime.strftime(dt.datetime.now() - dt.timedelta(1), '%Y-%m')
@@ -98,13 +109,13 @@ pathExists = os.path.exists(ProcessedPath)
 if not pathExists:
     # create directory structure
     os.makedirs(ProcessedPath)
-    print('ProcessDataMonthACM0.py     :', 
-          dt.datetime.strftime(dt.datetime.now(), '%Y-%m-%d %H:%M:%S'), 
-          ': New directory created :', 
+    print('ProcessData90DaysACM0.py    :',
+          dt.datetime.strftime(dt.datetime.now(), '%Y-%m-%d %H:%M:%S'),
+          ': New ACM0 3month directory created :',
           ProcessedPath)
 
 # Processed data file name
-ProcessedDataFile = "/home/pi/UKRAA_PicoMuon/data/processed/month/ACM0/" \
+ProcessedDataFile = "/home/pi/UKRAA_PicoMuon/data/processed/3month/ACM0/" \
                      + dt.datetime.strftime(dt.datetime.now() - dt.timedelta(1), '%Y') \
                      + "/" \
                      + dt.datetime.strftime(dt.datetime.now() - dt.timedelta(1), '%Y-%m') \
@@ -115,7 +126,7 @@ ProcessedDataFile = "/home/pi/UKRAA_PicoMuon/data/processed/month/ACM0/" \
 # =============================================================================
 # Main program
 
-StartTime_str = dt.datetime.strftime(dt.datetime.now() - dt.timedelta(31), '%Y-%m-%d') \
+StartTime_str = dt.datetime.strftime(dt.datetime.now() - dt.timedelta(90), '%Y-%m-%d') \
                 + ' 00:00:00.000000'
 
 StartTime_datetime = dt.datetime.strptime(StartTime_str, '%Y-%m-%d %H:%M:%S.%f')
@@ -132,14 +143,14 @@ minute = dt.timedelta(
     microseconds =  0,
     milliseconds =  0,
     minutes      =  0,
-    hours        =  1,
+    hours        =  24,
     weeks        =  0)
 
 # set up variable to use in loop
 ProcessedTime = StartTime_datetime - minute
 
-# number of 60 minutes in 31 days
-n = 744
+# number of 24 hours in 90 days
+n = 90
 
 # open file to store data in and append to end
 ProcessedData = open(file=ProcessedDataFile,
@@ -147,7 +158,7 @@ ProcessedData = open(file=ProcessedDataFile,
                      encoding='UTF-8')
 
 for i in range(1, n + 1):
-    # add timedelta to each time value from 00:00:00 to 23:59:00
+    # add a minute to each time value from 00:00:00 to 23:59:00
     ProcessedTime = ProcessedTime + minute
     
     StartBinTime = ProcessedTime
@@ -155,12 +166,12 @@ for i in range(1, n + 1):
     EndBinTime = StartBinTime + minute
 
     # using csv.DictReader
-    MonthFile = open(file=MonthDataFile,
+    ThreeMonthFile = open(file=ThreeMonthDataFile,
                      mode='r',
                      encoding='UTF-8')
     
-    MonthCSV_reader = csv.DictReader(MonthFile,
-                                     MonthFieldNames)
+    ThreeMonthCSV_reader = csv.DictReader(ThreeMonthFile,
+                                          ThreeMonthFieldNames)
 
     # set counters to zero (remember 'NaN' is a float)
     count_T     = 0.0
@@ -170,24 +181,23 @@ for i in range(1, n + 1):
     pressure    = 0.0
     count_N     = 0.0
 
-    for MonthLine in MonthCSV_reader:
+    for ThreeMonthLine in ThreeMonthCSV_reader:
         # try to get raw data after start StartBinTime
         # convert string to dt.datetime.datetime format
-        MonthDatetime = dt.datetime.strptime(MonthLine['DateTime'],
-                                             '%Y-%m-%d %H:%M:%S')
+        ThreeMonthDatetime = dt.datetime.strptime(ThreeMonthLine['DateTime'], '%Y-%m-%d %H:%M:%S')
         
         # search file for data between two time points
-        if (MonthDatetime >= StartBinTime) and (MonthDatetime < EndBinTime):
+        if (ThreeMonthDatetime >= StartBinTime) and (ThreeMonthDatetime < EndBinTime):
             # increase relevant counter
-            count_T = count_T + float(MonthLine['Position_T'])
-            count_B = count_B + float(MonthLine['Position_B'])
-            count_M = count_M + float(MonthLine['Position_M'])
-            temperature = temperature + float(MonthLine['temperature'])
-            pressure = pressure + float(MonthLine['pressure'])
-            count_N = count_N + float(MonthLine['neutrons'])
+            count_T = count_T + float(ThreeMonthLine['Position_T'])
+            count_B = count_B + float(ThreeMonthLine['Position_B'])
+            count_M = count_M + float(ThreeMonthLine['Position_M'])
+            temperature = temperature + float(ThreeMonthLine['temperature'])
+            pressure = pressure + float(ThreeMonthLine['pressure'])
+            count_N = count_N + float(ThreeMonthLine['neutrons'])
 
     # close open MonthFile
-    MonthFile.close()
+    ThreeMonthFile.close()
 
     # no need for 'nan' as already included in day data
     # check if there is some top counts data
@@ -208,32 +218,32 @@ for i in range(1, n + 1):
 
     # check if there is some count data
     if ((count_T + count_B + count_M) != 0):
-        ProcessedTemp  = '{:.1f}'.format(temperature / 12.0)
-        ProcessedPres  = '{:.1f}'.format(pressure / 12.0)
+        ProcessedTemp  = '{:.1f}'.format(temperature / (12.0 * 24.0))
+        ProcessedPres  = '{:.1f}'.format(pressure / (12.0 * 24.0))
     else:
         ProcessedTemp = float('nan')
         ProcessedPres = float('nan')
 
     # check if there is some neutron counts data
-    if (count_N > (400.0 * 31.0)):
+    if (count_N > (400.0 * 90.0)):
         ProcessedCPM_N = '{:.3f}'.format(count_N)
     else:
         ProcessedCPM_N = float('nan')
- 
+
     # write to file
     ProcessedData.write(str(ProcessedTime))          # Data time date
     ProcessedData.write(",")                         # "," separator
-    ProcessedData.write(str(ProcessedCPM_T))         # Top detector count over 1 hour
+    ProcessedData.write(str(ProcessedCPM_T))         # Top detector count over 24 hours
     ProcessedData.write(",")                         # "," separator
-    ProcessedData.write(str(ProcessedCPM_B))         # Bottom detector count over 1 hour
+    ProcessedData.write(str(ProcessedCPM_B))         # Bottom detector count over 24 hours
     ProcessedData.write(",")                         # "," separator
-    ProcessedData.write(str(ProcessedCPM_M))         # Muon count over 1 hour
+    ProcessedData.write(str(ProcessedCPM_M))         # Muon count over 24 hours
     ProcessedData.write(",")                         # "," separator
-    ProcessedData.write(str(ProcessedTemp))          # Detector temperature over 1 hour
+    ProcessedData.write(str(ProcessedTemp))          # Detector temperature over 24 hours
     ProcessedData.write(",")                         # "," separator
-    ProcessedData.write(str(ProcessedPres))          # Detector pressure over 1 hour
+    ProcessedData.write(str(ProcessedPres))          # Detector pressure over 24 hours
     ProcessedData.write(",")                         # "," separator
-    ProcessedData.write(str(ProcessedCPM_N))         # Neutron count over 1 hour
+    ProcessedData.write(str(ProcessedCPM_N))         # Neutron count over 24 hours
     ProcessedData.write("\n")                        # new line
 
 # close open ProcessedData file
@@ -243,11 +253,11 @@ ProcessedData.close()
 # Message to log file at end of program
 
 # print message to log file to say completed
-print('ProcessDataMonthACM0.py     :', \
-      dt.datetime.strftime(dt.datetime.now(), '%Y-%m-%d %H:%M:%S'), \
-      ': Completed ACM0 months % deviation data processing, from', \
-      dt.datetime.strftime(dt.datetime.now() - dt.timedelta(31), '%Y-%m-%d'), \
-      'to', \
+print('ProcessData90DaysACM0.py    :',
+      dt.datetime.strftime(dt.datetime.now(), '%Y-%m-%d %H:%M:%S'),
+      ': Completed ACM0 90 days % deviation data processing, from',
+      dt.datetime.strftime(dt.datetime.now() - dt.timedelta(90), '%Y-%m-%d'),
+      'to',
       dt.datetime.strftime(dt.datetime.now() - dt.timedelta(1), '%Y-%m-%d'))
 
 # =============================================================================

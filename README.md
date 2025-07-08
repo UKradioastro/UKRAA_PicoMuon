@@ -61,6 +61,22 @@ ls /dev/tty*
 
 &nbsp;
 <!-- =============================================================================== --> 
+## Using the code
+
+The code assumes that your UKRAA PicoMuon detector is connected to the RPi4/5 via supplied USB cable and that it is /dev/ttyACM0 - you can check this by using **ls /dev/tty*** in a terminal window on the RPi4/5 and reviewing the response.
+
+The code assumes username is **pi**.  If **pi** is not the username, then you will need to change all occurances of '/home/pi' to '/home/*username*' in the python and gnuplot scripts, where *username* is the username you have selected for your RPi4/5.
+
+The code assumes one detector connected to the RPi4/5 USB and that it will be connected via **/dev/ttyACM0**, if there are other devices connected to the RPi and your detector is not **/dev/ttyACM0**, then you will need to change **/dev/ttyACM0** to **/dev/*ttyACMx*** in the **GetDataRawACM0.py** python script, where *ttyACMx* is the tty address of you connected detector.
+
+**GetDataRawACM0.py** is run as a service.
+
+Other scripts (Python, gnuplot and shell) are run from **cron**
+
+---
+
+&nbsp;
+<!-- =============================================================================== --> 
 ## Install the software onto your RPi
 
 1. Log into your Raspberry Pi4/5 using VNC.
@@ -75,22 +91,6 @@ git clone https://github.com/UKradioastro/UKRAA_PicoMuon
 ![img_01](images/RPi_imager_01.PNG)
 
 This will download all of the code to the directory **UKRAA_PicoMuon** inside **/home/pi**
-
----
-
-&nbsp;
-<!-- =============================================================================== --> 
-## Using the code
-
-The code assumes that your UKRAA PicoMuon detector is connected to the RPi4/5 via supplied USB cable and that it is /dev/ttyACM0 - you can check this by using **ls /dev/tty*** in a terminal window on the RPi4/5 and reviewing the response.
-
-The code assumes username is **pi**.  If **pi** is not the username, then you will need to change all occurances of '/home/pi' to '/home/*username*' in the python and gnuplot scripts, where *username* is the username you have selected for your RPi4/5.
-
-The code assumes one detector connected to the RPi4/5 USB and that it will be connected via **/dev/ttyACM0**, if there are other devices connected to the RPi and your detector is not **/dev/ttyACM0**, then you will need to change **/dev/ttyACM0** to **/dev/*ttyACMx*** in the **GetDataRawACM0.py** python script, where *ttyACMx* is the tty address of you connected detector.
-
-**GetDataRawACM0.py** is run as a service.
-
-Other scripts (Python and gnuplot) are run from **cron**
 
 ---
 
@@ -156,12 +156,12 @@ The code receives the event data from the UKRAA PicoMuon detector via serial ove
 
 The raw data will be processed overnight, via CRON, to get counts per minute, the frequency of the counts per minute and the frequency of the adc values for your previous day's data.
 
-Three plots will be created:
+A number of plots will be created:
 * counts per minute
 * frequency of counts per minute
 * frequency of ADC values recorded
 
-A request will be made to [NMDB](https://www.nmdb.eu/) via NEST to get the previous days recorded neutron count, this data will be overlaid onto the day / week / month % deviation counts per minute graphs.
+The raw data will also be processed overnight, via CRON, to produce % deviation of muon counts, this data is supplemented by a request  to [NMDB](https://www.nmdb.eu/) via NEST to get the previous days recorded neutron count, which will be overlaid onto the day / week / month / etc % deviation counts graphs.
 
 These will appear as the required amount of data is recorded by the detector
 
@@ -234,7 +234,30 @@ sudo systemctl disable PicoMuonACM0.service
 1. Log into your Raspberry Pi4/5 using VNC.
 
 
-2. Open your web browser, type the following command into the URL window and press enter
+2. We need to do a bit of house-keeping prior to installing the latest update...
+
+
+3. Open **File Manager** and navigate to **/home/pi/UKRAA_PicoMuon**. You should see something like the following.
+
+![img_20](images/RPi_imager_20.PNG)
+
+4. Right mouse click on the **update** folder and select **Move to Wastebasket**
+
+![img_21](images/RPi_imager_21.PNG)
+
+5. If you have undertaken a previous update open **File Manager** and navigate to **/home/pi/Downloads**. You should see the file you previously downloaded.
+
+![img_22](images/RPi_imager_22.PNG)
+
+6. Right mouse click on the **update** folder and select **Move to Wastebasket**
+
+![img_23](images/RPi_imager_23.PNG)
+
+7. Right mouse click on the **UKradioastro zip folder** folder and select **Move to Wastebasket**
+
+![img_24](images/RPi_imager_24.PNG)
+
+8. Open your web browser, type the following command into the URL window and press enter
 ```
 https://download-directory.github.io/?url=https%3A%2F%2Fgithub.com%2FUKradioastro%2FUKRAA_PicoMuon%2Ftree%2Fmain%2Fupdate
 ```
@@ -248,41 +271,41 @@ This will download a zip file of the updated code to your RPi **/home/pi/Downloa
 Close your web browser.
 
 
-3. Open **File Manager** and navigate to **/home/pi/Downloads**. You should see the zip file you just downloaded.
+9. Open **File Manager** and navigate to **/home/pi/Downloads**. You should see the zip file you just downloaded.
 
 ![img_07](images/RPi_imager_07.PNG)
 
-4. Double click on the downloaded zip file **UKradioastro UKRAA_PicoMuon main update.zip**.  This will open the RPi **xarchiver** utility.
+10. Double click on the downloaded zip file **UKradioastro UKRAA_PicoMuon main update.zip**.  This will open the RPi **xarchiver** utility.
 
 ![img_08](images/RPi_imager_08.PNG)
 
-5. Now click on the **extract** icon on the menu ribbon.
+11. Now click on the **extract** icon on the menu ribbon.
 
 ![img_09](images/RPi_imager_09.PNG)
 
-6. Change **Extract to:** from **/tmp** to **/home/pi/Downloads**, then click on the **Extract** button
+12. Change **Extract to:** from **/tmp** to **/home/pi/Downloads**, then click on the **Extract** button
 
 ![img_10](images/RPi_imager_10.PNG)
 
 Close the RPi xarchiver utility.
 
-7. You should now see a new unzipped folder in the Downloads folder
+13. You should now see a new unzipped folder in the Downloads folder
 
 ![img_11](images/RPi_imager_11.PNG)
 
-8. Select **UKradioastro UKRAA_PicoMuon main update** folder and rename **update** (Right click mouse to bring up function).
+14. Select **UKradioastro UKRAA_PicoMuon main update** folder and rename **update** (Right click mouse to bring up function).
 
 ![img_12](images/RPi_imager_12.PNG)
 
-9. Select the **update** folder and copy (Right click mouse to bring up function).
+15. Select the **update** folder and copy (Right click mouse to bring up function).
 
-10. Navigate to the PicoMuon directory, **/home/pi/UKRAA_PicoMuon**, and paste the **update** folder
+16. Navigate to the PicoMuon directory, **/home/pi/UKRAA_PicoMuon**, and paste the **update** folder
 
 ![img_14](images/RPi_imager_14.PNG)
 
 Close the **File Manager** window
 
-11. Open a terminal window and type the following command and press enter
+17. Open a terminal window and type the following command and press enter
 ```
 cd ~/UKRAA_PicoMuon/update
 ```
@@ -291,7 +314,7 @@ cd ~/UKRAA_PicoMuon/update
 
 This will take you to the **update** directory inside **/home/pi/UKRAA_PicoMuon**
 
-12. Type the following command and press enter
+18. Type the following command and press enter
 ```
 chmod +x *.sh
 ```
@@ -301,7 +324,7 @@ chmod +x *.sh
 This will make the **update.sh** script executable.
 
 
-13. Type the following command and press enter
+19. Type the following command and press enter
 ```
 sudo bash update.sh
 ```
@@ -310,9 +333,9 @@ sudo bash update.sh
 
 This will run the update script.
 
-14. That's it!  You should see the following...
+20. That's it!  You should see the following...
 
-![img_18](images/RPi_imager_18.PNG)
+![img_25](images/RPi_imager_25.PNG)
 
 The updated code is now set; it will get the data from the detector, process yesterdays data, plot yesterdays data and post yesterdays plots to your intranet web page once per day, at 9.30am in the morning.
 
