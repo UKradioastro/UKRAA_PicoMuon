@@ -173,10 +173,10 @@ for i in range(1, n + 1):
     ThreeMonthCSV_reader = csv.DictReader(ThreeMonthFile,
                                           ThreeMonthFieldNames)
 
-    # set counters to zero
-    count_T     = 0
-    count_B     = 0
-    count_M     = 0
+    # set counters to zero (remember 'NaN' is a float)
+    count_T     = 0.0
+    count_B     = 0.0
+    count_M     = 0.0
     temperature = 0.0
     pressure    = 0.0
     count_N     = 0.0
@@ -189,9 +189,9 @@ for i in range(1, n + 1):
         # search file for data between two time points
         if (ThreeMonthDatetime >= StartBinTime) and (ThreeMonthDatetime < EndBinTime):
             # increase relevant counter
-            count_T = count_T + int(ThreeMonthLine['Position_T'])
-            count_B = count_B + int(ThreeMonthLine['Position_B'])
-            count_M = count_M + int(ThreeMonthLine['Position_M'])
+            count_T = count_T + float(ThreeMonthLine['Position_T'])
+            count_B = count_B + float(ThreeMonthLine['Position_B'])
+            count_M = count_M + float(ThreeMonthLine['Position_M'])
             temperature = temperature + float(ThreeMonthLine['temperature'])
             pressure = pressure + float(ThreeMonthLine['pressure'])
             count_N = count_N + float(ThreeMonthLine['neutrons'])
@@ -200,13 +200,35 @@ for i in range(1, n + 1):
     ThreeMonthFile.close()
 
     # no need for 'nan' as already included in day data
+    # check if there is some top counts data
+    if (count_T != 0.0):
+        ProcessedCPM_T = '{:.0f}'.format(count_T)
+    else:
+        ProcessedCPM_T = float('nan')
+    # check if there is some bottom counts data
+    if (count_B != 0.0):
+        ProcessedCPM_B = '{:.0f}'.format(count_B)
+    else:
+        ProcessedCPM_B = float('nan')
+    # check if there is some coincidence counts data
+    if (count_M != 0.0):
+        ProcessedCPM_M = '{:.0f}'.format(count_M)
+    else:
+        ProcessedCPM_M = float('nan')
 
-    ProcessedCPM_T = '{:.0f}'.format(count_T)
-    ProcessedCPM_B = '{:.0f}'.format(count_B)
-    ProcessedCPM_M = '{:.0f}'.format(count_M)
-    ProcessedTemp  = '{:.1f}'.format(temperature / (12.0 * 24.0))
-    ProcessedPres  = '{:.1f}'.format(pressure / (12.0 * 24.0))
-    ProcessedCPM_N = '{:.3f}'.format(count_N)
+    # check if there is some count data
+    if ((count_T + count_B + count_M) != 0):
+        ProcessedTemp  = '{:.1f}'.format(temperature / (12.0 * 24.0))
+        ProcessedPres  = '{:.1f}'.format(pressure / (12.0 * 24.0))
+    else:
+        ProcessedTemp = float('nan')
+        ProcessedPres = float('nan')
+
+    # check if there is some neutron counts data
+    if (count_N > (400.0 * 90.0)):
+        ProcessedCPM_N = '{:.3f}'.format(count_N)
+    else:
+        ProcessedCPM_N = float('nan')
 
     # write to file
     ProcessedData.write(str(ProcessedTime))          # Data time date
