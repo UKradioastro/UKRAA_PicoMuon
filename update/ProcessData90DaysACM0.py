@@ -225,7 +225,7 @@ for i in range(1, n + 1):
         ProcessedPres = float('nan')
 
     # check if there is some neutron counts data
-    if (count_N > (400.0 * 90.0)):
+    if (count_N > (400.0 * (12.0 * 24.0))):
         ProcessedCPM_N = '{:.3f}'.format(count_N)
     else:
         ProcessedCPM_N = float('nan')
