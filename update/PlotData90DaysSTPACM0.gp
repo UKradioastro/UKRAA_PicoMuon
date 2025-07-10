@@ -45,9 +45,9 @@ FileData        = pathData.YearFolder.YearMonthFolder.YmdFile
 
 # check if FileData exists - 0=exists, 1=doesn't exist, if doesn't exist then exit, with message
 is_missing = system("/home/pi/UKRAA_PicoMuon/scripts/ismissing.sh ".FileData)
-if (is_missing == 1) {print "PlotData90DaysSTPACM0.gp    : ".system("date +'%Y/%M/%d %H:%M:%S'")." : ACM0 3month data file missing, so..."; 
+if (is_missing == 1) {print "PlotData90DaysSTPACM0.gp    : ".system("date +'%Y-%m-%d %H:%M:%S'")." : ACM0 3month data file missing, so..."; 
     print "PlotData90DaysSTPACM0.gp    : "\
-        .system("date +'%Y/%M/%d %H:%M:%S'")\
+        .system("date +'%Y-%m-%d %H:%M:%S'")\
         ." : **FAILED** to complete ACM0 90 days STP plot from "\
         .system("date -d '90 days ago' +'%Y-%m-%d'")\
         ." to "\

@@ -22,7 +22,7 @@ set print "-"
 
 # print to log file
 print "PlotDataMonthACM0.gp        : "\
-    .system("date +'%Y/%M/%d %H:%M:%S'")\
+    .system("date +'%Y-%m-%d %H:%M:%S'")\
     ." : Started ACM0 months % deviation plot from "\
     .system("date -d 'last month' +'%Y-%m-%d'")\
     ." to "\
@@ -45,9 +45,9 @@ FileData        = pathData.YearFolder.YearMonthFolder.YmdFile
 
 # check if FileData exists - 0=exists, 1=doesn't exist, if doesn't exist then exit, with message
 is_missing = system("/home/pi/UKRAA_PicoMuon/scripts/ismissing.sh ".FileData)
-if (is_missing == 1) {print "PlotDataMonthACM0.gp        : ".system("date +'%Y/%M/%d %H:%M:%S'")." : ACM0 month data file missing, so..."; 
+if (is_missing == 1) {print "PlotDataMonthACM0.gp        : ".system("date +'%Y-%m-%d %H:%M:%S'")." : ACM0 month data file missing, so..."; 
     print "PlotDataMonthACM0.gp        : "\
-        .system("date +'%Y/%M/%d %H:%M:%S'")\
+        .system("date +'%Y-%m-%d %H:%M:%S'")\
         ." : **FAILED** to complete ACM0 months % deviation plot from "\
         .system("date -d 'last month' +'%Y-%m-%d'")\
         ." to "\
@@ -163,7 +163,7 @@ replot
 
 # print to log file
 print "PlotDataMonthACM0.gp        : "\
-    .system("date +'%Y/%M/%d %H:%M:%S'")\
+    .system("date +'%Y-%m-%d %H:%M:%S'")\
     ." : Completed ACM0 months % deviation day plot from "\
     .system("date -d 'last month' +'%Y-%m-%d'")\
     ." to "\
