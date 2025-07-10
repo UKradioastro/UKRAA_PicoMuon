@@ -20,13 +20,13 @@ Instructions for setting up a Raspberry Pi4/5 are included in the **docs** folde
 <!-- =============================================================================== --> 
 ## Contents
 
-- [Can I update to latest version?](#can-I-update-to-latest-version?)
-- [Where is my detector?](#where-is-my-detector?)
+- [Can I update to latest version](#can-I-update-to-latest-version)
+- [Where is my detector](#where-is-my-detector)
 - [Using the code](#using-the-code) 
 - [Getting the software onto your RPi](#getting-the-software-onto-your-RPi)
 - [Installing the software onto your RPi](#installing-the-software-onto-your-RPi)
-- [What does the code do?](#what-does-the-code-do?)
-- [Check GetDataRawACM0.py is running](#check-GetDataRawACM0.py-is-running)
+- [What does the code do](#what-does-the-code-do)
+- [Check GetDataRawACM0 service is running](#check-GetDataRawACM0-service-is-running)
 - [Updating your software](#updating-your-software)
 - [License](#license)
 - [Contact us](#contact-us)
@@ -37,7 +37,7 @@ Instructions for setting up a Raspberry Pi4/5 are included in the **docs** folde
 
 &nbsp;
 <!-- =============================================================================== --> 
-### Can I update to latest version?
+### Can I update to latest version
 
 There is a section on updating your software to the latest version at the bottom of this README.
 
@@ -47,7 +47,7 @@ There is a section on updating your software to the latest version at the bottom
 
 &nbsp;
 <!-- =============================================================================== --> 
-### Where is my detector?
+### Where is my detector
 
 Plug your detector into any of the RPi USB ports - I normally use the blue ports (USB3).
 
@@ -169,7 +169,7 @@ The code is now set up to run automatically; it will get the data from the detec
 
 &nbsp;
 <!-- =============================================================================== --> 
-## What does the code do?
+## What does the code do
 
 The code receives the event data from the UKRAA PicoMuon detector via serial over the supplied USB cable and stores the event data to the raw data folder:
 
@@ -207,7 +207,7 @@ Where *hostname* is the hostname for your RPi setup.
 
 &nbsp;
 <!-- =============================================================================== --> 
-## Check GetDataRawACM0.py is running
+## Check GetDataRawACM0 service is running
 
 1. To check the **status** of your service, type the following command and press enter.
 ```
