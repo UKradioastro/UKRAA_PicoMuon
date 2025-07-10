@@ -77,7 +77,7 @@ Other scripts (Python, gnuplot and shell) are run from **cron**
 
 &nbsp;
 <!-- =============================================================================== --> 
-## Install the software onto your RPi
+## Getting the software onto your RPi
 
 1. Log into your Raspberry Pi4/5 using VNC.
 
@@ -96,7 +96,7 @@ This will download all of the code to the directory **UKRAA_PicoMuon** inside **
 
 &nbsp;
 <!-- =============================================================================== --> 
-## Install the software onto your RPi
+## Installing the software onto your RPi
 
 
 1. Open a terminal window and type the following command and press enter
