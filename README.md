@@ -41,6 +41,7 @@ Instructions for setting up a Raspberry Pi4/5 are included in the **docs** folde
 
 There is a section on updating your software to the latest version at the [bottom of this README](#updating-your-software).
 
+[Back to Contents...](#contents)
 
 &nbsp;
 
@@ -75,6 +76,8 @@ ls /dev/tty*
 
 5. As long as you see **/dev/ttyACM0** then you do not have to make any changes to the python scripts, because they are looking for **ACM0**.
 
+[Back to Contents...](#contents)
+
 &nbsp;
 
 ---
@@ -92,6 +95,10 @@ The code assumes one detector connected to the RPi4/5 USB and that it will be co
 **GetDataRawACM0.py** is run as a service.
 
 Other scripts (Python, gnuplot and shell) are run from **cron**
+
+[Back to Contents...](#contents)
+
+&nbsp;
 
 ---
 
@@ -111,6 +118,10 @@ git clone https://github.com/UKradioastro/UKRAA_PicoMuon
 ![img_01](images/RPi_imager_01.PNG)
 
 This will download all of the code to the directory **UKRAA_PicoMuon** inside **/home/pi**
+
+[Back to Contents...](#contents)
+
+&nbsp;
 
 ---
 
@@ -166,6 +177,10 @@ That's it!
 
 The code is now set up to run automatically; it will get the data from the detector, process yesterdays data, plot yesterdays data and post yesterdays plots to your intranet web page once per day, at 9.30am in the morning.
 
+[Back to Contents...](#contents)
+
+&nbsp;
+
 ---
 
 &nbsp;
@@ -203,6 +218,10 @@ NOTE: if you have a different **hostname** for your RPi, change the search bar e
 **http://_hostname_.local**
 
 Where *hostname* is the hostname for your RPi setup.
+
+[Back to Contents...](#contents)
+
+&nbsp;
 
 ---
 
@@ -242,6 +261,8 @@ sudo systemctl enable PicoMuonACM0.service
 ```
 sudo systemctl disable PicoMuonACM0.service
 ```
+
+[Back to Contents...](#contents)
 
 &nbsp;
 
@@ -359,6 +380,9 @@ This will run the update script.
 
 The updated code is now set; it will get the data from the detector, process yesterdays data, plot yesterdays data and post yesterdays plots to your intranet web page once per day, at 9.30am in the morning.
 
+
+[Back to Contents...](#contents)
+
 &nbsp;
 
 ---
@@ -389,6 +413,9 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
+[Back to Contents...](#contents)
+
+&nbsp;
 
 ---
 
@@ -397,3 +424,9 @@ SOFTWARE.
 ### Contact us
 
 Please send an e-mail to picomuon@ukraa.com
+
+[Back to Contents...](#contents)
+
+&nbsp;
+
+---
