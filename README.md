@@ -39,7 +39,8 @@ Instructions for setting up a Raspberry Pi4/5 are included in the **docs** folde
 <!-- =============================================================================== --> 
 ### Can I update to latest version
 
-There is a section on updating your software to the latest version at the bottom of this README.
+There is a section on updating your software to the latest version at the [bottom of this README](#updating-your-software).
+
 
 &nbsp;
 
