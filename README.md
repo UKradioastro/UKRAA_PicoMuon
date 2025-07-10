@@ -18,6 +18,25 @@ Instructions for setting up a Raspberry Pi4/5 are included in the **docs** folde
 
 &nbsp;
 <!-- =============================================================================== --> 
+## Contents
+
+- [Can I update to latest version?](#can-I-update-to-latest-version?)
+- [Where is my detector?](#where-is-my-detector?)
+- [Using the code](#using-the-code) 
+- [Getting the software onto your RPi](#getting-the-software-onto-your-RPi)
+- [Installing the software onto your RPi](#installing-the-software-onto-your-RPi)
+- [What does the code do?](#what-does-the-code-do?)
+- [Check GetDataRawACM0.py is running](#check-GetDataRawACM0.py-is-running)
+- [Updating your software](#updating-your-software)
+- [License](#license)
+- [Contact us](#contact-us)
+
+&nbsp;
+
+---
+
+&nbsp;
+<!-- =============================================================================== --> 
 ### Can I update to latest version?
 
 There is a section on updating your software to the latest version at the bottom of this README.
