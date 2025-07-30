@@ -25,46 +25,46 @@ This software was written to suit a specific set-up, feel free to use as you see
 https://download-directory.github.io/?url=https%3A%2F%2Fgithub.com%2FUKradioastro%2FUKRAA_PicoMuon%2Ftree%2Fmain%2Fpatch_1
 ```
 
-![img_05](../images/RPi_imager_05.PNG)
+![img_26](../images/RPi_imager_26.PNG)
 
 This will download a zip file of the updated code to your RPi **/home/pi/Downloads** folder.
 
-![img_06](../images/RPi_imager_06.PNG)
+![img_27](../images/RPi_imager_27.PNG)
 
 Close your web browser.
 
 
 3. Open **File Manager** and navigate to **/home/pi/Downloads**. You should see the zip file you just downloaded.
 
-![img_07](../images/RPi_imager_07.PNG)
+![img_28](../images/RPi_imager_28.PNG)
 
 10. Double click on the downloaded zip file **UKradioastro UKRAA_PicoMuon main patch_1.zip**.  This will open the RPi **xarchiver** utility.
 
-![img_08](../images/RPi_imager_08.PNG)
+![img_29](../images/RPi_imager_29.PNG)
 
 11. Now click on the **extract** icon on the menu ribbon.
 
-![img_09](../images/RPi_imager_09.PNG)
+![img_30](../images/RPi_imager_09.PNG)
 
 12. Change **Extract to:** from **/tmp** to **/home/pi/Downloads**, then click on the **Extract** button
 
-![img_10](../images/RPi_imager_10.PNG)
+![img_10](../images/RPi_imager_30.PNG)
 
 Close the RPi xarchiver utility.
 
 13. You should now see a new unzipped folder in the Downloads folder
 
-![img_11](../images/RPi_imager_11.PNG)
+![img_31](../images/RPi_imager_31.PNG)
 
 14. Select **UKradioastro UKRAA_PicoMuon main patch_1** folder and rename **patch_1** (Right click mouse to bring up function).
 
-![img_12](../images/RPi_imager_12.PNG)
+![img_32](../images/RPi_imager_32.PNG)
 
 15. Select the **patch_1** folder and copy (Right click mouse to bring up function).
 
 16. Navigate to the PicoMuon directory, **/home/pi/UKRAA_PicoMuon**, and paste the **patch_1** folder
 
-![img_14](../images/RPi_imager_14.PNG)
+![img_33](../images/RPi_imager_33.PNG)
 
 Close the **File Manager** window
 
@@ -73,7 +73,7 @@ Close the **File Manager** window
 cd ~/UKRAA_PicoMuon/patch_1
 ```
 
-![img_15](../images/RPi_imager_15.PNG)
+![img_34](../images/RPi_imager_34.PNG)
 
 This will take you to the **patch_1** directory inside **/home/pi/UKRAA_PicoMuon**
 
@@ -82,7 +82,7 @@ This will take you to the **patch_1** directory inside **/home/pi/UKRAA_PicoMuon
 chmod +x *.sh
 ```
 
-![img_16](../images/RPi_imager_16.PNG)
+![img_35](../images/RPi_imager_35.PNG)
 
 This will make the **patch_1.sh** script executable.
 
@@ -92,18 +92,18 @@ This will make the **patch_1.sh** script executable.
 sudo bash patch_1.sh
 ```
 
-![img_17](../images/RPi_imager_17.PNG)
+![img_36](../images/RPi_imager_36.PNG)
 
 This will run the patch script.
 The patch script will take about 90 minutes on a Raspberry Pi 4 and about 20 minutes on a Raspberry Pi 5.
 
 20. That's it!  You should see the following...
 
-![img_25](../images/RPi_imager_25.PNG)
+![img_37](../images/RPi_imager_37.PNG)
 
-The patch is now set; it will populate correct NMDB data for 26th July 2025 and process the day data for 26th July 2025.
+The patch is now complete; it will populate correct NMDB data for 26th July 2025, process the day data for 26th July 2025 and post to your logfile.
 No changes have been made to the week or month data files.
-As these are next processed you should see corrected data in these plots when they are posted to your intranet web page at 9.30am in the morning.
+When these are next processed you should see corrected data in these plots when they are posted to your intranet web page at 9.30am in the morning.
 
 
 &nbsp;
