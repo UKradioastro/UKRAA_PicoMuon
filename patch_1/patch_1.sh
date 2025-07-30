@@ -24,7 +24,7 @@ echo "Finished moving correct NMDB data to /home/pi/UKRAA_PicoMuon/data/NMDB/neu
 
 
 # create copy of any processed day data for 26/07/2025
-echo "If there is processed daya data for 2025-07-26, move to 2025-07-26_old.txt..."
+echo "If there is processed day data for 2025-07-26, move to 2025-07-26_old.txt..."
 if [ -r /home/pi/UKRAA_PicoMuon/data/processed/day/ACM0/2025/2025-07/2025-07-26.txt ]; then
     su pi -c "mv -f /home/pi/UKRAA_PicoMuon/data/processed/day/ACM0/2025/2025-07/2025-07-26.txt \
                     /home/pi/UKRAA_PicoMuon/data/processed/day/ACM0/2025/2025-07/2025-07-26_old.txt"
