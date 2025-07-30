@@ -38,7 +38,7 @@ Close your web browser.
 
 ![img_07](../images/RPi_imager_07.PNG)
 
-10. Double click on the downloaded zip file **UKradioastro UKRAA_PicoMuon main update.zip**.  This will open the RPi **xarchiver** utility.
+10. Double click on the downloaded zip file **UKradioastro UKRAA_PicoMuon main patch_1.zip**.  This will open the RPi **xarchiver** utility.
 
 ![img_08](../images/RPi_imager_08.PNG)
 
@@ -56,13 +56,13 @@ Close the RPi xarchiver utility.
 
 ![img_11](../images/RPi_imager_11.PNG)
 
-14. Select **UKradioastro UKRAA_PicoMuon main update** folder and rename **update** (Right click mouse to bring up function).
+14. Select **UKradioastro UKRAA_PicoMuon main patch_1** folder and rename **patch_1** (Right click mouse to bring up function).
 
 ![img_12](../images/RPi_imager_12.PNG)
 
-15. Select the **update** folder and copy (Right click mouse to bring up function).
+15. Select the **patch_1** folder and copy (Right click mouse to bring up function).
 
-16. Navigate to the PicoMuon directory, **/home/pi/UKRAA_PicoMuon**, and paste the **update** folder
+16. Navigate to the PicoMuon directory, **/home/pi/UKRAA_PicoMuon**, and paste the **patch_1** folder
 
 ![img_14](../images/RPi_imager_14.PNG)
 
@@ -70,12 +70,12 @@ Close the **File Manager** window
 
 17. Open a terminal window and type the following command and press enter
 ```
-cd ~/UKRAA_PicoMuon/update
+cd ~/UKRAA_PicoMuon/patch_1
 ```
 
 ![img_15](../images/RPi_imager_15.PNG)
 
-This will take you to the **update** directory inside **/home/pi/UKRAA_PicoMuon**
+This will take you to the **patch_1** directory inside **/home/pi/UKRAA_PicoMuon**
 
 18. Type the following command and press enter
 ```
@@ -84,23 +84,26 @@ chmod +x *.sh
 
 ![img_16](../images/RPi_imager_16.PNG)
 
-This will make the **update.sh** script executable.
+This will make the **patch_1.sh** script executable.
 
 
 19. Type the following command and press enter
 ```
-sudo bash update.sh
+sudo bash patch_1.sh
 ```
 
 ![img_17](../images/RPi_imager_17.PNG)
 
-This will run the update script.
+This will run the patch script.
+The patch script will take about 90 minutes on a Raspberry Pi 4 and about 20 minutes on a Raspberry Pi 5.
 
 20. That's it!  You should see the following...
 
 ![img_25](../images/RPi_imager_25.PNG)
 
-The updated code is now set; it will get the data from the detector, process yesterdays data, plot yesterdays data and post yesterdays plots to your intranet web page once per day, at 9.30am in the morning.
+The patch is now set; it will populate correct NMDB data for 26th July 2025 and process the day data for 26th July 2025.
+No changes have been made to the week or month data files.
+As these are next processed you should see corrected data in these plots when they are posted to your intranet web page at 9.30am in the morning.
 
 
 &nbsp;
