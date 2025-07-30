@@ -6,7 +6,7 @@ import csv
 import os
 
 # print message to log file to say started
-print('ProcessDataDayACM0.py:',
+print('ProcessDataDayACM0.py       :',
       dt.datetime.strftime(dt.datetime.now(), '%Y-%m-%d %H:%M:%S'),
       ': Started ACM0 days % deviation data processing for 2025-07-26')
 
@@ -211,7 +211,7 @@ ProcessedData.close()
 # Message to log file at end of program
 
 # print message to log file to say completed
-print('ProcessDataDayACM0.py:',
+print('ProcessDataDayACM0.py       :',
       dt.datetime.strftime(dt.datetime.now(), '%Y-%m-%d %H:%M:%S'),
       ': Completed ACM0 days % deviation data processing for 2025-07-26')
       
