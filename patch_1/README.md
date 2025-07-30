@@ -44,27 +44,27 @@ Close your web browser.
 
 11. Now click on the **extract** icon on the menu ribbon.
 
-![img_30](../images/RPi_imager_09.PNG)
+![img_30](../images/RPi_imager_30.PNG)
 
 12. Change **Extract to:** from **/tmp** to **/home/pi/Downloads**, then click on the **Extract** button
 
-![img_10](../images/RPi_imager_30.PNG)
+![img_31](../images/RPi_imager_31.PNG)
 
 Close the RPi xarchiver utility.
 
 13. You should now see a new unzipped folder in the Downloads folder
 
-![img_31](../images/RPi_imager_31.PNG)
+![img_32](../images/RPi_imager_32.PNG)
 
 14. Select **UKradioastro UKRAA_PicoMuon main patch_1** folder and rename **patch_1** (Right click mouse to bring up function).
 
-![img_32](../images/RPi_imager_32.PNG)
+![img_33](../images/RPi_imager_33.PNG)
 
 15. Select the **patch_1** folder and copy (Right click mouse to bring up function).
 
 16. Navigate to the PicoMuon directory, **/home/pi/UKRAA_PicoMuon**, and paste the **patch_1** folder
 
-![img_33](../images/RPi_imager_33.PNG)
+![img_34](../images/RPi_imager_34.PNG)
 
 Close the **File Manager** window
 
@@ -73,7 +73,7 @@ Close the **File Manager** window
 cd ~/UKRAA_PicoMuon/patch_1
 ```
 
-![img_34](../images/RPi_imager_34.PNG)
+![img_35](../images/RPi_imager_35.PNG)
 
 This will take you to the **patch_1** directory inside **/home/pi/UKRAA_PicoMuon**
 
@@ -82,7 +82,7 @@ This will take you to the **patch_1** directory inside **/home/pi/UKRAA_PicoMuon
 chmod +x *.sh
 ```
 
-![img_35](../images/RPi_imager_35.PNG)
+![img_36](../images/RPi_imager_36.PNG)
 
 This will make the **patch_1.sh** script executable.
 
@@ -92,14 +92,14 @@ This will make the **patch_1.sh** script executable.
 sudo bash patch_1.sh
 ```
 
-![img_36](../images/RPi_imager_36.PNG)
+![img_37](../images/RPi_imager_37.PNG)
 
 This will run the patch script.
 The patch script will take about 90 minutes on a Raspberry Pi 4 and about 20 minutes on a Raspberry Pi 5.
 
 20. That's it!  You should see the following...
 
-![img_37](../images/RPi_imager_37.PNG)
+![img_38](../images/RPi_imager_38.PNG)
 
 The patch is now complete; it will populate correct NMDB data for 26th July 2025, process the day data for 26th July 2025 and post to your logfile.
 No changes have been made to the week or month data files.
