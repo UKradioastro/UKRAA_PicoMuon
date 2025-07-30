@@ -22,7 +22,7 @@ This software was written to suit a specific set-up, feel free to use as you see
 
 2. Open your web browser, type the following command into the URL window and press enter
 ```
-https://download-directory.github.io/?url=https%3A%2F%2Fgithub.com%2FUKradioastro%2FUKRAA_PicoMuon%2Ftree%2Fmain%2Fupdate
+https://download-directory.github.io/?url=https%3A%2F%2Fgithub.com%2FUKradioastro%2FUKRAA_PicoMuon%2Ftree%2Fmain%2Fpatch_1
 ```
 
 ![img_05](../images/RPi_imager_05.PNG)
