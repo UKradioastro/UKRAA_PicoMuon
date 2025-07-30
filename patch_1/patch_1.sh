@@ -34,9 +34,7 @@ fi
 echo "Process day data for 26 July 2025..."
 echo "For Raspberry Pi 4 this will take about 90 minutes... please be patient..."
 echo "For Raspberry Pi 5 this will take about 20 minutes... please be patient..."
-su pi -c "/usr/bin/python3 /home/pi/UKRAA_PicoMuon/patch_1/Process20250726.py \
-                        >> /home/pi/UKRAA_PicoMuon/logfiles/log-PicoMuonACM0.txt \
-                        2>>/home/pi/UKRAA_PicoMuon/logfiles/log-error.txt"
+su pi -c "/usr/bin/python3 /home/pi/UKRAA_PicoMuon/patch_1/Process20250726.py"
 echo "Completed processing revised day data for 26/07/2025"
 
 
