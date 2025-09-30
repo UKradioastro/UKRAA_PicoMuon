@@ -88,7 +88,7 @@ ls /dev/tty*
 
 The code assumes that your UKRAA PicoMuon detector is connected to the RPi4/5 via supplied USB cable and that it is /dev/ttyACM0 - you can check this by using **ls /dev/tty*** in a terminal window on the RPi4/5 and reviewing the response.
 
-The code assumes username is **pi**.  If **pi** is not the username, then you will need to change all occurances of '/home/pi' to '/home/*username*' in the python and gnuplot scripts, where *username* is the username you have selected for your RPi4/5.
+The code assumes username is **pi**.  If **pi** is not the username, then you will need to change all occurances of '$HOME' to '/home/*username*' in the python and gnuplot scripts, where *username* is the username you have selected for your RPi4/5.
 
 The code assumes one detector connected to the RPi4/5 USB and that it will be connected via **/dev/ttyACM0**, if there are other devices connected to the RPi and your detector is not **/dev/ttyACM0**, then you will need to change **/dev/ttyACM0** to **/dev/*ttyACMx*** in the **GetDataRawACM0.py** python script, where *ttyACMx* is the tty address of you connected detector.
 
@@ -117,7 +117,7 @@ git clone https://github.com/UKradioastro/UKRAA_PicoMuon
 
 ![img_01](images/RPi_imager_01.PNG)
 
-This will download all of the code to the directory **UKRAA_PicoMuon** inside **/home/pi**
+This will download all of the code to the directory **UKRAA_PicoMuon** inside **$HOME**
 
 [Back to Contents...](#contents)
 
@@ -137,7 +137,7 @@ cd ~/UKRAA_PicoMuon/install
 
 ![img_02](images/RPi_imager_02.PNG)
 
-This will take you to the **install** directory inside **/home/pi/UKRAA_PicoMuon**
+This will take you to the **install** directory inside **$HOME/UKRAA_PicoMuon**
 
 
 2. Type the following command and press enter
@@ -278,7 +278,7 @@ sudo systemctl disable PicoMuonACM0.service
 2. We need to do a bit of house-keeping prior to installing the latest update...
 
 
-3. Open **File Manager** and navigate to **/home/pi/UKRAA_PicoMuon**. You should see something like the following.
+3. Open **File Manager** and navigate to **$HOME/UKRAA_PicoMuon**. You should see something like the following.
 
 ![img_20](images/RPi_imager_20.PNG)
 
@@ -286,7 +286,7 @@ sudo systemctl disable PicoMuonACM0.service
 
 ![img_21](images/RPi_imager_21.PNG)
 
-5. If you have undertaken a previous update open **File Manager** and navigate to **/home/pi/Downloads**. You should see the file you previously downloaded.
+5. If you have undertaken a previous update open **File Manager** and navigate to **$HOME/Downloads**. You should see the file you previously downloaded.
 
 ![img_22](images/RPi_imager_22.PNG)
 
@@ -305,14 +305,14 @@ https://download-directory.github.io/?url=https%3A%2F%2Fgithub.com%2FUKradioastr
 
 ![img_05](images/RPi_imager_05.PNG)
 
-This will download a zip file of the updated code to your RPi **/home/pi/Downloads** folder.
+This will download a zip file of the updated code to your RPi **$HOME/Downloads** folder.
 
 ![img_06](images/RPi_imager_06.PNG)
 
 Close your web browser.
 
 
-9. Open **File Manager** and navigate to **/home/pi/Downloads**. You should see the zip file you just downloaded.
+9. Open **File Manager** and navigate to **$HOME/Downloads**. You should see the zip file you just downloaded.
 
 ![img_07](images/RPi_imager_07.PNG)
 
@@ -324,7 +324,7 @@ Close your web browser.
 
 ![img_09](images/RPi_imager_09.PNG)
 
-12. Change **Extract to:** from **/tmp** to **/home/pi/Downloads**, then click on the **Extract** button
+12. Change **Extract to:** from **/tmp** to **$HOME/Downloads**, then click on the **Extract** button
 
 ![img_10](images/RPi_imager_10.PNG)
 
@@ -340,7 +340,7 @@ Close the RPi xarchiver utility.
 
 15. Select the **update** folder and copy (Right click mouse to bring up function).
 
-16. Navigate to the PicoMuon directory, **/home/pi/UKRAA_PicoMuon**, and paste the **update** folder
+16. Navigate to the PicoMuon directory, **$HOME/UKRAA_PicoMuon**, and paste the **update** folder
 
 ![img_14](images/RPi_imager_14.PNG)
 
@@ -353,7 +353,7 @@ cd ~/UKRAA_PicoMuon/update
 
 ![img_15](images/RPi_imager_15.PNG)
 
-This will take you to the **update** directory inside **/home/pi/UKRAA_PicoMuon**
+This will take you to the **update** directory inside **$HOME/UKRAA_PicoMuon**
 
 18. Type the following command and press enter
 ```

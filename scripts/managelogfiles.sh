@@ -4,7 +4,7 @@
 # runs once per week (Sunday 00:00) via cron
 
 # go to logfile directory
-cd /home/pi/UKRAA_PicoMuon/logfiles
+cd $HOME/UKRAA_PicoMuon/logfiles
 
 # move logfile-1 to logfile-2
 if [ -r log-PicoMuonACM0-1.txt ]; then

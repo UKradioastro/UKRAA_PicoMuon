@@ -27,7 +27,7 @@ print "PlotDataDayACM0.gp          : "\
     .system("date -d yesterday +'%Y-%m-%d'")
 
 # Set up data paths
-pathData        = "/home/pi/UKRAA_PicoMuon/data/processed/day/ACM0"
+pathData        = "$HOME/UKRAA_PicoMuon/data/processed/day/ACM0"
 
 # Year folder
 YearFolder = "/".system("date -d yesterday +'%Y'")
@@ -42,7 +42,7 @@ YmdFile = "/".system("date -d yesterday +'%Y-%m-%d'").".txt"
 FileData        = pathData.YearFolder.YearMonthFolder.YmdFile
 
 # check if FileData exists - 0=exists, 1=doesn't exist, if doesn't exist then exit, with message
-is_missing = system("/home/pi/UKRAA_PicoMuon/scripts/ismissing.sh ".FileData)
+is_missing = system("$HOME/UKRAA_PicoMuon/scripts/ismissing.sh ".FileData)
 if (is_missing == 1) {print "PlotDataDayACM0.gp          : ".system("date +'%Y-%m-%d %H:%M:%S'")." : ACM0 days data file missing, so..."; 
     print "PlotDataDayACM0.gp          : "\
         .system("date +'%Y-%m-%d %H:%M:%S'")\
@@ -70,7 +70,7 @@ StartXaxis = system("date -d '-1 day' +'%Y-%m-%d'")." 00:00:00"
 EndXaxis = system("date +'%Y-%m-%d'")." 00:00:00"
 
 # setting output path to include data stamp
-pathPlot3 = "/home/pi/UKRAA_PicoMuon/plots/day/ACM0/".date."_day_plot.png"
+pathPlot3 = "$HOME/UKRAA_PicoMuon/plots/day/ACM0/".date."_day_plot.png"
 
 # Title for graph
 GraphTitle3 = "% change of muon and neutron count rate from mean count rate for ".system("date -d yesterday +'%A %d %B %Y'")."\n Graph is updated every day at 9.30am \n"
@@ -148,7 +148,7 @@ plot FileData using 1:(((($4/MUON_mean)*100)-100)) linetype 1 linewidth 1 lineco
 set terminal pngcairo enhanced font "DejaVuSansCondensed, 10" rounded size 640,540 
 
 # Path to directory to store file
-pathPlot = "/home/pi/UKRAA_PicoMuon/temp/ACM0_day_plot"
+pathPlot = "$HOME/UKRAA_PicoMuon/temp/ACM0_day_plot"
 
 # set output path to Plot folder
 set output pathPlot.".png"

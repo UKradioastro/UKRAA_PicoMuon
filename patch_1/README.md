@@ -27,14 +27,14 @@ https://download-directory.github.io/?url=https%3A%2F%2Fgithub.com%2FUKradioastr
 
 ![img_26](../images/RPi_imager_26.PNG)
 
-This will download a zip file of the updated code to your RPi **/home/pi/Downloads** folder.
+This will download a zip file of the updated code to your RPi **$HOME/Downloads** folder.
 
 ![img_27](../images/RPi_imager_27.PNG)
 
 Close your web browser.
 
 
-3. Open **File Manager** and navigate to **/home/pi/Downloads**. You should see the zip file you just downloaded.
+3. Open **File Manager** and navigate to **$HOME/Downloads**. You should see the zip file you just downloaded.
 
 ![img_28](../images/RPi_imager_28.PNG)
 
@@ -46,7 +46,7 @@ Close your web browser.
 
 ![img_30](../images/RPi_imager_30.PNG)
 
-12. Change **Extract to:** from **/tmp** to **/home/pi/Downloads**, then click on the **Extract** button
+12. Change **Extract to:** from **/tmp** to **$HOME/Downloads**, then click on the **Extract** button
 
 ![img_31](../images/RPi_imager_31.PNG)
 
@@ -62,7 +62,7 @@ Close the RPi xarchiver utility.
 
 15. Select the **patch_1** folder and copy (Right click mouse to bring up function).
 
-16. Navigate to the PicoMuon directory, **/home/pi/UKRAA_PicoMuon**, and paste the **patch_1** folder
+16. Navigate to the PicoMuon directory, **$HOME/UKRAA_PicoMuon**, and paste the **patch_1** folder
 
 ![img_34](../images/RPi_imager_34.PNG)
 
@@ -75,7 +75,7 @@ cd ~/UKRAA_PicoMuon/patch_1
 
 ![img_35](../images/RPi_imager_35.PNG)
 
-This will take you to the **patch_1** directory inside **/home/pi/UKRAA_PicoMuon**
+This will take you to the **patch_1** directory inside **$HOME/UKRAA_PicoMuon**
 
 18. Type the following command and press enter
 ```

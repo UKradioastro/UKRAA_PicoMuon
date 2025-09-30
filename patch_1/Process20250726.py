@@ -24,7 +24,7 @@ RawFieldNames    = ['RawDateTime',
 # Set path for data file structure
 
 # raw data file source
-RawDataFile   = "/home/pi/UKRAA_PicoMuon/data/raw/ACM0/2025/2025-07/2025-07-26.txt"
+RawDataFile   = "$HOME/UKRAA_PicoMuon/data/raw/ACM0/2025/2025-07/2025-07-26.txt"
 
 # Set file headers for data file structure
 NeutronFieldNames    = ['NeutronDateTime',
@@ -34,10 +34,10 @@ NeutronFieldNames    = ['NeutronDateTime',
                         'EfficiencyCorrected']
 
 # Neutron data file source
-NeutronDataFile   = "/home/pi/UKRAA_PicoMuon/data/NMDB/neutrons/2025/2025-07/2025-07-26.txt"
+NeutronDataFile   = "$HOME/UKRAA_PicoMuon/data/NMDB/neutrons/2025/2025-07/2025-07-26.txt"
 
 # Processed data path
-ProcessedPath = "/home/pi/UKRAA_PicoMuon/data/processed/day/ACM0/2025/2025-07"
+ProcessedPath = "$HOME/UKRAA_PicoMuon/data/processed/day/ACM0/2025/2025-07"
 
 # check if the specific path exists
 pathExists = os.path.exists(ProcessedPath)
@@ -50,7 +50,7 @@ if not pathExists:
           ProcessedPath)
 
 # Processed data file name
-ProcessedDataFile = "/home/pi/UKRAA_PicoMuon/data/processed/day/ACM0/2025/2025-07/2025-07-26.txt"
+ProcessedDataFile = "$HOME/UKRAA_PicoMuon/data/processed/day/ACM0/2025/2025-07/2025-07-26.txt"
 
 # =============================================================================
 # Main program
