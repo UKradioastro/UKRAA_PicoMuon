@@ -88,8 +88,6 @@ ls /dev/tty*
 
 The code assumes that your UKRAA PicoMuon detector is connected to the RPi4/5 via supplied USB cable and that it is /dev/ttyACM0 - you can check this by using **ls /dev/tty*** in a terminal window on the RPi4/5 and reviewing the response.
 
-The code assumes username is **pi**.  If **pi** is not the username, then you will need to change all occurances of '$HOME' to '/home/*username*' in the python and gnuplot scripts, where *username* is the username you have selected for your RPi4/5.
-
 The code assumes one detector connected to the RPi4/5 USB and that it will be connected via **/dev/ttyACM0**, if there are other devices connected to the RPi and your detector is not **/dev/ttyACM0**, then you will need to change **/dev/ttyACM0** to **/dev/*ttyACMx*** in the **GetDataRawACM0.py** python script, where *ttyACMx* is the tty address of you connected detector.
 
 **GetDataRawACM0.py** is run as a service.
