@@ -4,7 +4,7 @@
 echo "Start installing UKRAA PicoMuon software..."
 
 echo "What is your username?"
-read uservar
+read -p 'Username: ' uservar
 
 
 echo "Start installing pandas software..."
