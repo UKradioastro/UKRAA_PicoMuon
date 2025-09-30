@@ -20,30 +20,30 @@ echo "gnuplot software installed"
 
 
 echo "Creating directory structure..."
-sudo -u uservar mkdir -vp /home/uservar/UKRAA_PicoMuon/data/environment/coefficient
-sudo -u uservar mkdir -vp /home/uservar/UKRAA_PicoMuon/data/NMDB/neutrons
-sudo -u uservar mkdir -vp /home/uservar/UKRAA_PicoMuon/data/processed/3month/ACM0
-sudo -u uservar mkdir -vp /home/uservar/UKRAA_PicoMuon/data/processed/adc/ACM0
-sudo -u uservar mkdir -vp /home/uservar/UKRAA_PicoMuon/data/processed/cpm/ACM0
-sudo -u uservar mkdir -vp /home/uservar/UKRAA_PicoMuon/data/processed/day/ACM0
-sudo -u uservar mkdir -vp /home/uservar/UKRAA_PicoMuon/data/processed/month/ACM0
-sudo -u uservar mkdir -vp /home/uservar/UKRAA_PicoMuon/data/processed/week/ACM0
-sudo -u uservar mkdir -vp /home/uservar/UKRAA_PicoMuon/data/raw/ACM0
-sudo -u uservar mkdir -v  /home/uservar/UKRAA_PicoMuon/logfiles
-sudo -u uservar mkdir -vp /home/uservar/UKRAA_PicoMuon/plots/3month/ACM0
-sudo -u uservar mkdir -vp /home/uservar/UKRAA_PicoMuon/plots/adc/ACM0
-sudo -u uservar mkdir -vp /home/uservar/UKRAA_PicoMuon/plots/cpm/ACM0
-sudo -u uservar mkdir -vp /home/uservar/UKRAA_PicoMuon/plots/day/ACM0
-sudo -u uservar mkdir -vp /home/uservar/UKRAA_PicoMuon/plots/freq/ACM0
-sudo -u uservar mkdir -vp /home/uservar/UKRAA_PicoMuon/plots/month/ACM0
-sudo -u uservar mkdir -vp /home/uservar/UKRAA_PicoMuon/plots/week/ACM0
-sudo -u uservar mkdir -v  /home/uservar/UKRAA_PicoMuon/temp
-sudo -u uservar mkdir -vp /home/uservar/UKRAA_PicoMuon/WWW/temp
+sudo -u $uservar mkdir -vp /home/uservar/UKRAA_PicoMuon/data/environment/coefficient
+sudo -u $uservar mkdir -vp /home/uservar/UKRAA_PicoMuon/data/NMDB/neutrons
+sudo -u $uservar mkdir -vp /home/uservar/UKRAA_PicoMuon/data/processed/3month/ACM0
+sudo -u $uservar mkdir -vp /home/uservar/UKRAA_PicoMuon/data/processed/adc/ACM0
+sudo -u $uservar mkdir -vp /home/uservar/UKRAA_PicoMuon/data/processed/cpm/ACM0
+sudo -u $uservar mkdir -vp /home/uservar/UKRAA_PicoMuon/data/processed/day/ACM0
+sudo -u $uservar mkdir -vp /home/uservar/UKRAA_PicoMuon/data/processed/month/ACM0
+sudo -u $uservar mkdir -vp /home/uservar/UKRAA_PicoMuon/data/processed/week/ACM0
+sudo -u $uservar mkdir -vp /home/uservar/UKRAA_PicoMuon/data/raw/ACM0
+sudo -u $uservar mkdir -v  /home/uservar/UKRAA_PicoMuon/logfiles
+sudo -u $uservar mkdir -vp /home/uservar/UKRAA_PicoMuon/plots/3month/ACM0
+sudo -u $uservar mkdir -vp /home/uservar/UKRAA_PicoMuon/plots/adc/ACM0
+sudo -u $uservar mkdir -vp /home/uservar/UKRAA_PicoMuon/plots/cpm/ACM0
+sudo -u $uservar mkdir -vp /home/uservar/UKRAA_PicoMuon/plots/day/ACM0
+sudo -u $uservar mkdir -vp /home/uservar/UKRAA_PicoMuon/plots/freq/ACM0
+sudo -u $uservar mkdir -vp /home/uservar/UKRAA_PicoMuon/plots/month/ACM0
+sudo -u $uservar mkdir -vp /home/uservar/UKRAA_PicoMuon/plots/week/ACM0
+sudo -u $uservar mkdir -v  /home/uservar/UKRAA_PicoMuon/temp
+sudo -u $uservar mkdir -vp /home/uservar/UKRAA_PicoMuon/WWW/temp
 echo "Directory structure created"
 
 echo "Sort out file permissions..."
-sudo -u uservar chmod -v +x /home/uservar/UKRAA_PicoMuon/scripts/*.py
-sudo -u uservar chmod -v +x /home/uservar/UKRAA_PicoMuon/scripts/*.sh
+sudo -u $uservar chmod -v +x /home/uservar/UKRAA_PicoMuon/scripts/*.py
+sudo -u $uservar chmod -v +x /home/uservar/UKRAA_PicoMuon/scripts/*.sh
 echo "File permissions sorted out"
 
 echo "Start installing PicoMuonACM0.service..."
@@ -98,10 +98,10 @@ echo "webpage update crontab entry installed"
 
 
 echo "Final cleanup..."
-sudo -u uservar rm -vrf /home/uservar/UKRAA_PicoMuon/images
-sudo -u uservar rm -vrf /home/uservar/UKRAA_PicoMuon/WWW
-sudo -u uservar rm -vrf /home/uservar/UKRAA_PicoMuon/update
-sudo -u uservar rm -v /home/uservar/UKRAA_PicoMuon/README.md
+sudo -u $uservar rm -vrf /home/uservar/UKRAA_PicoMuon/images
+sudo -u $uservar rm -vrf /home/uservar/UKRAA_PicoMuon/WWW
+sudo -u $uservar rm -vrf /home/uservar/UKRAA_PicoMuon/update
+sudo -u $uservar rm -v /home/uservar/UKRAA_PicoMuon/README.md
 echo "Finished final cleanup"
 
 
