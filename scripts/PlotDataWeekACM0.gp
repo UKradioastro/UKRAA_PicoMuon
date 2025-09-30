@@ -29,7 +29,7 @@ print "PlotDataWeekACM0.gp         : "\
     .system("date -d yesterday +'%Y-%m-%d'")
 
 # Set up data paths
-pathData        = "$HOME/UKRAA_PicoMuon/data/processed/week/ACM0"
+pathData        = "/home/$USER/UKRAA_PicoMuon/data/processed/week/ACM0"
 
 # Year folder
 YearFolder      = "/".system("date -d yesterday +'%Y'")
@@ -44,7 +44,7 @@ YmdFile         = "/".system("date -d yesterday +'%Y-%m-%d'").".txt"
 FileData        = pathData.YearFolder.YearMonthFolder.YmdFile
 
 # check if FileData exists - 0=exists, 1=doesn't exist, if doesn't exist then exit, with message
-is_missing = system("$HOME/UKRAA_PicoMuon/scripts/ismissing.sh ".FileData)
+is_missing = system("/home/$USER/UKRAA_PicoMuon/scripts/ismissing.sh ".FileData)
 if (is_missing == 1) {print "PlotDataWeekACM0.gp         : ".system("date +'%Y-%m-%d %H:%M:%S'")." : ACM0 week data file missing, so..."; 
     print "PlotDataWeekACM0.gp         : "\
         .system("date +'%Y-%m-%d %H:%M:%S'")\
@@ -75,7 +75,7 @@ EndXaxis = system("date +'%Y-%m-%d'")." 00:00:00"
 
 # setting output path to include data stamp
 # week data
-pathPlot3 = "$HOME/UKRAA_PicoMuon/plots/week/ACM0/".date."_week_plot.png"
+pathPlot3 = "/home/$USER/UKRAA_PicoMuon/plots/week/ACM0/".date."_week_plot.png"
 
 # Title for graph
 # muons detected
@@ -153,7 +153,7 @@ plot FileData using 1:(((($4/MUON_mean)*100)-100)) linetype 1 linewidth 1 lineco
 set terminal pngcairo enhanced font "DejaVuSansCondensed, 10" rounded size 640,540 
 
 # Path to directory to store file
-pathPlot = "$HOME/UKRAA_PicoMuon/temp/ACM0_week_plot"
+pathPlot = "/home/$USER/UKRAA_PicoMuon/temp/ACM0_week_plot"
 
 # set output path to Plot folder
 set output pathPlot.".png"

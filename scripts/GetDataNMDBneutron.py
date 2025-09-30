@@ -12,7 +12,7 @@ print('GetDataNMDBneutron.py       :', \
       dt.datetime.strftime(dt.datetime.now() - dt.timedelta(1), '%Y-%m-%d'))
 
 # create path to save data
-path = '$HOME/UKRAA_PicoMuon/data/NMDB/neutrons/'\
+path = '/home/$USER/UKRAA_PicoMuon/data/NMDB/neutrons/'\
        + dt.datetime.strftime(dt.date.today() - dt.timedelta(days = 1), '%Y')\
        + '/'\
        + dt.datetime.strftime(dt.date.today() - dt.timedelta(days = 1), '%Y-%m')
@@ -27,7 +27,7 @@ if not pathExist:
           ': New NMDB Oulu neutron directory created')
 
 # create file for yesterdays data
-outfile = '$HOME/UKRAA_PicoMuon/data/NMDB/neutrons/'\
+outfile = '/home/$USER/UKRAA_PicoMuon/data/NMDB/neutrons/'\
           + dt.datetime.strftime(dt.date.today() - dt.timedelta(days = 1), '%Y')\
           + '/'\
           + dt.datetime.strftime(dt.date.today() - dt.timedelta(days = 1), '%Y-%m')\

@@ -29,7 +29,7 @@ print "PlotDataMonthACM0.gp        : "\
     .system("date -d yesterday +'%Y-%m-%d'")
 
 # Set up data paths
-pathData        = "$HOME/UKRAA_PicoMuon/data/processed/month/ACM0"
+pathData        = "/home/$USER/UKRAA_PicoMuon/data/processed/month/ACM0"
 
 # Year folder
 YearFolder      = "/".system("date -d yesterday +'%Y'")
@@ -44,7 +44,7 @@ YmdFile         = "/".system("date -d yesterday +'%Y-%m-%d'").".txt"
 FileData        = pathData.YearFolder.YearMonthFolder.YmdFile
 
 # check if FileData exists - 0=exists, 1=doesn't exist, if doesn't exist then exit, with message
-is_missing = system("$HOME/UKRAA_PicoMuon/scripts/ismissing.sh ".FileData)
+is_missing = system("/home/$USER/UKRAA_PicoMuon/scripts/ismissing.sh ".FileData)
 if (is_missing == 1) {print "PlotDataMonthACM0.gp        : ".system("date +'%Y-%m-%d %H:%M:%S'")." : ACM0 month data file missing, so..."; 
     print "PlotDataMonthACM0.gp        : "\
         .system("date +'%Y-%m-%d %H:%M:%S'")\
@@ -75,7 +75,7 @@ EndXaxis = system("date +'%Y-%m-%d'")." 00:00:00"
 
 # Path to directory to store file
 # week data
-pathPlot3 = "$HOME/UKRAA_PicoMuon/plots/month/ACM0/".date."_month_plot.png"
+pathPlot3 = "/home/$USER/UKRAA_PicoMuon/plots/month/ACM0/".date."_month_plot.png"
 
 # Title for graph
 GraphTitle3 = "% change of muon and neutron count rate from mean count rate for the last month.\n Graph is updated every day at 9.30am \n"
@@ -152,7 +152,7 @@ plot FileData using 1:(((($4/MUON_mean)*100)-100)) linetype 1 linewidth 1 lineco
 set terminal pngcairo enhanced font "DejaVuSansCondensed, 10" rounded size 640,540 
 
 # Path to directory to store file
-pathPlot = "$HOME/UKRAA_PicoMuon/temp/ACM0_month_plot"
+pathPlot = "/home/$USER/UKRAA_PicoMuon/temp/ACM0_month_plot"
 
 # set output path to Plot folder
 set output pathPlot.".png"

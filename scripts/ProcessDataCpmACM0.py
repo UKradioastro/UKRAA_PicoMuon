@@ -24,7 +24,7 @@ RawFieldNames    = ['RawDateTime',
 # Set path for data file structure
 
 # raw data file source
-RawDataFile   = "$HOME/UKRAA_PicoMuon/data/raw/ACM0/" \
+RawDataFile   = "/home/$USER/UKRAA_PicoMuon/data/raw/ACM0/" \
                  + dt.datetime.strftime(dt.datetime.now() - dt.timedelta(1), '%Y') \
                  + "/" \
                  + dt.datetime.strftime(dt.datetime.now() - dt.timedelta(1), '%Y-%m') \
@@ -33,7 +33,7 @@ RawDataFile   = "$HOME/UKRAA_PicoMuon/data/raw/ACM0/" \
                  + ".txt"
 
 # Processed data path
-ProcessedPath = '$HOME/UKRAA_PicoMuon/data/processed/cpm/ACM0/'\
+ProcessedPath = '/home/$USER/UKRAA_PicoMuon/data/processed/cpm/ACM0/'\
                 + dt.datetime.strftime(dt.datetime.now() - dt.timedelta(1), '%Y') \
                 + "/" \
                 + dt.datetime.strftime(dt.datetime.now() - dt.timedelta(1), '%Y-%m')
@@ -49,7 +49,7 @@ if not pathExists:
           ProcessedPath)
 
 # Processed data file name
-ProcessedDataFile = "$HOME/UKRAA_PicoMuon/data/processed/cpm/ACM0/" \
+ProcessedDataFile = "/home/$USER/UKRAA_PicoMuon/data/processed/cpm/ACM0/" \
                      + dt.datetime.strftime(dt.datetime.now() - dt.timedelta(1), '%Y') \
                      + "/" \
                      + dt.datetime.strftime(dt.datetime.now() - dt.timedelta(1), '%Y-%m') \
