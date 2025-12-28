@@ -5,7 +5,7 @@ After=multi-user.target
 [Service]
 Type=idle
 User=pi
-ExecStart=/usr/bin/python3 /home/pi/UKRAA_PicoMuon/scripts/GetDataRawACM0.py
+ExecStart=/usr/bin/python3 /home/$USER/UKRAA_PicoMuon/scripts/GetDataRawACM0.py
 Restart=always
 RestartSec=10
 

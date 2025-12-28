@@ -14,7 +14,7 @@ def main():
        
     for line in ser:
         # path for data storage
-        path = '/home/pi/UKRAA_PicoMuon/data/raw/ACM0/'\
+        path = '/home/$USER/UKRAA_PicoMuon/data/raw/ACM0/'\
                 + dt.datetime.strftime(dt.datetime.now(dt.timezone.utc), '%Y')\
                 + '/'\
                 + dt.datetime.strftime(dt.datetime.now(dt.timezone.utc), '%Y-%m')
@@ -26,7 +26,7 @@ def main():
             os.makedirs(path)
 
         # output file to write data to
-        outfile = open('/home/pi/UKRAA_PicoMuon/data/raw/ACM0/'
+        outfile = open('/home/$USER/UKRAA_PicoMuon/data/raw/ACM0/'
                     + dt.datetime.strftime(dt.datetime.now(dt.timezone.utc), '%Y')
                     + '/'
                     + dt.datetime.strftime(dt.datetime.now(dt.timezone.utc), '%Y-%m')

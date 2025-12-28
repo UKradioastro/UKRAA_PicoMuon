@@ -19,7 +19,7 @@ print('ProcessData90DaysACM0.py    :',
 
 # raw data file source
 for i in range(1, 91):
-    globals()['RawDataFile%s' % i] = '/home/pi/UKRAA_PicoMuon/data/processed/day/ACM0/' \
+    globals()['RawDataFile%s' % i] = '$HOME/UKRAA_PicoMuon/data/processed/day/ACM0/' \
                                      + dt.datetime.strftime(dt.datetime.now() - dt.timedelta(i), '%Y') \
                                      + '/' \
                                      + dt.datetime.strftime(dt.datetime.now() - dt.timedelta(i), '%Y-%m') \
@@ -39,7 +39,7 @@ ThreeMonthFieldNames = ['DateTime',
 
 
 # create 90 days worth of data
-ThreeMonthPath = '/home/pi/UKRAA_PicoMuon/data/processed/3month/ACM0/' \
+ThreeMonthPath = '$HOME/UKRAA_PicoMuon/data/processed/3month/ACM0/' \
                 + dt.datetime.strftime(dt.datetime.now() - dt.timedelta(1), '%Y') \
                 + "/" \
                 + dt.datetime.strftime(dt.datetime.now() - dt.timedelta(1), '%Y-%m')
@@ -56,7 +56,7 @@ if not pathExists:
 
 
 # 90 days data file name
-ThreeMonthDataFile = '/home/pi/UKRAA_PicoMuon/data/processed/3month/ACM0/' \
+ThreeMonthDataFile = '$HOME/UKRAA_PicoMuon/data/processed/3month/ACM0/' \
                + dt.datetime.strftime(dt.datetime.now() - dt.timedelta(1), '%Y') \
                + "/" \
                + dt.datetime.strftime(dt.datetime.now() - dt.timedelta(1), '%Y-%m') \
@@ -99,7 +99,7 @@ else:
     exit()
   
 # Processed data path
-ProcessedPath = '/home/pi/UKRAA_PicoMuon/data/processed/3month/ACM0/'\
+ProcessedPath = '$HOME/UKRAA_PicoMuon/data/processed/3month/ACM0/'\
                 + dt.datetime.strftime(dt.datetime.now() - dt.timedelta(1), '%Y') \
                 + "/" \
                 + dt.datetime.strftime(dt.datetime.now() - dt.timedelta(1), '%Y-%m')
@@ -115,7 +115,7 @@ if not pathExists:
           ProcessedPath)
 
 # Processed data file name
-ProcessedDataFile = "/home/pi/UKRAA_PicoMuon/data/processed/3month/ACM0/" \
+ProcessedDataFile = "$HOME/UKRAA_PicoMuon/data/processed/3month/ACM0/" \
                      + dt.datetime.strftime(dt.datetime.now() - dt.timedelta(1), '%Y') \
                      + "/" \
                      + dt.datetime.strftime(dt.datetime.now() - dt.timedelta(1), '%Y-%m') \

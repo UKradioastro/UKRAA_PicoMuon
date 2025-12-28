@@ -1,12 +1,12 @@
 # UKRAA PicoMuon crontab entry
 # cron entry to process yesterdays raw muon counts per minute
-30 00 * * * su pi -c "sudo bash /home/pi/UKRAA_PicoMuon/scripts/processCPM.sh  >> /home/pi/UKRAA_PicoMuon/logfiles/log-PicoMuonACM0.txt 2>>/home/pi/UKRAA_PicoMuon/logfiles/log-error.txt"
+30 00 * * * su $USER -c "sudo bash /home/$USER/UKRAA_PicoMuon/scripts/processCPM.sh  >> /home/$USER/UKRAA_PicoMuon/logfiles/log-PicoMuonACM0.txt 2>>/home/$USER/UKRAA_PicoMuon/logfiles/log-error.txt"
 
 # cron entry to process yesterdays raw muon adc values
-15 03 * * * su pi -c "sudo bash /home/pi/UKRAA_PicoMuon/scripts/processADC.sh  >> /home/pi/UKRAA_PicoMuon/logfiles/log-PicoMuonACM0.txt 2>>/home/pi/UKRAA_PicoMuon/logfiles/log-error.txt"
+15 03 * * * su $USER -c "sudo bash /home/$USER/UKRAA_PicoMuon/scripts/processADC.sh  >> /home/$USER/UKRAA_PicoMuon/logfiles/log-PicoMuonACM0.txt 2>>/home/$USER/UKRAA_PicoMuon/logfiles/log-error.txt"
 
 # cron entry to get NMDB data and process day, week and month data
-30 04 * * * su pi -c "sudo bash /home/pi/UKRAA_PicoMuon/scripts/processData.sh >> /home/pi/UKRAA_PicoMuon/logfiles/log-PicoMuonACM0.txt 2>>/home/pi/UKRAA_PicoMuon/logfiles/log-error.txt"
+30 04 * * * su $USER -c "sudo bash /home/$USER/UKRAA_PicoMuon/scripts/processData.sh >> /home/$USER/UKRAA_PicoMuon/logfiles/log-PicoMuonACM0.txt 2>>/home/$USER/UKRAA_PicoMuon/logfiles/log-error.txt"
 
 # cron entry to manage log files - on a Sunday 00:00 each week
-00 00 * * 00 bash /home/pi/UKRAA_PicoMuon/scripts/managelogfiles.sh
+00 00 * * 00 bash /home/$USER/UKRAA_PicoMuon/scripts/managelogfiles.sh

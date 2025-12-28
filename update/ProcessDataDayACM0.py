@@ -25,7 +25,7 @@ RawFieldNames    = ['RawDateTime',
 # Set path for data file structure
 
 # raw data file source
-RawDataFile   = "/home/pi/UKRAA_PicoMuon/data/raw/ACM0/" \
+RawDataFile   = "$HOME/UKRAA_PicoMuon/data/raw/ACM0/" \
                  + dt.datetime.strftime(dt.datetime.now() - dt.timedelta(1), '%Y') \
                  + "/" \
                  + dt.datetime.strftime(dt.datetime.now() - dt.timedelta(1), '%Y-%m') \
@@ -41,7 +41,7 @@ NeutronFieldNames    = ['NeutronDateTime',
                         'EfficiencyCorrected']
 
 # Neutron data file source
-NeutronDataFile   = "/home/pi/UKRAA_PicoMuon/data/NMDB/neutrons/" \
+NeutronDataFile   = "$HOME/UKRAA_PicoMuon/data/NMDB/neutrons/" \
                  + dt.datetime.strftime(dt.datetime.now() - dt.timedelta(1), '%Y') \
                  + "/" \
                  + dt.datetime.strftime(dt.datetime.now() - dt.timedelta(1), '%Y-%m') \
@@ -50,7 +50,7 @@ NeutronDataFile   = "/home/pi/UKRAA_PicoMuon/data/NMDB/neutrons/" \
                  + ".txt"
 
 # Processed data path
-ProcessedPath = '/home/pi/UKRAA_PicoMuon/data/processed/day/ACM0/'\
+ProcessedPath = '$HOME/UKRAA_PicoMuon/data/processed/day/ACM0/'\
                 + dt.datetime.strftime(dt.datetime.now() - dt.timedelta(1), '%Y') \
                 + "/" \
                 + dt.datetime.strftime(dt.datetime.now() - dt.timedelta(1), '%Y-%m')
@@ -66,7 +66,7 @@ if not pathExists:
           ProcessedPath)
 
 # Processed data file name
-ProcessedDataFile = "/home/pi/UKRAA_PicoMuon/data/processed/day/ACM0/" \
+ProcessedDataFile = "$HOME/UKRAA_PicoMuon/data/processed/day/ACM0/" \
                      + dt.datetime.strftime(dt.datetime.now() - dt.timedelta(1), '%Y') \
                      + "/" \
                      + dt.datetime.strftime(dt.datetime.now() - dt.timedelta(1), '%Y-%m') \
