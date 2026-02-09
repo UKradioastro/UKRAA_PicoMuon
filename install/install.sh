@@ -72,7 +72,6 @@ apt install php libapache2-mod-php -y
 
 echo "Install mariadb..."
 apt install mariadb-server -y
-mysql_secure_installation
 
 echo "Install the php-mysql connector..."
 apt install php-mysql -y

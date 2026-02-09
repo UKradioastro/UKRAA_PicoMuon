@@ -163,16 +163,6 @@ There will be occasions during the running of the install script that require yo
 
 When asked **Do you want to continue? [Y/n]** - type **Y** or **y** and press **enter** 
 
-During **mysql_secure_installation** you will be asked a number of questions.  
-
-* Enter current password for root (enter for none): ------> press **enter**
-* Switch to unix_socket authentication [Y/n] -------------> type **n** and press **enter**
-* Change the root password? [Y/n] -----------------------> type **n** and press **enter**
-* Remove anonymous users? [Y/n] -----------------------> type **y** and press **enter**
-* Disallow root login remotely? [Y/n] ---------------------> type **y** and press **enter**
-* Remove test database and access to it? [Y/n] ----------> type **y** and press **enter**
-* Reload privilege tables now? [Y/n] ----------------------> type **y** and press **enter**
-
 That's it!
 
 The code is now set up to run automatically; it will get the data from the detector, process yesterdays data, plot yesterdays data and post yesterdays plots to your intranet web page once per day, at 9.30am in the morning.
