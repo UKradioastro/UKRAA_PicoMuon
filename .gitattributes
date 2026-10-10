@@ -1,0 +1,9 @@
+* text=auto eol=lf
+
+*.sh text eol=lf
+*.gp text eol=lf
+*.py text eol=lf
+*.cron text eol=lf
+*.service text eol=lf
+*.ini text eol=lf
+*.ini.example text eol=lf

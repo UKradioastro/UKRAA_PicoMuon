@@ -1,0 +1,9 @@
+# Local temporary validation output
+.tmp_*/
+examples/
+
+# Python bytecode and cache files
+__pycache__/
+**/__pycache__/
+*.py[cod]
+*.pyo
