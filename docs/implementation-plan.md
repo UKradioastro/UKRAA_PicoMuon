@@ -215,19 +215,20 @@ computes `T_eff` per hour (see section 5.2).
 ### Phase 0 – Foundations (items 1, 2, 5, 12)
 1. **Versioning:** `VERSION` (CalVer `YYYY.MM.patch`, already `2026.10.0`) is
    read by `picomuon_common.get_version()`. It is shown in logs, the web page
-   footer, and the email footer. Releases get a git tag `v2026.11.0`.
+   footer, and will be used for the email footer when Phase 6 adds email
+   alerts. Releases get a git tag `v2026.11.0`.
 2. **Changelog:** maintain `CHANGELOG.md` (already present) with an
    `[Unreleased]` section. The release notes are copied from it.
-3. **No `pi` user:** `install.sh` uses `${SUDO_USER}`. It templates
-   `@PICOMUON_USER@` and `@PICOMUON_BASE_PATH@` into the service and cron
-   files. Scripts find their base path from their own location
+3. **No `pi` user:** `install/install.sh` uses `${SUDO_USER}`. It templates
+   `@PICOMUON_USER@`, `@PICOMUON_GROUP@` and `@PICOMUON_BASE_PATH@` into the
+   service and cron files. Scripts find their base path from their own location
    (`picomuon-env.sh` / `get_base_path()`), as in the Magnetometer suite.
 4. **UTC everywhere (F3):** all "which day?" decisions are made in code by one
    `utc_yesterday()` helper, never by the cron schedule. Debian's cron (used
    by Raspberry Pi OS) does not support `CRON_TZ`. So the daily job runs at
-   **01:15 local time**, which is always after 00:00 UTC in the UK in both GMT
-   and BST. Any time later than that is also safe for users in other time
-   zones.
+   **01:15 local time** for UK installations, which is after 00:00 UTC in both
+   GMT and BST. Installations in other time zones must schedule after
+   00:00 UTC in their local time; the helper still selects the UTC date.
 5. **Cron and `su` pattern (F10), copied from the Magnetometer suite:**
    - The crontab only calls
      `runCronJob.sh /bin/bash <base>/scripts/processData.sh`. There is no
@@ -237,7 +238,8 @@ computes `T_eff` per hour (see section 5.2).
      `su "$FILE_OWNER" -c "…"`. The `if … then … else … FAILED` checks write
      a one-line failure to the error log.
    - `runCronJob.sh` timestamps any stderr into `log-error.txt` and returns
-     the exit code.
+     the exit code; the service writes stdout/stderr to the corresponding
+     good/error log files.
    - As a safety net, also `export TERM=dumb` in `picomuon-env.sh`, and put
      `set terminal pngcairo` first in every `.gp` file.
    - The installer replaces only the `# UKRAA PicoMuon` block in root's
@@ -255,8 +257,9 @@ computes `T_eff` per hour (see section 5.2).
 7. **Locking:** `runCronJob.sh` wraps each job in `flock` so runs never
    overlap (for example, a long reprocess and the 5-minute rolling job).
 
-*Done when:* a fresh install works under any user name, `grep -r /home/pi`
-finds nothing, and the error log is empty on a healthy day.
+*Done when:* a fresh install works under any user name, no runtime code assumes
+the `pi` account or its home directory, and the error log is empty on a healthy
+day.
 
 ### Phase 1 – Collector and serial identity (items 6, 7)
 1. Rename `GetDataRawACM0.py` to `GetDataRaw.py` and `PicoMuonACM0.service` to
@@ -290,7 +293,11 @@ finds nothing, and the error log is empty on a healthy day.
    products from L2. A completeness rule (as in the Magnetometer suite's
    `period_min_valid_days_percent`) prevents misleading plots.
 3. `reprocessData.sh --from YYYY-MM-DD --to YYYY-MM-DD [--dry-run]`
-   back-fills L1/L2 for your 1.5 years of history. Expect minutes, not weeks.
+   back-fills L1/L2 for your 1.5 years of history. It can also be run after a
+   later software or correction-coefficient update to rebuild derived products
+   from the unchanged raw files. Reprocessing is repeatable: it replaces only
+   the selected date range's generated products, never the raw input. Expect
+   minutes, not weeks.
 4. The cron schedule collapses to one `processData.sh` at 01:15 local time.
    It runs: fetch NMDB and upper-air data → daily → period → coefficients →
    plots → publish → FTP upload.
@@ -391,16 +398,30 @@ update.
 2. Download the release tarball to a temporary directory. Verify the SHA-256
    checksum if a checksum asset is published.
 3. Back up `scripts/ install/ WWW/ VERSION` to `backup/<old-version>/`.
-   **Never touch** `config/ data/ plots/ logfiles/`.
+   **Never overwrite or delete** `config/ data/ plots/ logfiles/` as part of
+   installing release files. Historical raw data is preserved as the source
+   of truth; generated products can be rebuilt with `reprocessData.sh`.
 4. Copy the new files, run `MergeConfig.py` and any migrations, re-template the
    service and cron files, `systemctl daemon-reload` and restart the service,
    and run `runPostUpdateChecks.sh`. Restore the backup if any step fails.
-5. `MigrateLegacyInstall.py` runs once and handles the old setup. It moves
-   `data/raw/ACM0/*` to `data/raw/` (or to `data/raw/<label>/` in
-   multi-detector mode), and does the same for the processed and plots
-   folders. It removes the old PicoMuon cron lines **only** (no more
-   `crontab -r`), disables `PicoMuonACM0.service`, enables `PicoMuon.service`,
-   and reprocesses history.
+5. `MigrateLegacyInstall.py` runs once and handles the old setup. Migration
+   must be non-destructive and restart-safe:
+   - offer a `--dry-run` preview and record the source/destination mapping;
+   - copy, do not move, `data/raw/ACM0/*` to `data/raw/` (or to
+     `data/raw/<label>/` in multi-detector mode); preserve the original files
+     until the user has verified the new installation;
+   - verify copied files (at minimum, relative paths, sizes, and counts; use
+     SHA-256 checks where practical) before switching configured paths;
+   - retain a migration manifest and never overwrite a destination file with
+     different contents; stop with a clear error if a conflict is found;
+   - migrate generated data and plots only if safe; otherwise regenerate them
+     from the preserved raw data using `reprocessData.sh`;
+   - remove the old PicoMuon cron lines **only** (no more `crontab -r`),
+     disable `PicoMuonACM0.service`, enable `PicoMuon.service`, and reprocess
+     history only after the raw-data copy has passed verification.
+
+   The original legacy tree is not automatically deleted. Cleanup is a
+   separate, user-approved step after checking the new files and plots.
 6. `docs/RELEASING.md` gives the release steps: bump `VERSION`, move
    `[Unreleased]` in `CHANGELOG.md`, tag, and publish a GitHub release.
 

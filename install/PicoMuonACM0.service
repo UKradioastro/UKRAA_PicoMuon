@@ -1,11 +1,18 @@
 [Unit]
-Description=start GetDataRawACM0.py
+Description=UKRAA PicoMuon raw data collector
 After=multi-user.target
 
 [Service]
-Type=idle
-User=pi
-ExecStart=/usr/bin/python3 /home/pi/UKRAA_PicoMuon/scripts/GetDataRawACM0.py
+Type=simple
+User=@PICOMUON_USER@
+Group=@PICOMUON_GROUP@
+SupplementaryGroups=dialout
+WorkingDirectory="@PICOMUON_BASE_PATH@"
+Environment="PICOMUON_BASE_PATH=@PICOMUON_BASE_PATH@"
+Environment=TERM=dumb
+ExecStart=/usr/bin/python3 "@PICOMUON_BASE_PATH@/scripts/GetDataRawACM0.py"
+StandardOutput=append:"@PICOMUON_BASE_PATH@/logfiles/log-PicoMuon.txt"
+StandardError=append:"@PICOMUON_BASE_PATH@/logfiles/log-error.txt"
 Restart=always
 RestartSec=10
 

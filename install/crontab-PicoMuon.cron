@@ -1,0 +1,7 @@
+# BEGIN UKRAA PicoMuon
+# Process the previous UTC day after midnight UTC in the UK.
+15 1 * * * /bin/bash @PICOMUON_BASE_PATH_SHELL@/scripts/runCronJob.sh /bin/bash @PICOMUON_BASE_PATH_SHELL@/scripts/processData.sh >> @PICOMUON_BASE_PATH_SHELL@/logfiles/log-PicoMuon.txt
+
+# Rotate the two PicoMuon logs weekly.
+0 0 * * 0 /bin/bash @PICOMUON_BASE_PATH_SHELL@/scripts/runCronJob.sh /bin/bash @PICOMUON_BASE_PATH_SHELL@/scripts/managelogfiles.sh >> @PICOMUON_BASE_PATH_SHELL@/logfiles/log-PicoMuon.txt
+# END UKRAA PicoMuon

@@ -1,6 +1,7 @@
 import datetime as dt
 import pandas as pd
 import os
+from picomuon_common import get_base_path, utc_yesterday
 
 # local library that generates the html strings to download NEST data
 import nest
@@ -12,7 +13,8 @@ print('GetDataNeutron.py      :', \
       dt.datetime.strftime(dt.datetime.now() - dt.timedelta(1), '%Y-%m-%d'))
 
 # get yesterday variable
-yesterday = dt.date.today() - dt.timedelta(days = 1)
+yesterday = utc_yesterday()
+base_path = get_base_path()
 
 # year
 yesterdayYear = yesterday.year
@@ -24,10 +26,10 @@ yesterdayMonth=yesterday.month
 yesterdayDay = yesterday.day
 
 # create path to save data
-path = '/home/pi/UKRAA_PicoMuon/data/neutrons/'\
-       + dt.datetime.strftime(dt.date.today() - dt.timedelta(days = 1), '%Y')\
+path = str(base_path / 'data/neutrons') + '/'\
+       + yesterday.strftime('%Y')\
        + '/'\
-       + dt.datetime.strftime(dt.date.today() - dt.timedelta(days = 1), '%Y-%m')
+       + yesterday.strftime('%Y-%m')
 
 # Check if the specific path exists or not
 pathExist = os.path.exists(path)
@@ -39,12 +41,12 @@ if not pathExist:
           ': New directory created')
 
 # create file for yesterdays data
-outfile = '/home/pi/UKRAA_PicoMuon/data/neutrons/'\
-          + dt.datetime.strftime(dt.date.today() - dt.timedelta(days = 1), '%Y')\
+outfile = str(base_path / 'data/neutrons') + '/'\
+          + yesterday.strftime('%Y')\
           + '/'\
-          + dt.datetime.strftime(dt.date.today() - dt.timedelta(days = 1), '%Y-%m')\
+          + yesterday.strftime('%Y-%m')\
           + '/'\
-          + dt.datetime.strftime(dt.date.today() - dt.timedelta(days = 1), '%Y-%m-%d')\
+          + yesterday.strftime('%Y-%m-%d')\
           + '.txt'
 
 # Start date/time for data to be extraction - should be start of day yesterday, i.e. 00:00:00

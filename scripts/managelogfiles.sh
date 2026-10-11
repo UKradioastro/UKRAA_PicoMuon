@@ -1,35 +1,16 @@
 #!/bin/bash
 
-# script managelogfiles.sh keeps older copies of log files.
-# runs once per week (Sunday 00:00) via cron
+set -euo pipefail
 
-# go to logfile directory
-cd /home/pi/UKRAA_PicoMuon/logfiles
+source "$(dirname "${BASH_SOURCE[0]}")/picomuon-env.sh"
+LOG_DIR="$PICOMUON_BASE_PATH/logfiles"
+mkdir -p "$LOG_DIR"
 
-# move logfile-1 to logfile-2
-if [ -r log-PicoMuonACM0-1.txt ]; then
-    su pi -c "mv -f log-PicoMuonACM0-1.txt log-PicoMuonACM0-2.txt"
-fi
-if [ -r log-error-1.txt ]; then
-    su pi -c "mv -f log-error-1.txt log-error-2.txt"
-fi
-
-# move logfile-0 to logfile-1
-if [ -r log-PicoMuonACM0-0.txt ]; then
-    su pi -c "mv -f log-PicoMuonACM0-0.txt log-PicoMuonACM0-1.txt"
-fi
-if [ -r log-error-0.txt ]; then
-    su pi -c "mv -f log-error-0.txt log-error-1.txt"
-fi
-
-# move current logfile to logfile-0
-if [ -r log-PicoMuonACM0.txt ]; then
-    su pi -c "mv -f log-PicoMuonACM0.txt log-PicoMuonACM0-0.txt"
-fi
-if [ -r log-error.txt ]; then
-    su pi -c "mv -f log-error.txt log-error-0.txt"
-fi
-
-# create new empty logfile
-su pi -c "cat /dev/null > log-PicoMuonACM0.txt"
-su pi -c "cat /dev/null > log-error.txt"
+for log_name in log-PicoMuon.txt log-error.txt; do
+    [ ! -e "$LOG_DIR/$log_name-2" ] || cp -p "$LOG_DIR/$log_name-2" "$LOG_DIR/$log_name-3"
+    [ ! -e "$LOG_DIR/$log_name-1" ] || cp -p "$LOG_DIR/$log_name-1" "$LOG_DIR/$log_name-2"
+    [ ! -e "$LOG_DIR/$log_name-0" ] || cp -p "$LOG_DIR/$log_name-0" "$LOG_DIR/$log_name-1"
+    [ ! -e "$LOG_DIR/$log_name" ] || cp -p "$LOG_DIR/$log_name" "$LOG_DIR/$log_name-0"
+    : > "$LOG_DIR/$log_name"
+    chown "$PICOMUON_FILE_OWNER:$PICOMUON_FILE_GROUP" "$LOG_DIR/$log_name"
+done

@@ -1,35 +1,16 @@
 #!/bin/bash
 
-echo "Start plotting yesterday's graphs..."
+set -euo pipefail
 
-# Plot yesterdays counts per minute
-su pi -c "/usr/bin/gnuplot /home/pi/UKRAA_PicoMuon/scripts/PlotDataCpmACM0.gp    \
-                        >> /home/pi/UKRAA_PicoMuon/logfiles/log-PicoMuonACM0.txt \
-                       2>> /home/pi/UKRAA_PicoMuon/logfiles/log-error.txt"
-
-# Plot yesterdays counts per minute frequency
-su pi -c "/usr/bin/gnuplot /home/pi/UKRAA_PicoMuon/scripts/PlotDataFreqACM0.gp   \
-                        >> /home/pi/UKRAA_PicoMuon/logfiles/log-PicoMuonACM0.txt \
-                       2>> /home/pi/UKRAA_PicoMuon/logfiles/log-error.txt"
-
-# Plot yesterdays adc frequency
-su pi -c "/usr/bin/gnuplot /home/pi/UKRAA_PicoMuon/scripts/PlotDataAdcACM0.gp    \
-                        >> /home/pi/UKRAA_PicoMuon/logfiles/log-PicoMuonACM0.txt \
-                       2>> /home/pi/UKRAA_PicoMuon/logfiles/log-error.txt"
-
-# Plot yesterdays % muons & % neutron deviation
-su pi -c "/usr/bin/gnuplot /home/pi/UKRAA_PicoMuon/scripts/PlotDataDayACM0.gp    \
-                        >> /home/pi/UKRAA_PicoMuon/logfiles/log-PicoMuonACM0.txt \
-                       2>> /home/pi/UKRAA_PicoMuon/logfiles/log-error.txt"
-
-# Plot last weeks % muons & % neutron deviation
-su pi -c "/usr/bin/gnuplot /home/pi/UKRAA_PicoMuon/scripts/PlotDataWeekACM0.gp   \
-                        >> /home/pi/UKRAA_PicoMuon/logfiles/log-PicoMuonACM0.txt \
-                       2>> /home/pi/UKRAA_PicoMuon/logfiles/log-error.txt"
-
-# Plot last months % muons & % neutron deviation
-su pi -c "/usr/bin/gnuplot /home/pi/UKRAA_PicoMuon/scripts/PlotDataMonthACM0.gp  \
-                        >> /home/pi/UKRAA_PicoMuon/logfiles/log-PicoMuonACM0.txt \
-                       2>> /home/pi/UKRAA_PicoMuon/logfiles/log-error.txt"
-
-echo "Completed plotting yesterday's graphs"
+source "$(dirname "${BASH_SOURCE[0]}")/picomuon-env.sh"
+for plot_script in \
+    PlotDataCpmACM0.gp \
+    PlotDataFreqACM0.gp \
+    PlotDataAdcACM0.gp \
+    PlotDataDayACM0.gp \
+    PlotDataWeekACM0.gp \
+    PlotDataMonthACM0.gp
+do
+    su -s /bin/bash "$PICOMUON_FILE_OWNER" -c \
+        "export PICOMUON_BASE_PATH=$(printf '%q' "$PICOMUON_BASE_PATH") TZ=UTC TERM=dumb; exec /usr/bin/gnuplot $(printf '%q' "$PICOMUON_BASE_PATH/scripts/$plot_script")"
+done

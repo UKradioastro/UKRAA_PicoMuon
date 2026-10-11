@@ -74,7 +74,7 @@ git clone https://github.com/UKradioastro/UKRAA_PicoMuon
 
 ![img_01](images/RPi_imager_01.PNG)
 
-This will download all of the code to the directory **UKRAA_PicoMuon** inside **/home/pi**
+This downloads the code into a `UKRAA_PicoMuon` directory under the current user's home directory.
 
 ---
 
@@ -82,15 +82,9 @@ This will download all of the code to the directory **UKRAA_PicoMuon** inside **
 <!-- =============================================================================== --> 
 ## Using the code
 
-The code assumes that your UKRAA PicoMuon detector is connected to the RPi4/5 via supplied USB cable and that it is /dev/ttyACM0 - you can check this by using **ls /dev/tty*** in a terminal window on the RPi4/5 and reviewing the response.
+The current legacy collector expects the detector to appear as `/dev/ttyACM0`; stable USB identification is being added in a later implementation phase. The installer uses the account that invoked `sudo`, so the software does not require a user named `pi`. Python and gnuplot scripts resolve paths from the installation directory.
 
-The code assumes username is **pi**.  If **pi** is not the username, then you will need to change all occurances of '/home/pi' to '/home/*username*' in the python and gnuplot scripts, where *username* is the username you have selected for your RPi4/5.
-
-The code assumes one detector connected to the RPi4/5 USB and that it will be connected via **/dev/ttyACM0**, if there are other devices connected to the RPi and your detector is not **/dev/ttyACM0**, then you will need to change **/dev/ttyACM0** to **/dev/*ttyACMx*** in the **GetDataRawACM0.py** python script, where *ttyACMx* is the tty address of you connected detector.
-
-**GetDataRawACM0.py** is run as a service.
-
-Other scripts (Python and gnuplot) are run from **cron**
+**GetDataRawACM0.py** is run as a service. Daily processing and plotting are run by a managed root crontab entry, with jobs executed as the installing user.
 
 ---
 
@@ -101,50 +95,22 @@ Other scripts (Python and gnuplot) are run from **cron**
 
 1. Open a terminal window and type the following command and press enter
 ```
-cd ~/UKRAA_PicoMuon/install
+cd ~/UKRAA_PicoMuon
 ```
 
 ![img_02](images/RPi_imager_02.PNG)
 
-This will take you to the **install** directory inside **/home/pi/UKRAA_PicoMuon**
+This takes you to the root of your cloned repository.
 
 
 2. Type the following command and press enter
 ```
-chmod +x *.sh
-```
-
-![img_03](images/RPi_imager_03.PNG)
-
-This will make the **install.sh** script executable.
-
-
-3. Type the following command and press enter
-```
-sudo bash install.sh
+sudo bash install/install.sh
 ```
 
 ![img_04](images/RPi_imager_04.PNG)
 
-This will run the install script.
-
-There will be occasions during the running of the install script that require you to make a keyboard entry.
-
-When asked **Do you want to continue? [Y/n]** - type **Y** or **y** and press **enter** 
-
-During **mysql_secure_installation** you will be asked a number of questions.  
-
-* Enter current password for root (enter for none): ------> press **enter**
-* Switch to unix_socket authentication [Y/n] -------------> type **n** and press **enter**
-* Change the root password? [Y/n] -----------------------> type **n** and press **enter**
-* Remove anonymous users? [Y/n] -----------------------> type **y** and press **enter**
-* Disallow root login remotely? [Y/n] ---------------------> type **y** and press **enter**
-* Remove test database and access to it? [Y/n] ----------> type **y** and press **enter**
-* Reload privilege tables now? [Y/n] ----------------------> type **y** and press **enter**
-
-That's it!
-
-The code is now set up to run automatically; it will get the data from the detector, process yesterdays data, plot yesterdays data and post yesterdays plots to your intranet web page once per day, at 9.30am in the morning.
+The installer installs the required packages, configures the collector service for your account, and replaces only the PicoMuon block in root's crontab. Daily processing starts at 01:15 local time; until Phase 2 replaces the legacy processing, it can take many hours to finish.
 
 ---
 
@@ -241,14 +207,14 @@ https://download-directory.github.io/?url=https%3A%2F%2Fgithub.com%2FUKradioastr
 
 ![img_05](images/RPi_imager_05.PNG)
 
-This will download a zip file of the updated code to your RPi **/home/pi/Downloads** folder.
+This will download a zip file of the updated code to your RPi **~/Downloads** folder.
 
 ![img_06](images/RPi_imager_06.PNG)
 
 Close your web browser.
 
 
-3. Open **File Manager** and navigate to **/home/pi/Downloads**. You should see the zip file you just downloaded.
+3. Open **File Manager** and navigate to **~/Downloads**. You should see the zip file you just downloaded.
 
 ![img_07](images/RPi_imager_07.PNG)
 
@@ -260,7 +226,7 @@ Close your web browser.
 
 ![img_09](images/RPi_imager_09.PNG)
 
-6. Change **Extract to:** from **/tmp** to **/home/pi/Downloads**, then click on the **Extract** button
+6. Change **Extract to:** from **/tmp** to **~/Downloads**, then click on the **Extract** button
 
 ![img_10](images/RPi_imager_10.PNG)
 
@@ -276,7 +242,7 @@ Close the RPi xarchiver utility.
 
 9. Select the **update** folder and copy (Right click mouse to bring up function).
 
-10. Navigate to the PicoMuon directory, **/home/pi/UKRAA_PicoMuon**, and paste the **update** folder
+10. Navigate to the PicoMuon directory, **~/UKRAA_PicoMuon**, and paste the **update** folder
 
 ![img_14](images/RPi_imager_14.PNG)
 
@@ -289,7 +255,7 @@ cd ~/UKRAA_PicoMuon/update
 
 ![img_15](images/RPi_imager_15.PNG)
 
-This will take you to the **update** directory inside **/home/pi/UKRAA_PicoMuon**
+This will take you to the **update** directory inside **~/UKRAA_PicoMuon**
 
 12. Type the following command and press enter
 ```

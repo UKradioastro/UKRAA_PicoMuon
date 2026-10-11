@@ -2,9 +2,12 @@
 from datetime import datetime, timezone
 import serial
 import os
+from picomuon_common import get_base_path
 
 # main
 def main():
+    base_path = get_base_path()
+
     # set up usb serial variables
     ser = serial.Serial(port = '/dev/ttyACM0',
                         baudrate = 115200,
@@ -14,7 +17,7 @@ def main():
        
     for line in ser:
         # path for data storage
-        path = '/home/pi/UKRAA_PicoMuon/data/raw/ACM0/'\
+        path = str(base_path / 'data/raw/ACM0') + '/'\
                 + datetime.strftime(datetime.now(timezone.utc), '%Y')\
                 + '/'\
                 + datetime.strftime(datetime.now(timezone.utc), '%Y-%m')
@@ -24,7 +27,7 @@ def main():
             # create directory structure
             os.makedirs(path)
         # output file to write data to
-        outfile = open('/home/pi/UKRAA_PicoMuon/data/raw/ACM0/'
+        outfile = open(str(base_path / 'data/raw/ACM0') + '/'
                     + datetime.strftime(datetime.now(timezone.utc), '%Y')
                     + '/'
                     + datetime.strftime(datetime.now(timezone.utc), '%Y-%m')

@@ -16,6 +16,7 @@ reset
 
 # Set terminal 
 set terminal pngcairo enhanced font "DejaVuSansCondensed, 10" rounded size 640,540 
+basePath = system("printf '%s' \"$PICOMUON_BASE_PATH\"")
 
 # Set print to <stdout>
 set print "-"
@@ -27,7 +28,7 @@ print "PlotDataAdcACM0.gp     : "\
     .system("date -d yesterday +'%Y-%m-%d'")
 
 # Set up data paths
-pathData = "/home/pi/UKRAA_PicoMuon/data/processed/adc/ACM0"
+pathData = basePath."/data/processed/adc/ACM0"
 
 # Year folder
 YearFolder = "/".system("date -d yesterday +'%Y'")
@@ -45,7 +46,7 @@ date = system("date -d yesterday +'%Y-%m-%d'")
 FileData = pathData.YearFolder.YearMonthFolder.YmdFile
 
 # check if FileData exists - 0=exists, 1=doesn't exist, if doesn't exist then exit, with message
-is_missing = system("/home/pi/UKRAA_PicoMuon/scripts/ismissing.sh ".FileData)
+is_missing = system("\"".basePath."/scripts/ismissing.sh\" \"".FileData."\"")
 if (is_missing == 1) {print "PlotDataAdcACM0.gp     : ".system("date +'%Y/%M/%d %H:%M:%S'")." : ACM0 adc data file missing, so..."; 
     print "PlotDataAdcACM0.gp: "\
         .system("date +'%Y/%M/%d %H:%M:%S'")\
@@ -58,11 +59,11 @@ if (is_missing == 1) {print "PlotDataAdcACM0.gp     : ".system("date +'%Y/%M/%d 
 
 # setting output path to include data stamp
 # top detector
-pathPlot1 = "/home/pi/UKRAA_PicoMuon/plots/adc/ACM0/".date."_ADC_T_plot.png"
+pathPlot1 = basePath."/plots/adc/ACM0/".date."_ADC_T_plot.png"
 # bottom detector
-pathPlot2 = "/home/pi/UKRAA_PicoMuon/plots/adc/ACM0/".date."_ADC_B_plot.png"
+pathPlot2 = basePath."/plots/adc/ACM0/".date."_ADC_B_plot.png"
 # muons detected
-pathPlot3 = "/home/pi/UKRAA_PicoMuon/plots/adc/ACM0/".date."_ADC_M_plot.png"
+pathPlot3 = basePath."/plots/adc/ACM0/".date."_ADC_M_plot.png"
 
 # Set separator to ","
 set datafile separator ","
@@ -121,7 +122,7 @@ plot FileData using 1:2 linetype 1 linewidth 1 linecolor rgb "#0000FF" title "Fr
 set terminal pngcairo enhanced font "DejaVuSansCondensed, 10" rounded size 640,540 
 
 # Path to directory to store file
-pathPlot = "/home/pi/UKRAA_PicoMuon/temp/ACM0_T-Adc"
+pathPlot = basePath."/temp/ACM0_T-Adc"
 
 # set output path to Plot folder
 set output pathPlot.".png"
@@ -140,7 +141,7 @@ plot FileData using 1:3 linetype 1 linewidth 1 linecolor rgb "#FF0000" title "Fr
 set terminal pngcairo enhanced font "DejaVuSansCondensed, 10" rounded size 640,540 
 
 # Path to directory to store file
-pathPlot = "/home/pi/UKRAA_PicoMuon/temp/ACM0_B-Adc"
+pathPlot = basePath."/temp/ACM0_B-Adc"
 
 # set output path to Plot folder
 set output pathPlot.".png"
@@ -159,7 +160,7 @@ plot FileData using 1:4 linetype 1 linewidth 1 linecolor rgb "#00FF00" title "Fr
 set terminal pngcairo enhanced font "DejaVuSansCondensed, 10" rounded size 640,540 
 
 # Path to directory to store file
-pathPlot = "/home/pi/UKRAA_PicoMuon/temp/ACM0_C-Adc"
+pathPlot = basePath."/temp/ACM0_C-Adc"
 
 # set output path to Plot folder
 set output pathPlot.".png"

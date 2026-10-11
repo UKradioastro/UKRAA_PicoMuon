@@ -3,6 +3,9 @@
 from datetime import datetime, timedelta
 import csv
 import os
+from picomuon_common import get_base_path
+
+BASE_PATH = str(get_base_path())
 
 # print message to log file to say started
 print('ProcessDataAdcACM0.py  :', \
@@ -17,7 +20,7 @@ RawFieldNames    = ['RawDateTime','RawPosition', 'RawCount', 'RawADC', \
 # Set path for data file structure
 
 # raw data file source
-RawDataFile   = "/home/pi/UKRAA_PicoMuon/data/raw/ACM0/" \
+RawDataFile   = BASE_PATH + "/data/raw/ACM0/" \
                  + datetime.strftime(datetime.now() - timedelta(1), '%Y') \
                  + "/" \
                  + datetime.strftime(datetime.now() - timedelta(1), '%Y-%m') \
@@ -26,7 +29,7 @@ RawDataFile   = "/home/pi/UKRAA_PicoMuon/data/raw/ACM0/" \
                  + ".txt"
 
 # Processed data path
-ProcessedPath = '/home/pi/UKRAA_PicoMuon/data/processed/adc/ACM0/'\
+ProcessedPath = BASE_PATH + '/data/processed/adc/ACM0/'\
                 + datetime.strftime(datetime.now() - timedelta(1), '%Y') \
                 + "/" \
                 + datetime.strftime(datetime.now() - timedelta(1), '%Y-%m')
@@ -42,7 +45,7 @@ if not pathExists:
           ProcessedPath)
 
 # Processed data file name
-ProcessedDataFile = "/home/pi/UKRAA_PicoMuon/data/processed/adc/ACM0/" \
+ProcessedDataFile = BASE_PATH + "/data/processed/adc/ACM0/" \
                      + datetime.strftime(datetime.now() - timedelta(1), '%Y') \
                      + "/" \
                      + datetime.strftime(datetime.now() - timedelta(1), '%Y-%m') \

@@ -229,9 +229,24 @@ body {font-family: "Lato", sans-serif}
 <!-- End Page Content -->
 </div>
 
+<footer class="w3-container w3-center w3-padding-16">
+  <small>UKRAA PicoMuon software version <span id="picomuon-version">unknown</span></small>
+</footer>
 
 <script>
 // Automatic Slideshow - change image every 4 seconds
+fetch("./picomuon-version.txt")
+  .then(response => {
+    if (!response.ok) throw new Error("Version file unavailable");
+    return response.text();
+  })
+  .then(version => {
+    document.getElementById("picomuon-version").textContent = version.trim();
+  })
+  .catch(error => {
+    console.error("Unable to load PicoMuon software version:", error);
+  });
+
 var myIndex = 0;
 carousel();
 

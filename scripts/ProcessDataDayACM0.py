@@ -4,6 +4,9 @@
 from datetime import datetime, timedelta
 import csv
 import os
+from picomuon_common import get_base_path
+
+BASE_PATH = str(get_base_path())
 
 # print message to log file to say started
 
@@ -26,7 +29,7 @@ RawFieldNames    = ['RawDateTime',\
 # Set path for data file structure
 
 # raw data file source
-RawDataFile   = "/home/pi/UKRAA_PicoMuon/data/raw/ACM0/" \
+RawDataFile   = BASE_PATH + "/data/raw/ACM0/" \
                  + datetime.strftime(datetime.now() - timedelta(1), '%Y') \
                  + "/" \
                  + datetime.strftime(datetime.now() - timedelta(1), '%Y-%m') \
@@ -42,7 +45,7 @@ NeutronFieldNames    = ['NeutronDateTime', \
                         'EfficiencyCorrected']
 
 # Neutron data file source
-NeutronDataFile   = "/home/pi/UKRAA_PicoMuon/data/neutrons/" \
+NeutronDataFile   = BASE_PATH + "/data/neutrons/" \
                  + datetime.strftime(datetime.now() - timedelta(1), '%Y') \
                  + "/" \
                  + datetime.strftime(datetime.now() - timedelta(1), '%Y-%m') \
@@ -51,7 +54,7 @@ NeutronDataFile   = "/home/pi/UKRAA_PicoMuon/data/neutrons/" \
                  + ".txt"
 
 # Processed data path
-ProcessedPath = '/home/pi/UKRAA_PicoMuon/data/processed/day/ACM0/'\
+ProcessedPath = BASE_PATH + '/data/processed/day/ACM0/'\
                 + datetime.strftime(datetime.now() - timedelta(1), '%Y') \
                 + "/" \
                 + datetime.strftime(datetime.now() - timedelta(1), '%Y-%m')
@@ -67,7 +70,7 @@ if not pathExists:
           ProcessedPath)
 
 # Processed data file name
-ProcessedDataFile = "/home/pi/UKRAA_PicoMuon/data/processed/day/ACM0/" \
+ProcessedDataFile = BASE_PATH + "/data/processed/day/ACM0/" \
                      + datetime.strftime(datetime.now() - timedelta(1), '%Y') \
                      + "/" \
                      + datetime.strftime(datetime.now() - timedelta(1), '%Y-%m') \
