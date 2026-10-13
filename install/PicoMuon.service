@@ -1,0 +1,20 @@
+[Unit]
+Description=UKRAA PicoMuon raw data collector
+After=multi-user.target
+
+[Service]
+Type=simple
+User=@PICOMUON_USER@
+Group=@PICOMUON_GROUP@
+SupplementaryGroups=dialout
+WorkingDirectory=@PICOMUON_BASE_PATH@
+Environment="PICOMUON_BASE_PATH=@PICOMUON_BASE_PATH@"
+Environment=TERM=dumb
+ExecStart=/usr/bin/python3 "@PICOMUON_BASE_PATH@/scripts/GetDataRaw.py"
+StandardOutput=append:@PICOMUON_BASE_PATH@/logfiles/log-PicoMuon.txt
+StandardError=append:@PICOMUON_BASE_PATH@/logfiles/log-error.txt
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target

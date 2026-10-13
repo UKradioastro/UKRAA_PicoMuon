@@ -34,6 +34,10 @@ DEBIAN_FRONTEND=noninteractive apt-get install -y \
     python3-serial
 
 install -d -o "$PICOMUON_USER" -g "$PICOMUON_GROUP" -m 0755 \
+    "$BASE_PATH/config" \
+    "$BASE_PATH/data/raw" \
+    "$BASE_PATH/data/raw/rejected" \
+    "$BASE_PATH/data/status" \
     "$BASE_PATH/data/raw/ACM0" \
     "$BASE_PATH/data/processed/adc/ACM0" \
     "$BASE_PATH/data/processed/cpm/ACM0" \
@@ -51,10 +55,26 @@ install -d -o "$PICOMUON_USER" -g "$PICOMUON_GROUP" -m 0755 \
     "$BASE_PATH/temp" \
     "$BASE_PATH/WWW/temp"
 
+if [ ! -f "$BASE_PATH/config/USB.ini" ] && [ -f "$BASE_PATH/install/USB.ini.example" ]; then
+    install -o "$PICOMUON_USER" -g "$PICOMUON_GROUP" -m 0644 \
+        "$BASE_PATH/install/USB.ini.example" "$BASE_PATH/config/USB.ini"
+elif [ -f "$BASE_PATH/config/USB.ini" ] && [ -f "$BASE_PATH/install/USB.ini.example" ]; then
+    su -s /bin/bash "$PICOMUON_USER" -c \
+        "python3 \"$BASE_PATH/scripts/MergeConfig.py\" \"$BASE_PATH/install/USB.ini.example\" \"$BASE_PATH/config/USB.ini\"" || true
+fi
+
 touch "$BASE_PATH/logfiles/log-PicoMuon.txt" "$BASE_PATH/logfiles/log-error.txt"
 chown "$PICOMUON_USER:$PICOMUON_GROUP" \
     "$BASE_PATH/logfiles/log-PicoMuon.txt" "$BASE_PATH/logfiles/log-error.txt"
 chmod +x "$BASE_PATH"/scripts/*.sh
+
+# Transition from legacy PicoMuonACM0.service if active
+if systemctl is-active --quiet PicoMuonACM0.service 2>/dev/null; then
+    echo "Stopping legacy PicoMuonACM0.service..."
+    systemctl stop PicoMuonACM0.service || true
+    systemctl disable PicoMuonACM0.service || true
+    rm -f /etc/systemd/system/PicoMuonACM0.service
+fi
 
 SERVICE_TMP=$(mktemp --suffix=.service)
 trap 'rm -f "$SERVICE_TMP"' EXIT
@@ -62,12 +82,12 @@ sed \
     -e "s|@PICOMUON_USER@|$(escape_sed_replacement "$PICOMUON_USER")|g" \
     -e "s|@PICOMUON_GROUP@|$(escape_sed_replacement "$PICOMUON_GROUP")|g" \
     -e "s|@PICOMUON_BASE_PATH@|$BASE_PATH_SED|g" \
-    "$BASE_PATH/install/PicoMuonACM0.service" > "$SERVICE_TMP"
+    "$BASE_PATH/install/PicoMuon.service" > "$SERVICE_TMP"
 systemd-analyze verify "$SERVICE_TMP"
-install -o root -g root -m 0644 "$SERVICE_TMP" /etc/systemd/system/PicoMuonACM0.service
+install -o root -g root -m 0644 "$SERVICE_TMP" /etc/systemd/system/PicoMuon.service
 systemctl daemon-reload
-systemctl enable PicoMuonACM0.service
-systemctl restart PicoMuonACM0.service
+systemctl enable PicoMuon.service
+systemctl restart PicoMuon.service
 
 CRON_TMP_DIR=$(mktemp -d)
 trap 'rm -f "$SERVICE_TMP"; rm -rf "$CRON_TMP_DIR"' EXIT

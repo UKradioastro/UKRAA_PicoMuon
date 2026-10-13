@@ -1,20 +1,19 @@
 import datetime as dt
 import pandas as pd
 import os
-from picomuon_common import get_base_path, utc_yesterday
+from picomuon_common import get_base_path, log_message, utc_yesterday
 
 # local library that generates the html strings to download NEST data
 import nest
 
-# print message to log file to say started
-print('GetDataNeutron.py      :', \
-      dt.datetime.strftime(dt.datetime.now(), '%Y-%m-%d %H:%M:%S'), \
-      ': Started neutron data scraping for', \
-      dt.datetime.strftime(dt.datetime.now() - dt.timedelta(1), '%Y-%m-%d'))
+PROCESS_NAME = "GetDataNeutron.py"
 
 # get yesterday variable
 yesterday = utc_yesterday()
 base_path = get_base_path()
+
+# print message to log file to say started
+log_message(PROCESS_NAME, f"Started neutron data scraping for {yesterday.strftime('%Y-%m-%d')}")
 
 # year
 yesterdayYear = yesterday.year
@@ -36,9 +35,7 @@ pathExist = os.path.exists(path)
 if not pathExist:
     # Create a new directory because it does not exist
     os.makedirs(path)
-    print('GetDataNeutron.py      :',\
-          dt.datetime.strftime(dt.datetime.now(), '%Y-%m-%d %H:%M:%S'), \
-          ': New directory created')
+    log_message(PROCESS_NAME, "New directory created")
 
 # create file for yesterdays data
 outfile = str(base_path / 'data/neutrons') + '/'\
@@ -78,7 +75,4 @@ df.to_csv(outfile,  sep=",", index=False, header=False, encoding='utf-8')
 # Message to log file at end of program
 
 # print message to log file to say completed
-print('GetDataNeutron.py      :', \
-      dt.datetime.strftime(dt.datetime.now(), '%Y-%m-%d %H:%M:%S'), \
-      ': Completed neutron data scraping for', \
-      dt.datetime.strftime(dt.datetime.now() - dt.timedelta(1), '%Y-%m-%d'))
+log_message(PROCESS_NAME, f"Completed neutron data scraping for {yesterday.strftime('%Y-%m-%d')}")

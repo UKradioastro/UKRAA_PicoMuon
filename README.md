@@ -82,9 +82,9 @@ This downloads the code into a `UKRAA_PicoMuon` directory under the current user
 <!-- =============================================================================== --> 
 ## Using the code
 
-The current legacy collector expects the detector to appear as `/dev/ttyACM0`; stable USB identification is being added in a later implementation phase. The installer uses the account that invoked `sudo`, so the software does not require a user named `pi`. Python and gnuplot scripts resolve paths from the installation directory.
+The raw data collector resolves serial settings from `config/USB.ini`, with support for stable `/dev/serial/by-id/` device paths configured via `python3 scripts/ConfigureUSB.py` (defaulting gracefully to `/dev/ttyACM0`). The installer uses the account that invoked `sudo`, so the software does not require a user named `pi`. Python and gnuplot scripts resolve paths from the installation directory.
 
-**GetDataRawACM0.py** is run as a service. Daily processing and plotting are run by a managed root crontab entry, with jobs executed as the installing user.
+**GetDataRaw.py** is run as the systemd service `PicoMuon.service`. Daily processing and plotting are run by a managed root crontab entry, with jobs executed as the installing user.
 
 ---
 
@@ -154,39 +154,39 @@ Where *hostname* is the hostname for your RPi setup.
 
 &nbsp;
 <!-- =============================================================================== --> 
-## Check GetDataRawACM0.py is running
+## Check GetDataRaw.py is running
 
 1. To check the **status** of your service, type the following command and press enter.
 ```
-sudo systemctl status PicoMuonACM0.service
+sudo systemctl status PicoMuon.service
 ```
 
 &nbsp;
 
 2. To **start** your service, type the following command and press enter.
 ```
-sudo systemctl start PicoMuonACM0.service
+sudo systemctl start PicoMuon.service
 ```
 
 &nbsp;
 
 3. To **stop** your service, type the following command and press enter.
 ```
-sudo systemctl stop PicoMuonACM0.service
+sudo systemctl stop PicoMuon.service
 ```
 
 &nbsp;
 
 4. To **enable** your service, type the following command and press enter.
 ```
-sudo systemctl enable PicoMuonACM0.service
+sudo systemctl enable PicoMuon.service
 ```
 
 &nbsp;
 
 5. To **disable** your service, type the following command and press enter.
 ```
-sudo systemctl disable PicoMuonACM0.service
+sudo systemctl disable PicoMuon.service
 ```
 
 &nbsp;

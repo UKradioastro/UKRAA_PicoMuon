@@ -1,0 +1,6 @@
+# USB serial configuration for UKRAA PicoMuon
+[usb]
+serial_port = /dev/ttyACM0
+id_serial =
+id_serial_short =
+label =

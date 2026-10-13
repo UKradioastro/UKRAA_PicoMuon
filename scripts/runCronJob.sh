@@ -3,6 +3,7 @@
 set -euo pipefail
 
 source "$(dirname "${BASH_SOURCE[0]}")/picomuon-env.sh"
+source "$(dirname "${BASH_SOURCE[0]}")/logging.sh"
 LOG_DIR="$PICOMUON_BASE_PATH/logfiles"
 ERROR_LOG="$LOG_DIR/log-error.txt"
 LOCK_FILE="$LOG_DIR/.picomuon-cron.lock"
@@ -10,8 +11,7 @@ LOCK_FILE="$LOG_DIR/.picomuon-cron.lock"
 mkdir -p "$LOG_DIR"
 
 log_error() {
-    printf '%s : %-34s : %s\n' \
-        "$(date -u '+%Y-%m-%d %H:%M:%S UTC')" "runCronJob.sh" "$1" >> "$ERROR_LOG"
+    write_log_entry "runCronJob.sh" "$1" >> "$ERROR_LOG"
 }
 
 if [ "$#" -eq 0 ]; then

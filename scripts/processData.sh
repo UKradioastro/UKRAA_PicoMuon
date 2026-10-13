@@ -3,6 +3,7 @@
 set -euo pipefail
 
 source "$(dirname "${BASH_SOURCE[0]}")/picomuon-env.sh"
+source "$(dirname "${BASH_SOURCE[0]}")/logging.sh"
 BASE_PATH=$PICOMUON_BASE_PATH
 MAIN_LOG="$BASE_PATH/logfiles/log-PicoMuon.txt"
 ERROR_LOG="$BASE_PATH/logfiles/log-error.txt"
@@ -14,7 +15,11 @@ SOFTWARE_VERSION=$(PYTHONPATH="$BASE_PATH/scripts" "$PYTHON" -c \
     'from picomuon_common import get_version; print(get_version())')
 
 log_message() {
-    printf '%s : %s\n' "$(date -u '+%Y-%m-%d %H:%M:%S UTC')" "$1" >> "$MAIN_LOG"
+    write_log_entry "processData.sh" "$1" >> "$MAIN_LOG"
+}
+
+log_failure() {
+    write_log_entry "processData.sh" "$1" >> "$ERROR_LOG"
 }
 
 run_as_owner() {
@@ -35,8 +40,7 @@ run_stage() {
     if run_as_owner "$@" >> "$MAIN_LOG"; then
         log_message "Completed $description"
     else
-        printf '%s : processData.sh : FAILED - %s\n' \
-            "$(date -u '+%Y-%m-%d %H:%M:%S UTC')" "$description" >> "$ERROR_LOG"
+        log_failure "FAILED - $description"
         return 1
     fi
 }
@@ -64,14 +68,12 @@ if [ -d "$BASE_PATH/WWW/temp" ]; then
     if install -d -m 0755 /var/www/html/temp && cp -a "$BASE_PATH/WWW/temp/." /var/www/html/temp/; then
         log_message "Published plot assets"
     else
-        printf '%s : processData.sh : FAILED - could not publish plot assets\n' \
-            "$(date -u '+%Y-%m-%d %H:%M:%S UTC')" >> "$ERROR_LOG"
+        log_failure "FAILED - could not publish plot assets"
         FAILURES=$((FAILURES + 1))
     fi
 fi
 if ! cp "$BASE_PATH/VERSION" /var/www/html/picomuon-version.txt; then
-    printf '%s : processData.sh : FAILED - could not publish version marker\n' \
-        "$(date -u '+%Y-%m-%d %H:%M:%S UTC')" >> "$ERROR_LOG"
+    log_failure "FAILED - could not publish version marker"
     FAILURES=$((FAILURES + 1))
 fi
 
