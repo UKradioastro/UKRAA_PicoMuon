@@ -203,7 +203,21 @@ def build_processed_day_path(
 
 
 def build_neutron_path(base_path: Path, target_date: date) -> Path:
-    """Build path to scraped NMDB neutron file for target_date."""
+    """Build path to scraped NMDB neutron file for target_date.
+    Checks data/neutrons (written by modern GetDataNeutron.py) first,
+    falling back to legacy data/NMDB/neutrons.
+    """
+    candidate_modern = (
+        base_path
+        / "data"
+        / "neutrons"
+        / target_date.strftime("%Y")
+        / target_date.strftime("%Y-%m")
+        / f"{target_date.strftime('%Y-%m-%d')}.txt"
+    )
+    if candidate_modern.exists():
+        return candidate_modern
+
     return (
         base_path
         / "data"

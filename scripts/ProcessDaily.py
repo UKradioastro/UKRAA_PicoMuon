@@ -41,6 +41,8 @@ def parse_arguments() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Single-pass PicoMuon daily processor.")
     parser.add_argument(
         "--target-date",
+        "--date",
+        dest="target_date",
         type=lambda d: datetime.strptime(d, "%Y-%m-%d").date(),
         default=None,
         help="UTC target date to process (YYYY-MM-DD, defaults to PICOMUON_TARGET_DATE or yesterday)",
@@ -139,6 +141,7 @@ def process_daily(target_date: date, base_path: Optional[Path] = None) -> int:
     prev_event_count: Optional[int] = None
     prev_elapsed_ms: Optional[int] = None
     prev_hour_idx: Optional[int] = None
+    prev_det_name: Optional[str] = None
 
     with raw_file.open(mode="r", encoding="utf-8", errors="replace") as rf:
         for line in rf:
@@ -203,11 +206,17 @@ def process_daily(target_date: date, base_path: Optional[Path] = None) -> int:
             hour_bins[hour_idx][6] += pres_val
 
             # Exposure and missing event calculation (section 2a)
-            if prev_event_count is not None and prev_elapsed_ms is not None:
-                # Missing events check
+            # Only compare against previous event if same detector and same session
+            if (
+                prev_event_count is not None
+                and prev_elapsed_ms is not None
+                and (not det_name or not prev_det_name or det_name == prev_det_name)
+            ):
+                # Missing events check: valid if counter advanced moderately (<= 50,000)
                 if event_count > prev_event_count + 1:
-                    missing = event_count - prev_event_count - 1
-                    hour_bins[hour_idx][4] += missing
+                    jump = event_count - prev_event_count - 1
+                    if jump <= 50000:
+                        hour_bins[hour_idx][4] += jump
 
                 # Elapsed unwrap: delta = (elapsed - prev_elapsed) % 2**32
                 delta_ms = (elapsed_ms - prev_elapsed_ms) % (2**32)
@@ -218,6 +227,7 @@ def process_daily(target_date: date, base_path: Optional[Path] = None) -> int:
             prev_event_count = event_count
             prev_elapsed_ms = elapsed_ms
             prev_hour_idx = hour_idx
+            prev_det_name = det_name
 
     # Output 1: Minute CPM file (1440 lines)
     # Compatible format: YYYY-MM-DD HH:MM:00,cpm_T,cpm_B,cpm_M

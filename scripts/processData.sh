@@ -23,6 +23,16 @@ log_failure() {
 }
 
 run_as_owner() {
+    # If already running as the file owner, execute directly without su/password prompt
+    if [ "$(id -un 2>/dev/null || true)" = "$PICOMUON_FILE_OWNER" ]; then
+        (
+            export PICOMUON_BASE_PATH="$BASE_PATH" TZ=UTC TERM=dumb
+            cd "$BASE_PATH"
+            "$@"
+        )
+        return $?
+    fi
+
     local command_text=""
     local argument
     for argument in "$@"; do
@@ -61,17 +71,24 @@ do
     run_stage "plot $plot_script" "$GNUPLOT" "$BASE_PATH/scripts/$plot_script" || FAILURES=$((FAILURES + 1))
 done
 
-if [ -d "$BASE_PATH/WWW/temp" ]; then
-    if install -d -m 0755 /var/www/html/temp && cp -a "$BASE_PATH/WWW/temp/." /var/www/html/temp/; then
-        log_message "Published plot assets"
+# Publish to web server directory if accessible (e.g. under root cron)
+if [ -d "/var/www/html" ]; then
+    if [ -w "/var/www/html" ]; then
+        if [ -d "$BASE_PATH/WWW/temp" ]; then
+            if install -d -m 0755 /var/www/html/temp && cp -a "$BASE_PATH/WWW/temp/." /var/www/html/temp/; then
+                log_message "Published plot assets"
+            else
+                log_failure "FAILED - could not publish plot assets"
+                FAILURES=$((FAILURES + 1))
+            fi
+        fi
+        if ! cp "$BASE_PATH/VERSION" /var/www/html/picomuon-version.txt; then
+            log_failure "FAILED - could not publish version marker"
+            FAILURES=$((FAILURES + 1))
+        fi
     else
-        log_failure "FAILED - could not publish plot assets"
-        FAILURES=$((FAILURES + 1))
+        log_message "Skipped publishing to /var/www/html (not writable by current user; published under root cron)"
     fi
-fi
-if ! cp "$BASE_PATH/VERSION" /var/www/html/picomuon-version.txt; then
-    log_failure "FAILED - could not publish version marker"
-    FAILURES=$((FAILURES + 1))
 fi
 
 if [ "$FAILURES" -gt 0 ]; then

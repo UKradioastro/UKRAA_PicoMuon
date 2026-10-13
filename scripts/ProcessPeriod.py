@@ -47,6 +47,8 @@ def parse_arguments() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="PicoMuon multi-day period aggregator.")
     parser.add_argument(
         "--target-date",
+        "--date",
+        dest="target_date",
         type=lambda d: datetime.strptime(d, "%Y-%m-%d").date(),
         default=None,
         help="UTC target date (end date) for period processing (YYYY-MM-DD)",

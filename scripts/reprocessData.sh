@@ -132,6 +132,16 @@ if [ "$DRY_RUN" = "true" ]; then
 fi
 
 run_as_owner() {
+    # If already running as the file owner, execute directly without su/password prompt
+    if [ "$(id -un 2>/dev/null || true)" = "$PICOMUON_FILE_OWNER" ]; then
+        (
+            export PICOMUON_BASE_PATH="$BASE_PATH" TZ=UTC TERM=dumb
+            cd "$BASE_PATH"
+            "$@"
+        )
+        return $?
+    fi
+
     local command_text=""
     local argument
     for argument in "$@"; do

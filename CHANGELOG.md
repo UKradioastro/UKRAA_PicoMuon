@@ -23,6 +23,12 @@ This project uses calendar versioning in the format `YYYY.MM.patch`.
 - Dynamic installation-root lookup for the legacy processing and plot scripts.
 
 ### Changed
+- `scripts/ProcessDaily.py` and `scripts/ProcessPeriod.py` support `--date` as an alias for `--target-date`.
+- `scripts/picomuon_common.py` resolves neutron files from both `data/neutrons/` and `data/NMDB/neutrons/`.
+- `scripts/processData.sh` and `scripts/reprocessData.sh` avoid unnecessary `su` invocations when executed by the file owner, eliminating interactive password prompts.
+- `scripts/processData.sh` verifies web directory write permissions before publishing plot assets, avoiding permission errors when invoked manually as a non-root user.
+- Gnuplot scripts (`PlotDataDayACM0.gp`, `PlotDataWeekACM0.gp`, `PlotDataMonthACM0.gp`) guard against missing neutron stats, avoiding undefined variable runtime errors when neutron flux data is unavailable.
+- `scripts/ProcessDaily.py` missing-event counter bounds event jumps to avoid spurious large counters during reboot or multi-detector switching.
 - `install/install.sh` automatically migrates from `PicoMuonACM0.service` to `PicoMuon.service`, initializes `config/USB.ini`, and creates status and rejected data directories.
 - Logging output from `processData.sh`, `runCronJob.sh`, and `GetDataNeutron.py` aligned to the columnar format.
 - Remove legacy `processCPM.sh`, `processADC.sh`, and `processData.sh` cron entries when installing the managed schedule, avoiding duplicate processing.

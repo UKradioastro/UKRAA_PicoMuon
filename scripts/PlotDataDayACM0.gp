@@ -61,6 +61,10 @@ set datafile separator ","
 stats FileData using 4 output prefix "MUON" nooutput
 stats FileData using 7 output prefix "NEUTRON" nooutput
 
+# Guard against missing/nan neutron stats so gnuplot does not fail with undefined variable
+if (!exists("NEUTRON_min")) { NEUTRON_min = 1.0; NEUTRON_max = 1.0; NEUTRON_mean = 1.0 }
+if (!exists("NEUTRON_mean") || NEUTRON_mean == 0.0) { NEUTRON_mean = 1.0; NEUTRON_min = 1.0; NEUTRON_max = 1.0 }
+
 # date to be processed
 date = system("date -d yesterday +'%Y-%m-%d'")
 
