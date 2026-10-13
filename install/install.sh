@@ -56,13 +56,14 @@ chown "$PICOMUON_USER:$PICOMUON_GROUP" \
     "$BASE_PATH/logfiles/log-PicoMuon.txt" "$BASE_PATH/logfiles/log-error.txt"
 chmod +x "$BASE_PATH"/scripts/*.sh
 
-SERVICE_TMP=$(mktemp)
+SERVICE_TMP=$(mktemp --suffix=.service)
 trap 'rm -f "$SERVICE_TMP"' EXIT
 sed \
     -e "s|@PICOMUON_USER@|$(escape_sed_replacement "$PICOMUON_USER")|g" \
     -e "s|@PICOMUON_GROUP@|$(escape_sed_replacement "$PICOMUON_GROUP")|g" \
     -e "s|@PICOMUON_BASE_PATH@|$BASE_PATH_SED|g" \
     "$BASE_PATH/install/PicoMuonACM0.service" > "$SERVICE_TMP"
+systemd-analyze verify "$SERVICE_TMP"
 install -o root -g root -m 0644 "$SERVICE_TMP" /etc/systemd/system/PicoMuonACM0.service
 systemctl daemon-reload
 systemctl enable PicoMuonACM0.service
@@ -91,6 +92,7 @@ awk '
     skip { next }
     /UKRAA_PicoMuon\/scripts\/(GetDataNeutron|ProcessData(Cpm|Day|Week|Month|Adc)|plots|managelogfiles)\.py?/ { next }
     /UKRAA_PicoMuon\/scripts\/(plots|managelogfiles)\.sh/ { next }
+    /UKRAA_PicoMuon\/scripts\/process(CPM|ADC|Data)\.sh([[:space:]"]|$)/ { next }
     /UKRAA_PicoMuon\/temp[[:space:]]+\/var\/www\/html/ { next }
     { print }
 ' "$CURRENT_CRON" > "$FILTERED_CRON"

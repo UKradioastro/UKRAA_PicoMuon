@@ -12,5 +12,7 @@ This project uses calendar versioning in the format `YYYY.MM.patch`.
 - Dynamic installation-root lookup for the legacy processing and plot scripts.
 
 ### Changed
+- Remove legacy `processCPM.sh`, `processADC.sh`, and `processData.sh` cron entries when installing the managed schedule, avoiding duplicate processing.
+- Corrected systemd path quoting and validate the rendered collector unit before installation.
 - Daily processing now runs as a single locked pipeline at 01:15 local time; until Phase 2 replaces the legacy processing implementation, runtimes can remain long.
 - Updated the installation instructions for non-`pi` users.
