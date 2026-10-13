@@ -181,7 +181,7 @@ def main() -> None:
                         # Log and record malformed/rejected row
                         log_error(
                             PROCESS_NAME,
-                            f"Malformed raw row rejected ({len(line_str)} chars): {line_str[:80]}",
+                            f"Malformed raw row rejected ({len(line_str)} chars): {line_str[:80]!r}",
                         )
                         if rejected_handle:
                             print(f"{timestamp_str},{line_str}", file=rejected_handle, flush=True)

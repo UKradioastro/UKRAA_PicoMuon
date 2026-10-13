@@ -23,7 +23,7 @@ set print "-"
 
 # print to log file
 print "PlotDataWeekACM0.gp    : "\
-    .system("date +'%Y/%M/%d %H:%M:%S'")\
+    .system("date +'%Y/%m/%d %H:%M:%S'")\
     ." : Started ACM0 weeks % deviation plot from "\
     .system("date -d 'last week' +'%Y-%m-%d'")\
     ." to "\
@@ -46,9 +46,9 @@ FileData        = pathData.YearFolder.YearMonthFolder.YmdFile
 
 # check if FileData exists - 0=exists, 1=doesn't exist, if doesn't exist then exit, with message
 is_missing = system("\"".basePath."/scripts/ismissing.sh\" \"".FileData."\"")
-if (is_missing == 1) {print "PlotDataWeekACM0.gp    : ".system("date +'%Y/%M/%d %H:%M:%S'")." : ACM0 week data file missing, so..."; 
+if (is_missing == 1) {print "PlotDataWeekACM0.gp    : ".system("date +'%Y/%m/%d %H:%M:%S'")." : ACM0 week data file missing, so..."; 
     print "PlotDataWeekACM0.gp    : "\
-        .system("date +'%Y/%M/%d %H:%M:%S'")\
+        .system("date +'%Y/%m/%d %H:%M:%S'")\
         ." : **FAILED** to complete ACM0 weeks % deviation plot from "\
         .system("date -d 'last week' +'%Y-%m-%d'")\
         ." to "\
@@ -169,7 +169,7 @@ replot
 
 # print to log file
 print "PlotDataWeekACM0.gp    : "\
-    .system("date +'%Y/%M/%d %H:%M:%S'")\
+    .system("date +'%Y/%m/%d %H:%M:%S'")\
     ." : Completed ACM0 weeks % deviation day plot from "\
     .system("date -d 'last week' +'%Y-%m-%d'")\
     ." to "\

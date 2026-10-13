@@ -9,6 +9,10 @@ MAIN_LOG="$BASE_PATH/logfiles/log-PicoMuon.txt"
 ERROR_LOG="$BASE_PATH/logfiles/log-error.txt"
 PYTHON=/usr/bin/python3
 GNUPLOT=/usr/bin/gnuplot
+TARGET_DATE="${1:-${PICOMUON_TARGET_DATE:-$(date -u -d yesterday +%F)}}"
+export PICOMUON_TARGET_DATE="$TARGET_DATE"
+TARGET_YEAR="${TARGET_DATE:0:4}"
+TARGET_MONTH="${TARGET_DATE:0:7}"
 
 mkdir -p "$BASE_PATH/logfiles"
 SOFTWARE_VERSION=$(PYTHONPATH="$BASE_PATH/scripts" "$PYTHON" -c \
@@ -57,8 +61,8 @@ run_stage() {
 
 FAILURES=0
 run_stage "NMDB download" "$PYTHON" "$BASE_PATH/scripts/GetDataNeutron.py" || FAILURES=$((FAILURES + 1))
-run_stage "fast daily processing" "$PYTHON" "$BASE_PATH/scripts/ProcessDaily.py" || FAILURES=$((FAILURES + 1))
-run_stage "multi-day period processing" "$PYTHON" "$BASE_PATH/scripts/ProcessPeriod.py" || FAILURES=$((FAILURES + 1))
+run_stage "fast daily processing" "$PYTHON" "$BASE_PATH/scripts/ProcessDaily.py" --date "$TARGET_DATE" || FAILURES=$((FAILURES + 1))
+run_stage "multi-day period processing" "$PYTHON" "$BASE_PATH/scripts/ProcessPeriod.py" --date "$TARGET_DATE" || FAILURES=$((FAILURES + 1))
 
 for plot_script in \
     PlotDataCpmACM0.gp \
@@ -68,6 +72,22 @@ for plot_script in \
     PlotDataWeekACM0.gp \
     PlotDataMonthACM0.gp
 do
+    case "$plot_script" in
+        PlotDataWeekACM0.gp)
+            period_file="$BASE_PATH/data/processed/week/ACM0/$TARGET_YEAR/$TARGET_MONTH/$TARGET_DATE.txt"
+            ;;
+        PlotDataMonthACM0.gp)
+            period_file="$BASE_PATH/data/processed/month/ACM0/$TARGET_YEAR/$TARGET_MONTH/$TARGET_DATE.txt"
+            ;;
+        *)
+            period_file=""
+            ;;
+    esac
+
+    if [ -n "$period_file" ] && [ ! -f "$period_file" ]; then
+        log_message "Skipped plot $plot_script (period data unavailable; insufficient history)"
+        continue
+    fi
     run_stage "plot $plot_script" "$GNUPLOT" "$BASE_PATH/scripts/$plot_script" || FAILURES=$((FAILURES + 1))
 done
 
@@ -82,7 +102,12 @@ if [ -d "/var/www/html" ]; then
                 FAILURES=$((FAILURES + 1))
             fi
         fi
-        if ! cp "$BASE_PATH/VERSION" /var/www/html/picomuon-version.txt; then
+        VERSION_MARKER=/var/www/html/picomuon-version.txt
+        if [ -f "$VERSION_MARKER" ] && cmp -s "$BASE_PATH/VERSION" "$VERSION_MARKER"; then
+            :
+        elif [ -e "$VERSION_MARKER" ] && [ ! -w "$VERSION_MARKER" ]; then
+            log_message "Skipped publishing version marker (not writable by current user; published under root cron)"
+        elif ! cp "$BASE_PATH/VERSION" "$VERSION_MARKER"; then
             log_failure "FAILED - could not publish version marker"
             FAILURES=$((FAILURES + 1))
         fi

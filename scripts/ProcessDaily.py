@@ -212,10 +212,10 @@ def process_daily(target_date: date, base_path: Optional[Path] = None) -> int:
                 and prev_elapsed_ms is not None
                 and (not det_name or not prev_det_name or det_name == prev_det_name)
             ):
-                # Missing events check: valid if counter advanced moderately (<= 50,000)
+                # Large jumps indicate a counter reset/wrap, not missing events.
                 if event_count > prev_event_count + 1:
                     jump = event_count - prev_event_count - 1
-                    if jump <= 50000:
+                    if jump <= 1000:
                         hour_bins[hour_idx][4] += jump
 
                 # Elapsed unwrap: delta = (elapsed - prev_elapsed) % 2**32

@@ -259,6 +259,39 @@ class Phase2ProcessingTests(unittest.TestCase):
             args = parse_period_args()
             self.assertEqual(args.target_date, date(2026, 10, 12))
 
+    def test_missing_event_counter_jump_is_capped(self):
+        raw_path = (
+            self.base_path
+            / "data"
+            / "raw"
+            / "2026"
+            / "2026-10"
+            / "2026-10-09.txt"
+        )
+        raw_path.parent.mkdir(parents=True, exist_ok=True)
+        raw_path.write_text(
+            "\n".join(
+                [
+                    "2026-10-09 00:00:01.000000,T,1,100,1000,0,22.0,1015.0,56/148/627",
+                    "2026-10-09 00:00:02.000000,T,500000,100,2000,0,22.0,1015.0,56/148/627",
+                    "2026-10-09 00:00:03.000000,T,500002,100,3000,0,22.0,1015.0,56/148/627",
+                ]
+            )
+            + "\n",
+            encoding="utf-8",
+        )
+
+        self.assertEqual(process_daily(self.target_date, self.base_path), 0)
+        summary_path = build_daily_summary_path(self.base_path)
+        summary_row = summary_path.read_text(encoding="utf-8").splitlines()[1]
+        self.assertEqual(summary_row.split(",")[8], "1")
+
+    def test_period_with_insufficient_history_is_skipped(self):
+        self.assertEqual(
+            process_period_data("week", self.target_date, self.base_path),
+            0,
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

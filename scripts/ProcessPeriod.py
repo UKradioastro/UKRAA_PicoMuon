@@ -133,14 +133,11 @@ def process_period_data(
     if available_days < min_required_days:
         log_message(
             SCRIPT_NAME,
-            f"Not enough ACM0 day files available ({available_days}/{num_days}, "
-            f"{min_required_days} needed at {min_percent:.0f}%)",
+            f"Insufficient history; skipping ACM0 {period_name} data "
+            f"({available_days}/{num_days} days, {min_required_days} needed "
+            f"at {min_percent:.0f}%)",
         )
-        log_error(
-            SCRIPT_NAME,
-            f"FAILED to process ACM0 {period_name} data from {start_str} to {date_str}",
-        )
-        return 1
+        return 0
 
     # Load 5-minute entries across the available days
     all_5min_rows: List[Tuple[datetime, float, float, float, float, float, float]] = []
