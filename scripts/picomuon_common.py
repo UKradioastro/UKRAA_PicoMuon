@@ -168,3 +168,55 @@ def build_raw_day_path(base_path: Path, current_time: datetime, label: Optional[
         / f"{current_time.strftime('%Y-%m-%d')}.txt"
     )
 
+
+def get_target_date(default_days_ago: int = 1) -> date:
+    """Return target date for processing, honoring PICOMUON_TARGET_DATE override."""
+    env_target = os.environ.get("PICOMUON_TARGET_DATE")
+    if env_target:
+        try:
+            return datetime.strptime(env_target.strip(), "%Y-%m-%d").date()
+        except ValueError:
+            raise ValueError(
+                f"PICOMUON_TARGET_DATE {env_target!r} is not a valid YYYY-MM-DD date"
+            ) from None
+    return utc_yesterday()
+
+
+def build_processed_day_path(
+    base_path: Path,
+    category: str,
+    target_date: date,
+    detector_label: str = "ACM0",
+    extension: str = "txt",
+) -> Path:
+    """Build standard processed file path: data/processed/<category>/<detector>/YYYY/YYYY-MM/YYYY-MM-DD.<ext>"""
+    return (
+        base_path
+        / "data"
+        / "processed"
+        / category
+        / detector_label
+        / target_date.strftime("%Y")
+        / target_date.strftime("%Y-%m")
+        / f"{target_date.strftime('%Y-%m-%d')}.{extension}"
+    )
+
+
+def build_neutron_path(base_path: Path, target_date: date) -> Path:
+    """Build path to scraped NMDB neutron file for target_date."""
+    return (
+        base_path
+        / "data"
+        / "NMDB"
+        / "neutrons"
+        / target_date.strftime("%Y")
+        / target_date.strftime("%Y-%m")
+        / f"{target_date.strftime('%Y-%m-%d')}.txt"
+    )
+
+
+def build_daily_summary_path(base_path: Path) -> Path:
+    """Build path to data/daily/summary.csv."""
+    return base_path / "data" / "daily" / "summary.csv"
+
+

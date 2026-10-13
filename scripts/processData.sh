@@ -47,11 +47,8 @@ run_stage() {
 
 FAILURES=0
 run_stage "NMDB download" "$PYTHON" "$BASE_PATH/scripts/GetDataNeutron.py" || FAILURES=$((FAILURES + 1))
-run_stage "minute-count processing" "$PYTHON" "$BASE_PATH/scripts/ProcessDataCpmACM0.py" || FAILURES=$((FAILURES + 1))
-run_stage "daily processing" "$PYTHON" "$BASE_PATH/scripts/ProcessDataDayACM0.py" || FAILURES=$((FAILURES + 1))
-run_stage "weekly processing" "$PYTHON" "$BASE_PATH/scripts/ProcessDataWeekACM0.py" || FAILURES=$((FAILURES + 1))
-run_stage "monthly processing" "$PYTHON" "$BASE_PATH/scripts/ProcessDataMonthACM0.py" || FAILURES=$((FAILURES + 1))
-run_stage "ADC processing" "$PYTHON" "$BASE_PATH/scripts/ProcessDataAdcACM0.py" || FAILURES=$((FAILURES + 1))
+run_stage "fast daily processing" "$PYTHON" "$BASE_PATH/scripts/ProcessDaily.py" || FAILURES=$((FAILURES + 1))
+run_stage "multi-day period processing" "$PYTHON" "$BASE_PATH/scripts/ProcessPeriod.py" || FAILURES=$((FAILURES + 1))
 
 for plot_script in \
     PlotDataCpmACM0.gp \
