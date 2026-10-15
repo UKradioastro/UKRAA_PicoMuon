@@ -51,7 +51,7 @@ run_stage() {
     local description=$1
     shift
     log_message "Starting $description (version $SOFTWARE_VERSION)"
-    if run_as_owner "$@" >> "$MAIN_LOG"; then
+    if run_as_owner "$@" >> "$MAIN_LOG" 2>> "$ERROR_LOG"; then
         log_message "Completed $description"
     else
         log_failure "FAILED - $description"
@@ -94,26 +94,36 @@ done
 # Publish to web server directory if accessible (e.g. under root cron)
 if [ -d "/var/www/html" ]; then
     if [ -w "/var/www/html" ]; then
-        if [ -d "$BASE_PATH/WWW/temp" ]; then
-            if install -d -m 0755 /var/www/html/temp && cp -a "$BASE_PATH/WWW/temp/." /var/www/html/temp/; then
-                log_message "Published plot assets"
+        PLOT_SOURCE="$BASE_PATH/temp"
+        PLOT_DEST=/var/www/html/temp
+        PLOT_FILES=("$PLOT_SOURCE"/*.png)
+        log_message "Publishing plot assets from $PLOT_SOURCE to $PLOT_DEST"
+        if [ -f "${PLOT_FILES[0]}" ]; then
+            if { install -d -m 0755 "$PLOT_DEST" &&
+                install -p -m 0644 "${PLOT_FILES[@]}" "$PLOT_DEST/"; } 2>> "$ERROR_LOG"; then
+                log_message "Published ${#PLOT_FILES[@]} plot assets from $PLOT_SOURCE to $PLOT_DEST"
             else
-                log_failure "FAILED - could not publish plot assets"
+                log_failure "FAILED - could not publish plot assets from $PLOT_SOURCE to $PLOT_DEST (see command errors above)"
                 FAILURES=$((FAILURES + 1))
             fi
+        else
+            log_failure "FAILED - no PNG plot assets found in $PLOT_SOURCE for publishing to $PLOT_DEST"
+            FAILURES=$((FAILURES + 1))
         fi
         VERSION_MARKER=/var/www/html/picomuon-version.txt
         if [ -f "$VERSION_MARKER" ] && cmp -s "$BASE_PATH/VERSION" "$VERSION_MARKER"; then
             :
         elif [ -e "$VERSION_MARKER" ] && [ ! -w "$VERSION_MARKER" ]; then
             log_message "Skipped publishing version marker (not writable by current user; published under root cron)"
-        elif ! cp "$BASE_PATH/VERSION" "$VERSION_MARKER"; then
+        elif ! cp "$BASE_PATH/VERSION" "$VERSION_MARKER" 2>> "$ERROR_LOG"; then
             log_failure "FAILED - could not publish version marker"
             FAILURES=$((FAILURES + 1))
         fi
     else
         log_message "Skipped publishing to /var/www/html (not writable by current user; published under root cron)"
     fi
+else
+    log_message "Skipped publishing to /var/www/html (web directory does not exist)"
 fi
 
 if [ "$FAILURES" -gt 0 ]; then

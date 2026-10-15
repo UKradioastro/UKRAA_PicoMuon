@@ -23,6 +23,7 @@ This project uses calendar versioning in the format `YYYY.MM.patch`.
 - Dynamic installation-root lookup for the legacy processing and plot scripts.
 
 ### Changed
+- Correct daily web publishing to copy generated PNGs from `temp/`, not stale assets in `WWW/temp/`. Log source, destination and file count, fail explicitly when no PNGs exist, and capture pipeline/publishing command errors in `log-error.txt`. Published images have web-readable permissions.
 - `scripts/ProcessDaily.py` and `scripts/ProcessPeriod.py` support `--date` as an alias for `--target-date`.
 - `scripts/picomuon_common.py` resolves neutron files from both `data/neutrons/` and `data/NMDB/neutrons/`.
 - `scripts/processData.sh` and `scripts/reprocessData.sh` avoid unnecessary `su` invocations when executed by the file owner, eliminating interactive password prompts.
