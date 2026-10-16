@@ -9,12 +9,33 @@ from pathlib import Path
 import re
 import subprocess
 import sys
-from typing import Any, Dict, Optional, Tuple
+from typing import Any, Dict, Iterable, Iterator, Optional, TextIO, Tuple
 
 _VERSION_PATTERN = re.compile(r"^\d{4}\.(0[1-9]|1[0-2])\.\d+$")
 
 # Column width for process name in aligned log format
 LOG_PROCESS_WIDTH = 26
+RAW_HEADER = "RPiTimestamp,Event,EventCount,ADC,Elapsed_ms,Dead_ms,Temp_C,Pres_hPa,DetectorName"
+
+
+def open_raw_file(path: Path) -> TextIO:
+    """Append raw events, adding a header only to a new or empty file."""
+    path.parent.mkdir(parents=True, exist_ok=True)
+    handle = path.open(mode="a", encoding="utf-8", buffering=1)
+    try:
+        if handle.tell() == 0:
+            handle.write(RAW_HEADER + "\n")
+    except OSError:
+        handle.close()
+        raise
+    return handle
+
+
+def raw_data_lines(lines: Iterable[str]) -> Iterator[str]:
+    """Read both historic headerless and headered raw event files."""
+    for line in lines:
+        if line.rstrip("\r\n") != RAW_HEADER:
+            yield line
 
 
 def get_base_path() -> Path:
@@ -231,4 +252,3 @@ def build_neutron_path(base_path: Path, target_date: date) -> Path:
 def build_daily_summary_path(base_path: Path) -> Path:
     """Build path to data/daily/summary.csv."""
     return base_path / "data" / "daily" / "summary.csv"
-

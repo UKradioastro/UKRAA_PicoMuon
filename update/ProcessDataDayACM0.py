@@ -4,6 +4,7 @@
 from datetime import datetime, timedelta
 import csv
 import os
+from picomuon_common import raw_data_lines
 
 # print message to log file to say started
 
@@ -125,7 +126,7 @@ for i in range(1, n+1):
 
     # using csv.DictReader
     RawFile = open(file=RawDataFile, mode='r', encoding='UTF-8')
-    RawCSV_reader = csv.DictReader(RawFile,RawFieldNames)
+    RawCSV_reader = csv.DictReader(raw_data_lines(RawFile),RawFieldNames)
 
     # set counters to zero
     count_T     = 0

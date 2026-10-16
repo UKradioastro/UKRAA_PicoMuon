@@ -1,8 +1,7 @@
 # imports
 from datetime import datetime, timezone
 import serial
-import os
-from picomuon_common import get_base_path
+from picomuon_common import build_raw_day_path, get_base_path, open_raw_file
 
 # main
 def main():
@@ -16,35 +15,13 @@ def main():
                         stopbits = serial.STOPBITS_ONE)
        
     for line in ser:
-        # path for data storage
-        path = str(base_path / 'data/raw/ACM0') + '/'\
-                + datetime.strftime(datetime.now(timezone.utc), '%Y')\
-                + '/'\
-                + datetime.strftime(datetime.now(timezone.utc), '%Y-%m')
-        # check if the specific path exists
-        pathExists = os.path.exists(path)
-        if not pathExists:
-            # create directory structure
-            os.makedirs(path)
-        # output file to write data to
-        outfile = open(str(base_path / 'data/raw/ACM0') + '/'
-                    + datetime.strftime(datetime.now(timezone.utc), '%Y')
-                    + '/'
-                    + datetime.strftime(datetime.now(timezone.utc), '%Y-%m')
-                    + '/'
-                    + datetime.strftime(datetime.now(timezone.utc), '%Y-%m-%d')
-                    + '.txt', 'a')
         # if data write to file
         if line:
-            timetowrite = (datetime.strftime(datetime.now(timezone.utc), '%Y-%m-%d')
-                        + " "
-                        + datetime.strftime(datetime.now(timezone.utc), '%H:%M:%S.%f'))
+            now = datetime.now(timezone.utc)
+            timetowrite = now.strftime('%Y-%m-%d %H:%M:%S.%f')
             texttowrite = (line.decode('utf-8', 'ignore').strip())
-
-            print(timetowrite
-                + ','
-                + texttowrite
-                , file = outfile)
+            with open_raw_file(build_raw_day_path(base_path, now, "ACM0")) as outfile:
+                print(timetowrite + ',' + texttowrite, file=outfile)
         
                         
 if __name__ == "__main__":

@@ -8,6 +8,7 @@ This project uses calendar versioning in the format `YYYY.MM.patch`.
 ## [Unreleased]
 
 ### Added
+- `scripts/AddRawHeaders.py`: preview and safely add column headers to historic and current raw event files while collectors are stopped, with byte-exact backups and atomic per-file replacement.
 - Phase 2 high-speed processing engine replacing the 9+ hour multi-pass bubble-sort:
   - `scripts/ProcessDaily.py`: Single-pass streaming daily parser that simultaneously computes 1,440-minute CPM, 288 5-minute Day records merged with NMDB neutron flux, 1,024-bin ADC energy spectra, 24 hourly L2 summaries with missing-event tracking, and daily quality metrics written to `data/daily/summary.csv`.
   - `scripts/ProcessPeriod.py`: Fast multi-day period aggregator producing week (7 days, 10-min bins, 1,008 rows), month (31 days, 1-hour bins, 744 rows), and 3-month (90 days, 1-day bins, 90 rows) derived products directly from 5-minute daily data in seconds instead of reading raw files. Enforces 90% completeness rule.
@@ -23,6 +24,7 @@ This project uses calendar versioning in the format `YYYY.MM.patch`.
 - Dynamic installation-root lookup for the legacy processing and plot scripts.
 
 ### Changed
+- Raw collectors write one column-header line to new or empty event files; current and legacy raw readers support both headered and headerless files without changing event counts or column order.
 - Correct daily web publishing to copy generated PNGs from `temp/`, not stale assets in `WWW/temp/`. Log source, destination and file count, fail explicitly when no PNGs exist, and capture pipeline/publishing command errors in `log-error.txt`. Published images have web-readable permissions.
 - `scripts/ProcessDaily.py` and `scripts/ProcessPeriod.py` support `--date` as an alias for `--target-date`.
 - `scripts/picomuon_common.py` resolves neutron files from both `data/neutrons/` and `data/NMDB/neutrons/`.

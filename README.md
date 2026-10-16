@@ -122,7 +122,67 @@ The code receives the event data from the UKRAA PicoMuon detector via serial ove
 
 The raw data will be processed overnight, via CRON, to get counts per minute, the frequency of the counts per minute and the frequency of the adc values for your previous day's data.
 
-Processed products are stored directly under `data/` in their own folders (for example, `data/cpm/`, `data/day/`, and `data/adc/`); they are no longer nested under `data/processed/`. Processed data files include a first-line column header, while raw event files retain their existing format.
+Processed products are stored directly under `data/` in their own folders (for example, `data/cpm/`, `data/day/`, and `data/adc/`); they are no longer nested under `data/processed/`. Processed data files and newly created raw event files include a first-line column header.
+
+### Raw event columns
+
+Raw files have this header:
+
+```text
+RPiTimestamp,Event,EventCount,ADC,Elapsed_ms,Dead_ms,Temp_C,Pres_hPa,DetectorName
+```
+
+| Column | Meaning |
+| --- | --- |
+| RPiTimestamp | Raspberry Pi UTC timestamp when the event was received |
+| Event | Top (`T`), bottom (`B`), or coincidence/muon (`C`) event |
+| EventCount | Detector's event counter |
+| ADC | Event pulse ADC value |
+| Elapsed_ms | Detector's reported elapsed-time counter, in milliseconds |
+| Dead_ms | Detector's reported dead-time counter, in milliseconds |
+| Temp_C | Detector temperature in degrees Celsius |
+| Pres_hPa | Detector pressure in hectopascals |
+| DetectorName | Detector identification string |
+
+The event rows and their column order are unchanged. Readers accept both headered and older headerless files. Appending to an existing headerless file does not insert a header mid-file; migrate it using the procedure below.
+
+### Adding headers to historic and current raw files
+
+Copy the revised scripts (including `picomuon_common.py`, both raw collectors, the raw readers, and `AddRawHeaders.py`) to the RPi first. Do not run this migration while a collector or another process is writing raw files.
+
+From the installation directory, preview which files need a header:
+
+```bash
+cd ~/UKRAA_PicoMuon
+python3 scripts/AddRawHeaders.py
+```
+
+Stop collection, then confirm it is stopped:
+
+```bash
+sudo systemctl stop PicoMuon.service
+systemctl is-active PicoMuon.service
+```
+
+The status must be `inactive`. If the legacy `PicoMuonACM0.service` is running, stop that too. Also stop any manually launched collectors. Run the migration as the account that owns the data:
+
+```bash
+python3 scripts/AddRawHeaders.py --apply --collectors-stopped
+```
+
+`--collectors-stopped` is your confirmation, not an automatic service check. The migration includes today's file, historic files and detector-labelled subfolders under `data/raw/`. Files in `data/raw/rejected/` are excluded because malformed serial rows do not have a fixed column schema.
+
+Each changed file gets a byte-exact `*.txt.pre-header.bak` backup alongside it. The original event bytes are preserved unchanged after the new header, and replacement is atomic per file. Keep enough free disk space for the backups and a temporary copy of the largest file. Re-running skips files that already have the header. If a backup already exists for a headerless file, the migration stops rather than overwriting it; investigate before retrying.
+
+Only after the migration succeeds, restart collection and check it:
+
+```bash
+sudo systemctl start PicoMuon.service
+systemctl is-active PicoMuon.service
+head -n 2 "data/raw/$(date -u +%Y/%Y-%m/%F).txt"
+```
+
+The service should be `active`. If using a detector label (including the legacy `ACM0` layout), include that folder between `raw/` and the year in the last command. Raw data collection pauses during migration; no missed events can be recovered by this procedure. There is no need to reprocess data just because a header was added.
 
 Three plots will be created:
 * counts per minute

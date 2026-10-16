@@ -8,7 +8,7 @@ import os
 from pathlib import Path
 import sys
 import time
-from typing import Optional, TextIO
+from typing import Optional, TextIO, Tuple
 
 import serial
 
@@ -18,6 +18,7 @@ from picomuon_common import (
     get_usb_options,
     log_error,
     log_message,
+    open_raw_file,
     utc_now,
     verify_usb_identity,
 )
@@ -93,8 +94,7 @@ def write_status_json(
 
 def open_daily_file(base_path: Path, current_time: datetime, label: Optional[str]) -> Tuple[TextIO, Path]:
     target_path = build_raw_day_path(base_path, current_time, label)
-    target_path.parent.mkdir(parents=True, exist_ok=True)
-    handle = open(target_path, mode="a", encoding="utf-8", buffering=1)
+    handle = open_raw_file(target_path)
     return handle, target_path
 
 

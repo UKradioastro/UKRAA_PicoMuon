@@ -26,6 +26,7 @@ from picomuon_common import (
     build_neutron_path,
     build_processed_day_path,
     build_raw_day_path,
+    raw_data_lines,
     get_base_path,
     get_target_date,
     get_usb_options,
@@ -143,7 +144,7 @@ def process_daily(target_date: date, base_path: Optional[Path] = None) -> int:
     prev_det_name: Optional[str] = None
 
     with raw_file.open(mode="r", encoding="utf-8", errors="replace") as rf:
-        for line in rf:
+        for line in raw_data_lines(rf):
             line = line.strip()
             if not line:
                 continue

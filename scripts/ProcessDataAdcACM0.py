@@ -3,7 +3,7 @@
 from datetime import datetime, timedelta
 import csv
 import os
-from picomuon_common import get_base_path
+from picomuon_common import get_base_path, raw_data_lines
 
 BASE_PATH = str(get_base_path())
 
@@ -80,7 +80,7 @@ for i in range(0, n):
 
     # using csv.DictReader
     RawFile = open(file=RawDataFile, mode='r', encoding='UTF-8')
-    RawCSV_reader = csv.DictReader(RawFile,RawFieldNames)
+    RawCSV_reader = csv.DictReader(raw_data_lines(RawFile),RawFieldNames)
 
     count_T = 0
     count_B = 0

@@ -77,7 +77,7 @@ config/  data/  plots/  logfiles/  temp/
 
 | Level | Path | Content | Written by |
 |-------|------|---------|------------|
-| L0 raw | `data/raw/YYYY/YYYY-MM/YYYY-MM-DD.txt` | **Unchanged** 9-field line format, no header line (decision 1) | `GetDataRaw.py` |
+| L0 raw | `data/raw/YYYY/YYYY-MM/YYYY-MM-DD.txt` | 9-field event rows preceded by a single column-header line (decision 1) | `GetDataRaw.py` |
 | L1 minute | `data/minute/YYYY/…/YYYY-MM-DD.csv` | `utc,T,B,C,live_s,temp,pres,adc_mean` | `ProcessDaily.py` |
 | L1 ADC | `data/adc/…` | ADC histogram for the day | `ProcessDaily.py` |
 | L2 hour | `data/hour/…` | Hourly counts, P, T, NMDB, **P- and PT-corrected** % deviation | `ProcessDaily.py` + `ApplyCorrections.py` |
@@ -625,7 +625,7 @@ P-corrected, and PT-corrected curves next to NMDB.
 
 | # | Question | Decision |
 |---|---|---|
-| 1 | Raw file format | **Keep unchanged:** 9 fields, no header line in the RPi day files. The header is already written to the detector's microSD card. |
+| 1 | Raw file format | **Revised 2026-10-16:** keep the 9 event fields unchanged and add one column-header line to RPi raw files. New files get the header automatically; migrate historic and current files with `AddRawHeaders.py` while collectors are stopped. Readers accept both formats. |
 | 2 | Folder layout | **Single detector:** `data/raw/YYYY/…` (as in the Magnetometer suite). **Optional multi-detector:** `data/raw/<label>/YYYY/…`, where the label is set once in `USB.ini` and bound to the by-id port. It is never taken from the live `DetectorName`, which users can rename (section 2b). |
 | 3 | Updater | **`updatePicoMuon.sh`**, as in the Magnetometer suite. |
 | 4 | Remote upload | **Plain FTP.** A `protocol` key is reserved so FTPS can be added later (section 3, Phase 5). |
