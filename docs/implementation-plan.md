@@ -127,13 +127,20 @@ Forbush decrease. With exposure known, the hour is either normalised
 (counts ÷ exposure) or flagged incomplete and left out of fits and alerts.
 That is the main benefit, rather than dead-time correction.
 
-### 2b. Multi-detector layout (decision 2 – proposal)
+### 2b. Multi-detector layout (decision 2 – target for Phase 2a)
+
+**Current implementation:** `ConfigureUSB.py` updates one `[usb]` selection
+in `config/USB.ini`; running it twice replaces that selection, rather than
+registering two detectors. A non-empty `label` directs the collector to
+`data/raw/<label>/...`, but does not create a second collector. Existing raw
+files are left where they are. The multi-detector behaviour below is a target,
+not an available feature yet.
 
 **Default (almost all users): one detector.** Use the same paths as the
 PicoMagnetometer suite, with no detector level:
 `data/raw/2026/2026-10/2026-10-09.txt`, `plots/day/…`, and so on.
 
-**Optional multi-detector mode.** It is enabled by listing more than one
+**Optional multi-detector mode (Phase 2a).** It will be enabled by listing more than one
 detector in `config/USB.ini`:
 
 ```ini
@@ -306,7 +313,63 @@ day.
 the outputs match the legacy outputs for a sample day. A pytest test compares
 them.
 
+### Phase 2a – Concurrent multi-detector support (before Phase 3)
+
+Phases 0-2 have implementation entries in the changelog; Phase 3 was the next
+planned feature. Insert this phase first: two physical detectors have now been
+recognised together on a powered USB hub, but simultaneous collection and
+processing are not yet wired end to end. The hub resolved USB enumeration;
+software configuration alone could not resolve that hardware issue.
+
+1. Extend `ConfigureUSB.py` and `USB.ini` to register and edit multiple
+   detectors without replacing previously configured units. Use the
+   `[detectors]` label-to-by-id mapping in section 2b, with per-detector USB
+   identity checks. Validate labels and reject duplicate physical devices,
+   including aliases resolving to the same device. Preserve existing `[usb]`
+   single-detector configurations and paths.
+2. Add `PicoMuon@.service`, with one collector instance per configured label.
+   Each instance selects exactly one detector and verifies its USB identity
+   before reading; an identity mismatch must not permit collection from the
+   wrong unit. Configure independent reconnect handling so unplugging one
+   detector does not interrupt the other. Installer/service transitions must
+   prevent the old single collector and a new instance reading the same port.
+3. Isolate all detector-specific outputs: raw and rejected rows, status,
+   logs, daily summaries, processed data, plots, temporary files and published
+   web assets. Raw files use `data/raw/unit_1/YYYY/YYYY-MM/YYYY-MM-DD.txt`
+   and `data/raw/unit_2/YYYY/YYYY-MM/YYYY-MM-DD.txt`, for example. No shared
+   status file, summary or generated filename may overwrite another unit's
+   output. Keep the default single-detector layout unchanged.
+4. Make daily, period and historical reprocessing operate on explicitly
+   selected detectors, with scheduled processing covering all configured
+   units. Scope locks appropriately and keep counts, exposure and summaries
+   separate. In multi-detector mode, do not silently fall back to another
+   detector's or an unlabelled raw file when input is missing.
+5. Provide separate web views/status for each detector. Establish the same
+   detector selection and output-path contract for Phase 3 rolling plots and
+   later publishing, alerts and science products; do not combine detector
+   counts implicitly.
+6. Provide a dry-run, explicit historical-data mapping when adopting labels.
+   Preserve original raw files, verify any copies and stop on conflicting
+   destination contents, following the Phase 7 migration safeguards. A
+   configuration change alone must never move or relabel historical data.
+   Handle a label change partway through a UTC day explicitly so subsequent
+   processing does not silently omit the earlier part of that day.
+7. Document setup, safe service transitions, historical-data handling and
+   powered-hub troubleshooting. Test two simulated serial streams, USB
+   reconnects and swapped ACM numbers, identity mismatches, duplicate
+   configurations, UTC rollover, output isolation, missing input and
+   single-detector compatibility.
+
+*Done when:* `unit_1` and `unit_2` record concurrently to distinct raw files
+using stable by-id identities; disconnecting either leaves the other recording;
+daily/period processing and web output remain separate; historical raw files
+remain intact; and the existing single-detector tests still pass. Confirm the
+two-detector collection and reconnect behaviour on the RPi before Phase 3.
+
 ### Phase 3 – Rolling 24-hour plot (item 4)
+- Depends on Phase 2a: run independently for each configured detector, using
+  its own raw input, rolling CSV, plot, status and published web location.
+  Retain the paths below for the default single-detector installation.
 - Cron runs every 5 minutes: `processRollingData.sh` → `ProcessRolling.py`.
   It reads only the tail of today's and yesterday's raw files (about 2 MB,
   under 1 s), writes `data/rolling/last24h.csv`, and runs `PlotRolling.gp`.
@@ -437,7 +500,8 @@ pytest covering:
 
 Update the README with the same section layout as the PicoMagnetometer README.
 
-**Suggested order:** 0 → 1 → 2 (biggest win) → 3 → 4 → 7 (so users can get
+**Suggested order:** 0 → 1 → 2 (biggest win) → 2a (multi-detector support) →
+3 → 4 → 7 (so users can get
 later phases by updating) → 5 → 6 → 8.
 
 ---
