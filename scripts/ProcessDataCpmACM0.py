@@ -30,7 +30,7 @@ RawDataFile   = BASE_PATH + "/data/raw/ACM0/" \
                  + ".txt"
 
 # Processed data path
-ProcessedPath = BASE_PATH + '/data/processed/cpm/ACM0/'\
+ProcessedPath = BASE_PATH + '/data/cpm/ACM0/'\
                 + datetime.strftime(datetime.now() - timedelta(1), '%Y') \
                 + "/" \
                 + datetime.strftime(datetime.now() - timedelta(1), '%Y-%m')
@@ -46,7 +46,7 @@ if not pathExists:
           ProcessedPath)
 
 # Processed data file name
-ProcessedDataFile = BASE_PATH + "/data/processed/cpm/ACM0/" \
+ProcessedDataFile = BASE_PATH + "/data/cpm/ACM0/" \
                      + datetime.strftime(datetime.now() - timedelta(1), '%Y') \
                      + "/" \
                      + datetime.strftime(datetime.now() - timedelta(1), '%Y-%m') \
@@ -90,6 +90,8 @@ n = 1440
 
 # open file to store data in and append to end
 ProcessedData = open(file=ProcessedDataFile, mode='a', encoding='UTF-8')
+if os.path.getsize(ProcessedDataFile) == 0:
+    ProcessedData.write("DateTime,Count_T,Count_B,Count_C\n")
 
 for i in range(1, n+1):
     # add a minute to each time value from 00:00:00 to 23:59:00

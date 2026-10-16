@@ -9,8 +9,7 @@ Reads yesterday's L0 raw file exactly once and generates:
 5. Appends to data/daily/summary.csv for multi-day period analysis and health checks.
 
 Backward compatibility:
-Writes to data/processed/cpm/ACM0, data/processed/day/ACM0, and data/processed/adc/ACM0
-so legacy gnuplot scripts continue to work without modification.
+Writes processed products to data/cpm/ACM0, data/day/ACM0, and data/adc/ACM0.
 """
 
 from __future__ import annotations
@@ -236,6 +235,7 @@ def process_daily(target_date: date, base_path: Optional[Path] = None) -> int:
     temp_cpm = cpm_out.with_suffix(".tmp")
 
     with temp_cpm.open(mode="w", encoding="utf-8") as out:
+        out.write("DateTime,Count_T,Count_B,Count_C\n")
         for m in range(1440):
             hh = m // 60
             mm = m % 60
@@ -251,6 +251,7 @@ def process_daily(target_date: date, base_path: Optional[Path] = None) -> int:
     temp_day = day_out.with_suffix(".tmp")
 
     with temp_day.open(mode="w", encoding="utf-8") as out:
+        out.write("DateTime,CPM_T,CPM_B,CPM_C,Mean_Temp,Mean_Pres,Neutrons\n")
         for b in range(288):
             min_start = b * 5
             hh = min_start // 60
@@ -290,6 +291,7 @@ def process_daily(target_date: date, base_path: Optional[Path] = None) -> int:
     temp_adc = adc_out.with_suffix(".tmp")
 
     with temp_adc.open(mode="w", encoding="utf-8") as out:
+        out.write("ADC_Value,Count_T,Count_B,Count_C\n")
         for adc_val in range(1024):
             cnt_T, cnt_B, cnt_C = adc_bins[adc_val]
             out.write(f"{adc_val},{cnt_T},{cnt_B},{cnt_C}\n")

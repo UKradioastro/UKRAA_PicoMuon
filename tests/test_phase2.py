@@ -127,8 +127,9 @@ class Phase2ProcessingTests(unittest.TestCase):
         cpm_file = build_processed_day_path(self.base_path, "cpm", self.target_date, "ACM0", "txt")
         self.assertTrue(cpm_file.exists())
         lines = cpm_file.read_text(encoding="utf-8").strip().splitlines()
-        self.assertEqual(len(lines), 1440)
-        first_cpm = lines[0].split(",")
+        self.assertEqual(lines[0], "DateTime,Count_T,Count_B,Count_C")
+        self.assertEqual(len(lines), 1441)
+        first_cpm = lines[1].split(",")
         self.assertEqual(first_cpm[0], "2026-10-09 00:00:00")
         if self.has_real_sample:
             self.assertEqual(first_cpm[1], "0")
@@ -143,8 +144,9 @@ class Phase2ProcessingTests(unittest.TestCase):
         day_file = build_processed_day_path(self.base_path, "day", self.target_date, "ACM0", "txt")
         self.assertTrue(day_file.exists())
         day_lines = day_file.read_text(encoding="utf-8").strip().splitlines()
-        self.assertEqual(len(day_lines), 288)
-        first_day = day_lines[0].split(",")
+        self.assertEqual(day_lines[0], "DateTime,CPM_T,CPM_B,CPM_C,Mean_Temp,Mean_Pres,Neutrons")
+        self.assertEqual(len(day_lines), 289)
+        first_day = day_lines[1].split(",")
         self.assertEqual(first_day[0], "2026-10-09 00:00:00")
         if self.has_real_sample:
             self.assertEqual(first_day[1], "nan")
@@ -160,8 +162,9 @@ class Phase2ProcessingTests(unittest.TestCase):
         adc_file = build_processed_day_path(self.base_path, "adc", self.target_date, "ACM0", "txt")
         self.assertTrue(adc_file.exists())
         adc_lines = adc_file.read_text(encoding="utf-8").strip().splitlines()
-        self.assertEqual(len(adc_lines), 1024)
-        bin_200 = adc_lines[200].split(",")
+        self.assertEqual(adc_lines[0], "ADC_Value,Count_T,Count_B,Count_C")
+        self.assertEqual(len(adc_lines), 1025)
+        bin_200 = adc_lines[201].split(",")
         self.assertEqual(bin_200[0], "200")
         if self.has_real_sample:
             self.assertEqual(bin_200[3], "14")
@@ -199,7 +202,6 @@ class Phase2ProcessingTests(unittest.TestCase):
             / "examples"
             / "UKRAA_PicoMuon"
             / "data"
-            / "processed"
             / "day"
             / "ACM0"
             / "2026"
@@ -218,7 +220,7 @@ class Phase2ProcessingTests(unittest.TestCase):
                 d = date(2026, 10, day_num)
                 dest_f = build_processed_day_path(self.base_path, "day", d, "ACM0", "txt")
                 dest_f.parent.mkdir(parents=True, exist_ok=True)
-                lines = []
+                lines = ["DateTime,CPM_T,CPM_B,CPM_C,Mean_Temp,Mean_Pres,Neutrons"]
                 for hour in range(24):
                     for minute in range(0, 60, 5):
                         ts = f"{d.strftime('%Y-%m-%d')} {hour:02d}:{minute:02d}:00"
@@ -231,9 +233,10 @@ class Phase2ProcessingTests(unittest.TestCase):
         week_file = build_processed_day_path(self.base_path, "week", self.target_date, "ACM0", "txt")
         self.assertTrue(week_file.exists())
         lines = week_file.read_text(encoding="utf-8").strip().splitlines()
-        self.assertEqual(len(lines), 1008)
+        self.assertEqual(lines[0], "DateTime,CPM_T,CPM_B,CPM_C,Mean_Temp,Mean_Pres,Neutrons")
+        self.assertEqual(len(lines), 1009)
 
-        first_week = lines[0].split(",")
+        first_week = lines[1].split(",")
         self.assertEqual(first_week[0], "2026-10-03 00:00:00")
         if sample_day_dir.exists():
             self.assertEqual(first_week[3], "143")

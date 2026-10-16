@@ -29,7 +29,7 @@ RawDataFile   = BASE_PATH + "/data/raw/ACM0/" \
                  + ".txt"
 
 # Processed data path
-ProcessedPath = BASE_PATH + '/data/processed/adc/ACM0/'\
+ProcessedPath = BASE_PATH + '/data/adc/ACM0/'\
                 + datetime.strftime(datetime.now() - timedelta(1), '%Y') \
                 + "/" \
                 + datetime.strftime(datetime.now() - timedelta(1), '%Y-%m')
@@ -45,7 +45,7 @@ if not pathExists:
           ProcessedPath)
 
 # Processed data file name
-ProcessedDataFile = BASE_PATH + "/data/processed/adc/ACM0/" \
+ProcessedDataFile = BASE_PATH + "/data/adc/ACM0/" \
                      + datetime.strftime(datetime.now() - timedelta(1), '%Y') \
                      + "/" \
                      + datetime.strftime(datetime.now() - timedelta(1), '%Y-%m') \
@@ -67,6 +67,8 @@ n = 1024
 
 # open file to store data in and append data
 ProcessedData = open(file=ProcessedDataFile, mode='a', encoding='UTF-8')
+if os.path.getsize(ProcessedDataFile) == 0:
+    ProcessedData.write("ADC_Value,Count_T,Count_B,Count_C\n")
 
 for i in range(0, n):
     # add bin size to Adc value from 0 to 4095

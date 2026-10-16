@@ -30,7 +30,7 @@ print "PlotDataWeekACM0.gp    : "\
     .system("date -d yesterday +'%Y-%m-%d'")
 
 # Set up data paths
-pathData        = basePath."/data/processed/week/ACM0"
+pathData        = basePath."/data/week/ACM0"
 
 # Year folder
 YearFolder      = "/".system("date -d yesterday +'%Y'")

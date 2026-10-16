@@ -33,17 +33,27 @@ DEBIAN_FRONTEND=noninteractive apt-get install -y \
     python3-pandas \
     python3-serial
 
+# Move existing processed products into the flat data directory layout.
+for category in 3month adc cpm day month week; do
+    legacy_path="$BASE_PATH/data/processed/$category"
+    flat_path="$BASE_PATH/data/$category"
+    if [ -d "$legacy_path" ] && [ ! -e "$flat_path" ]; then
+        mv "$legacy_path" "$flat_path"
+    fi
+done
+
 install -d -o "$PICOMUON_USER" -g "$PICOMUON_GROUP" -m 0755 \
     "$BASE_PATH/config" \
     "$BASE_PATH/data/raw" \
     "$BASE_PATH/data/raw/rejected" \
     "$BASE_PATH/data/status" \
     "$BASE_PATH/data/raw/ACM0" \
-    "$BASE_PATH/data/processed/adc/ACM0" \
-    "$BASE_PATH/data/processed/cpm/ACM0" \
-    "$BASE_PATH/data/processed/day/ACM0" \
-    "$BASE_PATH/data/processed/month/ACM0" \
-    "$BASE_PATH/data/processed/week/ACM0" \
+    "$BASE_PATH/data/3month/ACM0" \
+    "$BASE_PATH/data/adc/ACM0" \
+    "$BASE_PATH/data/cpm/ACM0" \
+    "$BASE_PATH/data/day/ACM0" \
+    "$BASE_PATH/data/month/ACM0" \
+    "$BASE_PATH/data/week/ACM0" \
     "$BASE_PATH/data/neutrons" \
     "$BASE_PATH/logfiles" \
     "$BASE_PATH/plots/adc/ACM0" \

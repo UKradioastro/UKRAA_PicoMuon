@@ -22,7 +22,7 @@ print('ProcessDataMonthACM0.py:', \
 
 # raw data file source
 for i in range(1, 32):
-    globals()['RawDataFile%s' % i] = BASE_PATH + '/data/processed/day/ACM0/' \
+    globals()['RawDataFile%s' % i] = BASE_PATH + '/data/day/ACM0/' \
                                      + datetime.strftime(datetime.now() - timedelta(i), '%Y') \
                                      + '/' \
                                      + datetime.strftime(datetime.now() - timedelta(i), '%Y-%m') \
@@ -42,7 +42,7 @@ MonthFieldNames    = ['DateTime', \
 
 
 # create months worth of data
-MonthPath = BASE_PATH + '/data/processed/month/ACM0/' \
+MonthPath = BASE_PATH + '/data/month/ACM0/' \
            + datetime.strftime(datetime.now() - timedelta(1), '%Y') \
            + "/" \
            + datetime.strftime(datetime.now() - timedelta(1), '%Y-%m')
@@ -58,7 +58,7 @@ if not pathExists:
           MonthPath)
 
 # Month data file name
-MonthDataFile = BASE_PATH + '/data/processed/month/ACM0/' \
+MonthDataFile = BASE_PATH + '/data/month/ACM0/' \
                + datetime.strftime(datetime.now() - timedelta(1), '%Y') \
                + "/" \
                + datetime.strftime(datetime.now() - timedelta(1), '%Y-%m') \
@@ -114,7 +114,7 @@ else:
     exit()
     
 # Processed data path
-ProcessedPath = BASE_PATH + '/data/processed/month/ACM0/'\
+ProcessedPath = BASE_PATH + '/data/month/ACM0/'\
                 + datetime.strftime(datetime.now() - timedelta(1), '%Y') \
                 + "/" \
                 + datetime.strftime(datetime.now() - timedelta(1), '%Y-%m')
@@ -130,7 +130,7 @@ if not pathExists:
           ProcessedPath)
 
 # Processed data file name
-ProcessedDataFile = BASE_PATH + "/data/processed/month/ACM0/" \
+ProcessedDataFile = BASE_PATH + "/data/month/ACM0/" \
                      + datetime.strftime(datetime.now() - timedelta(1), '%Y') \
                      + "/" \
                      + datetime.strftime(datetime.now() - timedelta(1), '%Y-%m') \
@@ -176,6 +176,8 @@ n = 744
 ProcessedData = open(file=ProcessedDataFile,
                      mode='a',
                      encoding='UTF-8')
+if os.path.getsize(ProcessedDataFile) == 0:
+    ProcessedData.write("DateTime,CPM_T,CPM_B,CPM_C,Mean_Temp,Mean_Pres,Neutrons\n")
 
 for i in range(1, n + 1):
     # add a minute to each time value from 00:00:00 to 23:59:00
@@ -201,6 +203,8 @@ for i in range(1, n + 1):
     count_N     = 0.0
 
     for MonthLine in MonthCSV_reader:
+        if MonthLine['DateTime'] == 'DateTime':
+            continue
         # try to get raw data after start StartBinTime
         # convert string to datetime.datetime format
         MonthDatetime = datetime.strptime(MonthLine['DateTime'], '%Y-%m-%d %H:%M:%S')

@@ -28,7 +28,7 @@ print "PlotDataCpmACM0.gp     : "\
     .system("date -d yesterday +'%Y-%m-%d'")
 
 # Set up data paths
-pathData = basePath."/data/processed/cpm/ACM0"
+pathData = basePath."/data/cpm/ACM0"
 
 # Year folder
 YearFolder = "/".system("date -d yesterday +'%Y'")

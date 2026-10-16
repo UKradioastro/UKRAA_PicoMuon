@@ -54,7 +54,7 @@ NeutronDataFile   = BASE_PATH + "/data/neutrons/" \
                  + ".txt"
 
 # Processed data path
-ProcessedPath = BASE_PATH + '/data/processed/day/ACM0/'\
+ProcessedPath = BASE_PATH + '/data/day/ACM0/'\
                 + datetime.strftime(datetime.now() - timedelta(1), '%Y') \
                 + "/" \
                 + datetime.strftime(datetime.now() - timedelta(1), '%Y-%m')
@@ -70,7 +70,7 @@ if not pathExists:
           ProcessedPath)
 
 # Processed data file name
-ProcessedDataFile = BASE_PATH + "/data/processed/day/ACM0/" \
+ProcessedDataFile = BASE_PATH + "/data/day/ACM0/" \
                      + datetime.strftime(datetime.now() - timedelta(1), '%Y') \
                      + "/" \
                      + datetime.strftime(datetime.now() - timedelta(1), '%Y-%m') \
@@ -115,6 +115,8 @@ n = 288
 
 # open file to store data in and append to end
 ProcessedData = open(file=ProcessedDataFile, mode='a', encoding='UTF-8')
+if os.path.getsize(ProcessedDataFile) == 0:
+    ProcessedData.write("DateTime,CPM_T,CPM_B,CPM_C,Mean_Temp,Mean_Pres,Neutrons\n")
 
 for i in range(1, n+1):
     # add a minute to each time value from 00:00:00 to 23:59:00

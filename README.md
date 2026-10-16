@@ -122,6 +122,8 @@ The code receives the event data from the UKRAA PicoMuon detector via serial ove
 
 The raw data will be processed overnight, via CRON, to get counts per minute, the frequency of the counts per minute and the frequency of the adc values for your previous day's data.
 
+Processed products are stored directly under `data/` in their own folders (for example, `data/cpm/`, `data/day/`, and `data/adc/`); they are no longer nested under `data/processed/`. Processed data files include a first-line column header, while raw event files retain their existing format.
+
 Three plots will be created:
 * counts per minute
 * frequency of counts per minute

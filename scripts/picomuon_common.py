@@ -189,11 +189,10 @@ def build_processed_day_path(
     detector_label: str = "ACM0",
     extension: str = "txt",
 ) -> Path:
-    """Build standard processed file path: data/processed/<category>/<detector>/YYYY/YYYY-MM/YYYY-MM-DD.<ext>"""
+    """Build standard processed file path: data/<category>/<detector>/YYYY/YYYY-MM/YYYY-MM-DD.<ext>"""
     return (
         base_path
         / "data"
-        / "processed"
         / category
         / detector_label
         / target_date.strftime("%Y")
@@ -232,5 +231,4 @@ def build_neutron_path(base_path: Path, target_date: date) -> Path:
 def build_daily_summary_path(base_path: Path) -> Path:
     """Build path to data/daily/summary.csv."""
     return base_path / "data" / "daily" / "summary.csv"
-
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Period data aggregator for UKRAA PicoMuon.
 
-Builds multi-day products from daily products (data/processed/day and data/daily/summary.csv):
+Builds multi-day products from daily products (data/day and data/daily/summary.csv):
 1. Week (7 days): 1008 lines (10-minute bins) for PlotDataWeekACM0.gp
    Format: YYYY-MM-DD HH:MM:00,cpm_T,cpm_B,cpm_M,avg_temp,avg_pres,neutrons
 2. Month (31 days): 744 lines (1-hour bins) for PlotDataMonthACM0.gp
@@ -160,6 +160,7 @@ def process_period_data(
     intervals_per_step = step_mins // 5
 
     with temp_out.open(mode="w", encoding="utf-8") as out:
+        out.write("DateTime,CPM_T,CPM_B,CPM_C,Mean_Temp,Mean_Pres,Neutrons\n")
         cur_bin_time = start_dt
         row_idx = 0
         num_rows = len(all_5min_rows)

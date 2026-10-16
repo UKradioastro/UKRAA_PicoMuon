@@ -74,10 +74,10 @@ for plot_script in \
 do
     case "$plot_script" in
         PlotDataWeekACM0.gp)
-            period_file="$BASE_PATH/data/processed/week/ACM0/$TARGET_YEAR/$TARGET_MONTH/$TARGET_DATE.txt"
+            period_file="$BASE_PATH/data/week/ACM0/$TARGET_YEAR/$TARGET_MONTH/$TARGET_DATE.txt"
             ;;
         PlotDataMonthACM0.gp)
-            period_file="$BASE_PATH/data/processed/month/ACM0/$TARGET_YEAR/$TARGET_MONTH/$TARGET_DATE.txt"
+            period_file="$BASE_PATH/data/month/ACM0/$TARGET_YEAR/$TARGET_MONTH/$TARGET_DATE.txt"
             ;;
         *)
             period_file=""
