@@ -13,12 +13,13 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
 
 from AddRawHeaders import add_header, main as migrate_main
 from GetDataRaw import open_daily_file
-from picomuon_common import RAW_HEADER, raw_data_lines
+from picomuon_common import LEGACY_RAW_HEADER, RAW_HEADER, raw_data_lines
+from picomuon_metadata import data_lines
 from ProcessDaily import process_daily
 
 
 EVENT = b"2026-10-09 00:00:01.000000,C,1,200,1000,0,22.0,1015.0,Detector"
-HEADER = (RAW_HEADER + "\n").encode("ascii")
+HEADER = (LEGACY_RAW_HEADER + "\n").encode("ascii")
 
 
 class RawHeaderTests(unittest.TestCase):
@@ -128,7 +129,7 @@ class RawHeaderTests(unittest.TestCase):
         for category, index in (("adc", 201), ("cpm", 1)):
             output = (self.base / "data" / category / "ACM0" / yesterday.strftime("%Y")
                       / yesterday.strftime("%Y-%m") / raw.name)
-            self.assertEqual(output.read_text().splitlines()[index].split(",")[-1], "1")
+            self.assertEqual(list(data_lines(output.read_text().splitlines()))[index].split(",")[-1], "1")
 
     def test_daily_outputs_identical_before_and_after_raw_migration(self):
         self.raw.write_bytes(EVENT + b"\n")

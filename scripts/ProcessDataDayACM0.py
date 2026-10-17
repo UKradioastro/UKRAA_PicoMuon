@@ -4,7 +4,9 @@
 from datetime import datetime, timedelta
 import csv
 import os
+from pathlib import Path
 from picomuon_common import get_base_path, raw_data_lines
+from picomuon_metadata import metadata_from_raw, write_metadata
 
 BASE_PATH = str(get_base_path())
 
@@ -116,6 +118,7 @@ n = 288
 # open file to store data in and append to end
 ProcessedData = open(file=ProcessedDataFile, mode='a', encoding='UTF-8')
 if os.path.getsize(ProcessedDataFile) == 0:
+    write_metadata(ProcessedData, metadata_from_raw(Path(RawDataFile)))
     ProcessedData.write("DateTime,CPM_T,CPM_B,CPM_C,Mean_Temp,Mean_Pres,Neutrons\n")
 
 for i in range(1, n+1):

@@ -1,0 +1,39 @@
+# Observation metadata for UKRAA PicoMuon
+# Non-empty fields except observer_email are embedded in raw/processed files.
+# Sharing those files discloses your name and location: use only the precision
+# you are happy to publish. Blank means unspecified, not zero.
+[Observatory]
+# Stable public identifier, especially useful if the station is renamed.
+station_id =
+observatory_name =
+# Decimal degrees, east/north positive, west/south negative.
+observatory_longitude =
+observatory_latitude =
+coordinate_datum = WGS84
+# Metres; state the height reference rather than mixing GPS and sea-level heights.
+observatory_altitude =
+altitude_reference = mean sea level
+observatory_location =
+# IANA timezone, e.g. Europe/London. Recorded event timestamps remain UTC.
+observatory_tz = UTC
+
+[Observer]
+observer_name =
+# Optional public identifier, e.g. ORCID.
+observer_id =
+# Private contact only: never copied into raw or processed data.
+observer_email =
+
+[Detector]
+# Optional descriptive metadata; update when the installation changes.
+detector_model =
+firmware_version =
+settings_units =
+calibration_date =
+calibration_reference =
+orientation =
+# Include units, e.g. mm, and identify top/bottom where different.
+scintillator_dimensions =
+detector_separation =
+shielding =
+notes =

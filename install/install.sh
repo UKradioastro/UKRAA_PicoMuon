@@ -73,6 +73,16 @@ elif [ -f "$BASE_PATH/config/USB.ini" ] && [ -f "$BASE_PATH/install/USB.ini.exam
         "python3 \"$BASE_PATH/scripts/MergeConfig.py\" \"$BASE_PATH/install/USB.ini.example\" \"$BASE_PATH/config/USB.ini\"" || true
 fi
 
+for name in legacy user; do
+    if [ ! -f "$BASE_PATH/config/$name.ini" ]; then
+        install -o "$PICOMUON_USER" -g "$PICOMUON_GROUP" -m 0600 \
+            "$BASE_PATH/install/$name.ini.example" "$BASE_PATH/config/$name.ini"
+    else
+        su -s /bin/bash "$PICOMUON_USER" -c \
+            "python3 \"$BASE_PATH/scripts/MergeConfig.py\" \"$BASE_PATH/install/$name.ini.example\" \"$BASE_PATH/config/$name.ini\""
+    fi
+done
+
 touch "$BASE_PATH/logfiles/log-PicoMuon.txt" "$BASE_PATH/logfiles/log-error.txt"
 chown "$PICOMUON_USER:$PICOMUON_GROUP" \
     "$BASE_PATH/logfiles/log-PicoMuon.txt" "$BASE_PATH/logfiles/log-error.txt"

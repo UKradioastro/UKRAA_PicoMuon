@@ -254,6 +254,16 @@ computes `T_eff` per hour (see section 5.2).
 6. **Logging (item 12):** two files, using the Magnetometer suite's format
    (`timestamp : source : message`, via `logging.sh` and the Python
    equivalent in `picomuon_common.py`).
+   - All new runtime lines use `YYYY-MM-DD HH:MM:SS UTC : process_name : message`
+     with process names padded to 26 characters. Multiline messages and
+     Python tracebacks are prefixed on each line.
+   - The shared shell command runner routes stdout/stderr to the normal/error
+     logs, preserves already formatted lines, waits for diagnostics to be
+     written and propagates non-zero exit codes. Gnuplot lifecycle messages
+     are written by the shell wrapper, not duplicated in the plot files.
+   - Daily processing, reprocessing and standalone plotting use the same
+     plot checks: absent period products are skips, absent daily inputs and
+     failed gnuplot commands are counted failures. Historic logs are unchanged.
    - `log-PicoMuon.txt` is the "good" log: Started/Completed lines and
      summaries, for example "2026-10-09: 21,177 C events, 1,440/1,440
      minutes, 0 missing events".

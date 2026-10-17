@@ -15,11 +15,15 @@ Writes processed products to data/cpm/ACM0, data/day/ACM0, and data/adc/ACM0.
 from __future__ import annotations
 
 import argparse
+import csv
 from datetime import date, datetime, timedelta, timezone
 import math
 from pathlib import Path
 import sys
 from typing import Dict, List, Optional, Tuple
+from picomuon_metadata import (
+    MetadataHistory, csv_line, read_metadata, split_payload, write_metadata,
+)
 
 from picomuon_common import (
     build_daily_summary_path,
@@ -142,16 +146,27 @@ def process_daily(target_date: date, base_path: Optional[Path] = None) -> int:
     prev_elapsed_ms: Optional[int] = None
     prev_hour_idx: Optional[int] = None
     prev_det_name: Optional[str] = None
+    history = MetadataHistory()
 
     with raw_file.open(mode="r", encoding="utf-8", errors="replace") as rf:
-        for line in raw_data_lines(rf):
+        for line in rf:
+            if history.consume_comment(line) or not list(raw_data_lines([line])):
+                continue
             line = line.strip()
             if not line:
                 continue
 
-            parts = [p.strip() for p in line.split(",")]
+            parts = [part.strip() for part in next(csv.reader([line]))]
             if len(parts) < 8:
                 continue
+            settings = None
+            if len(parts) >= 9:
+                try:
+                    payload, settings = split_payload(line.split(",", 1)[1])
+                except (ValueError, csv.Error) as exc:
+                    log_error(SCRIPT_NAME, f"Invalid raw metadata in {raw_file}: {exc}")
+                    continue
+                parts = [parts[0], *payload]
 
             # Parse datetime: YYYY-MM-DD HH:MM:SS.ffffff
             dt_str = parts[0]
@@ -183,6 +198,7 @@ def process_daily(target_date: date, base_path: Optional[Path] = None) -> int:
             det_name = parts[8] if len(parts) >= 9 else ""
             if det_name and not detector_name:
                 detector_name = det_name
+            history.add(dt_str, det_name, settings)
 
             total_events += 1
             pos_idx = 0 if pos == "T" else (1 if pos == "B" else 2)
@@ -236,6 +252,7 @@ def process_daily(target_date: date, base_path: Optional[Path] = None) -> int:
     temp_cpm = cpm_out.with_suffix(".tmp")
 
     with temp_cpm.open(mode="w", encoding="utf-8") as out:
+        write_metadata(out, history.metadata())
         out.write("DateTime,Count_T,Count_B,Count_C\n")
         for m in range(1440):
             hh = m // 60
@@ -252,6 +269,7 @@ def process_daily(target_date: date, base_path: Optional[Path] = None) -> int:
     temp_day = day_out.with_suffix(".tmp")
 
     with temp_day.open(mode="w", encoding="utf-8") as out:
+        write_metadata(out, history.metadata())
         out.write("DateTime,CPM_T,CPM_B,CPM_C,Mean_Temp,Mean_Pres,Neutrons\n")
         for b in range(288):
             min_start = b * 5
@@ -292,6 +310,7 @@ def process_daily(target_date: date, base_path: Optional[Path] = None) -> int:
     temp_adc = adc_out.with_suffix(".tmp")
 
     with temp_adc.open(mode="w", encoding="utf-8") as out:
+        write_metadata(out, history.metadata())
         out.write("ADC_Value,Count_T,Count_B,Count_C\n")
         for adc_val in range(1024):
             cnt_T, cnt_B, cnt_C = adc_bins[adc_val]
@@ -311,6 +330,7 @@ def process_daily(target_date: date, base_path: Optional[Path] = None) -> int:
     valid_hours = 0
 
     with temp_hour.open(mode="w", encoding="utf-8") as out:
+        write_metadata(out, history.metadata())
         out.write("DateTime,T,B,C,live_seconds,missing_events,temp,pres,neutrons\n")
         for h in range(24):
             ts_str = f"{date_str} {h:02d}:00:00"
@@ -353,22 +373,37 @@ def process_daily(target_date: date, base_path: Optional[Path] = None) -> int:
     coverage_pct = (valid_hours / 24.0) * 100.0
 
     summary_rows: Dict[str, str] = {}
+    summary_metadata = {}
     if summary_path.exists():
         with summary_path.open(mode="r", encoding="utf-8", errors="replace") as sf:
-            lines = sf.readlines()
-            for line in lines[1:]:
+            context = None
+            for line in sf:
+                if line.startswith("#"):
+                    context = read_metadata(line)
+                    continue
                 line = line.strip()
-                if line:
-                    parts = line.split(",")
-                    summary_rows[parts[0]] = line
+                if line and not line.startswith("DateTime,"):
+                    key = next(csv.reader([line]))[0]
+                    summary_rows[key] = line
+                    if context is not None:
+                        summary_metadata[key] = context
+                    context = None
 
-    new_row = f"{date_str} 00:00:00,{day_cnt_T},{day_cnt_B},{day_cnt_C},{mean_temp},{mean_pres},{valid_hours},{coverage_pct:.1f},{total_missing},{detector_name}"
+    new_row = csv_line([
+        f"{date_str} 00:00:00", day_cnt_T, day_cnt_B, day_cnt_C, mean_temp,
+        mean_pres, valid_hours, f"{coverage_pct:.1f}", total_missing, detector_name,
+    ])
     summary_rows[f"{date_str} 00:00:00"] = new_row
+    summary_metadata[f"{date_str} 00:00:00"] = history.metadata()
 
     temp_summary = summary_path.with_suffix(".tmp")
     with temp_summary.open(mode="w", encoding="utf-8") as sf:
         sf.write("DateTime,Count_T,Count_B,Count_C,Mean_Temp,Mean_Pres,ValidHours,CoveragePercent,MissingEvents,DetectorName\n")
         for key in sorted(summary_rows.keys()):
+            write_metadata(sf, summary_metadata.get(key, {
+                "schema_version": 1, "time_basis": "UTC", "segments": [],
+                "metadata_status": "unknown",
+            }))
             sf.write(f"{summary_rows[key]}\n")
     temp_summary.replace(summary_path)
 

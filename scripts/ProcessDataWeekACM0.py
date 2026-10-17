@@ -5,7 +5,8 @@ from datetime import datetime, timedelta
 import csv
 import os
 import shutil
-from picomuon_common import get_base_path
+from picomuon_common import build_processed_day_path, get_base_path
+from picomuon_metadata import data_lines, metadata_from_product, write_metadata
 
 BASE_PATH = str(get_base_path())
 
@@ -151,6 +152,14 @@ n = 1008
 # open file to store data in and append to end
 ProcessedData = open(file=ProcessedDataFile, mode='a', encoding='UTF-8')
 if os.path.getsize(ProcessedDataFile) == 0:
+    write_metadata(ProcessedData, {
+        "schema_version": 1, "time_basis": "UTC",
+        "daily_metadata": [
+            {"date": day.isoformat(), "metadata": metadata_from_product(
+                build_processed_day_path(get_base_path(), "day", day))}
+            for day in [(datetime.now() - timedelta(days=i)).date() for i in range(7, 0, -1)]
+        ],
+    })
     ProcessedData.write("DateTime,CPM_T,CPM_B,CPM_C,Mean_Temp,Mean_Pres,Neutrons\n")
 
 for i in range(1, n + 1):
@@ -163,7 +172,9 @@ for i in range(1, n + 1):
 
     # using csv.DictReader
     WeekFile = open(file=WeekDataFile, mode='r', encoding='UTF-8')
-    WeekCSV_reader = csv.DictReader(WeekFile,WeekFieldNames)
+    WeekCSV_reader = csv.DictReader(
+        (line for line in data_lines(WeekFile) if not line.startswith("DateTime,")),
+        WeekFieldNames)
 
     # set counters to zero
     count_T     = 0

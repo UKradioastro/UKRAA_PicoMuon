@@ -3,7 +3,9 @@
 from datetime import datetime, timedelta
 import csv
 import os
+from pathlib import Path
 from picomuon_common import get_base_path, raw_data_lines
+from picomuon_metadata import metadata_from_raw, write_metadata
 
 BASE_PATH = str(get_base_path())
 
@@ -68,6 +70,7 @@ n = 1024
 # open file to store data in and append data
 ProcessedData = open(file=ProcessedDataFile, mode='a', encoding='UTF-8')
 if os.path.getsize(ProcessedDataFile) == 0:
+    write_metadata(ProcessedData, metadata_from_raw(Path(RawDataFile)))
     ProcessedData.write("ADC_Value,Count_T,Count_B,Count_C\n")
 
 for i in range(0, n):

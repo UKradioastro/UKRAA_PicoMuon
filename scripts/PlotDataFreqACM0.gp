@@ -17,45 +17,27 @@ reset
 # Set terminal 
 set terminal pngcairo enhanced font "DejaVuSansCondensed, 10" rounded size 640,540 
 basePath = system("printf '%s' \"$PICOMUON_BASE_PATH\"")
+targetDate = system("date -u -d \"${PICOMUON_TARGET_DATE:-yesterday}\" +%F")
 
-# Set print to <stdout>
-set print "-"
-
-# print to log file
-print "PlotDataFreqACM0.gp    : "\
-    .system("date +'%Y/%m/%d %H:%M:%S'")\
-    ." : Started ACM0 frequency plot for "\
-    .system("date -d yesterday +'%Y-%m-%d'")
+# Logging and input checks are handled by run_logged_plot in logging.sh.
 
 # Set up data paths
 pathData = basePath."/data/cpm/ACM0"
 
 # Year folder
-YearFolder = "/".system("date -d yesterday +'%Y'")
+YearFolder = "/".targetDate[1:4]
 
 # YearMonth folder
-YearMonthFolder = "/".system("date -d yesterday +'%Y-%m'")
+YearMonthFolder = "/".targetDate[1:7]
 
 # YearMonthDay file
-YmdFile = "/".system("date -d yesterday +'%Y-%m-%d'").".txt"
+YmdFile = "/".targetDate.".txt"
 
 # date to be processed
-date = system("date -d yesterday +'%Y-%m-%d'")
+date = targetDate
 
 # Path to each data file for graphing
 FileData = pathData.YearFolder.YearMonthFolder.YmdFile
-
-# check if FileData exists - 0=exists, 1=doesn't exist, if doesn't exist then exit, with message
-is_missing = system("\"".basePath."/scripts/ismissing.sh\" \"".FileData."\"")
-if (is_missing == 1) { print "PlotDataFreqACM0.gp    : ".system("date +'%Y/%m/%d %H:%M:%S'").": ACM0 frequency data file missing, so..."; 
-    print "PlotDataFreqACM0.gp    : "\
-        .system("date +'%Y/%m/%d %H:%M:%S'")\
-        ." : **FAILED** to complete ACM0 frequency plot for "\
-        .system("date -d yesterday +'%Y-%m-%d'")
-    exit
-}
-
-# FileData exists - good to continue...
 
 # setting output path to include data stamp
 # top detector
@@ -68,14 +50,15 @@ pathPlot3 = basePath."/plots/freq/ACM0/".date."_Freq_M_plot.png"
 
 # Set separator to ","
 set datafile separator ","
+set datafile commentschars "#"
 
 # Title for graph
 # top detector
-GraphTitle1 = "Frequency of top SiPM counts per minute data for ".system("date -d yesterday +'%A %d %B %Y'")."\n Graph is updated every day at 9.30am \n"
+GraphTitle1 = "Frequency of top SiPM counts per minute data for ".system("date -u -d '".targetDate."' +'%A %d %B %Y'")."\n Graph is updated every day at 9.30am \n"
 # bottom detector
-GraphTitle2 = "Frequency of bottom SiPM counts per minute data for ".system("date -d yesterday +'%A %d %B %Y'")."\n Graph is updated every day at 9.30am \n"
+GraphTitle2 = "Frequency of bottom SiPM counts per minute data for ".system("date -u -d '".targetDate."' +'%A %d %B %Y'")."\n Graph is updated every day at 9.30am \n"
 # muons detected
-GraphTitle3 = "Frequency of muon counts per minute data for ".system("date -d yesterday +'%A %d %B %Y'")."\n Graph is updated every day at 9.30am \n"
+GraphTitle3 = "Frequency of muon counts per minute data for ".system("date -u -d '".targetDate."' +'%A %d %B %Y'")."\n Graph is updated every day at 9.30am \n"
 
 # Set format types
 set format x "%.1f"
@@ -185,12 +168,6 @@ set output pathPlot.".png"
 # replot graph to Plot folder with added date tag
 replot
 # end replot
-
-# print to log file
-print "PlotDataFreqACM0.gp    : "\
-    .system("date +'%Y/%m/%d %H:%M:%S'")\
-    ." : Completed ACM0 frequency plot for "\
-    .system("date -d yesterday +'%Y-%m-%d'")
 
 # This is important because it closes our output file.
 set output

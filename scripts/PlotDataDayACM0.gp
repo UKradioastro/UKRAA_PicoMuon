@@ -17,45 +17,28 @@ reset
 # Set terminal 
 set terminal pngcairo enhanced font "DejaVuSansCondensed, 10" rounded size 640,540 
 basePath = system("printf '%s' \"$PICOMUON_BASE_PATH\"")
+targetDate = system("date -u -d \"${PICOMUON_TARGET_DATE:-yesterday}\" +%F")
 
-# Set print to <stdout>
-set print "-"
-
-# print to log file
-print "PlotDataDayACM0.gp     : "\
-    .system("date +'%Y/%m/%d %H:%M:%S'")\
-    ." : Started ACM0 days % deviation plot for "\
-    .system("date -d yesterday +'%Y-%m-%d'")
+# Logging and input checks are handled by run_logged_plot in logging.sh.
 
 # Set up data paths
 pathData        = basePath."/data/day/ACM0"
 
 # Year folder
-YearFolder = "/".system("date -d yesterday +'%Y'")
+YearFolder = "/".targetDate[1:4]
 
 # YearMonth folder
-YearMonthFolder = "/".system("date -d yesterday +'%Y-%m'")
+YearMonthFolder = "/".targetDate[1:7]
 
 # YearMonthDay file
-YmdFile = "/".system("date -d yesterday +'%Y-%m-%d'").".txt"
+YmdFile = "/".targetDate.".txt"
 
 # Path to each data file for graphing
 FileData        = pathData.YearFolder.YearMonthFolder.YmdFile
 
-# check if FileData exists - 0=exists, 1=doesn't exist, if doesn't exist then exit, with message
-is_missing = system("\"".basePath."/scripts/ismissing.sh\" \"".FileData."\"")
-if (is_missing == 1) {print "PlotDataDayACM0.gp     : ".system("date +'%Y/%m/%d %H:%M:%S'")." : ACM0 days data file missing, so..."; 
-    print "PlotDataDayACM0.gp     : "\
-        .system("date +'%Y/%m/%d %H:%M:%S'")\
-        ." : **FAILED** to complete ACM0 days % deviation plot for "\
-        .system("date -d yesterday +'%Y-%m-%d'")
-    exit
-}
-
-# FileData exists - good to continue...
-
 # Set separator to ","
 set datafile separator ","
+set datafile commentschars "#"
 
 # undertake stats before setting timeformat and xdata
 stats FileData using 4 output prefix "MUON" nooutput
@@ -66,19 +49,19 @@ if (!exists("NEUTRON_min")) { NEUTRON_min = 1.0; NEUTRON_max = 1.0; NEUTRON_mean
 if (!exists("NEUTRON_mean") || NEUTRON_mean == 0.0) { NEUTRON_mean = 1.0; NEUTRON_min = 1.0; NEUTRON_max = 1.0 }
 
 # date to be processed
-date = system("date -d yesterday +'%Y-%m-%d'")
+date = targetDate
 
 # Start of X axis time
-StartXaxis = system("date -d '-1 day' +'%Y-%m-%d'")." 00:00:00"
+StartXaxis = targetDate." 00:00:00"
 
 # End of X axis time
-EndXaxis = system("date +'%Y-%m-%d'")." 00:00:00"
+EndXaxis = system("date -u -d '".targetDate." +1 day' +%F")." 00:00:00"
 
 # setting output path to include data stamp
 pathPlot3 = basePath."/plots/day/ACM0/".date."_day_plot.png"
 
 # Title for graph
-GraphTitle3 = "% change of muon and neutron count rate from mean count rate for ".system("date -d yesterday +'%A %d %B %Y'")."\n Graph is updated every day at 9.30am \n"
+GraphTitle3 = "% change of muon and neutron count rate from mean count rate for ".system("date -u -d '".targetDate."' +'%A %d %B %Y'")."\n Graph is updated every day at 9.30am \n"
 
 # Set data types
 set xdata time
@@ -161,12 +144,6 @@ set output pathPlot.".png"
 # replot graph to Plot folder with added date tag
 replot
 # end replot
-
-# print to log file
-print "PlotDataDayACM0.gp     : "\
-    .system("date +'%Y/%m/%d %H:%M:%S'")\
-    ." : Completed ACM0 days % deviation plot for "\
-    .system("date -d yesterday +'%Y-%m-%d'")
 
 # This is important because it closes our output file.
 set output

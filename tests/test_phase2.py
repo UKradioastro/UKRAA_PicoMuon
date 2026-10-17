@@ -17,6 +17,11 @@ from picomuon_common import (
 )
 from ProcessDaily import parse_arguments as parse_daily_args, process_daily
 from ProcessPeriod import parse_arguments as parse_period_args, process_period_data
+from picomuon_metadata import data_lines
+
+
+def read_csv_lines(path):
+    return list(data_lines(path.read_text(encoding="utf-8").strip().splitlines()))
 
 
 def generate_synthetic_raw_and_neutron(base_path: Path, target_date: date):
@@ -126,7 +131,7 @@ class Phase2ProcessingTests(unittest.TestCase):
         # Check CPM file (1440 lines)
         cpm_file = build_processed_day_path(self.base_path, "cpm", self.target_date, "ACM0", "txt")
         self.assertTrue(cpm_file.exists())
-        lines = cpm_file.read_text(encoding="utf-8").strip().splitlines()
+        lines = read_csv_lines(cpm_file)
         self.assertEqual(lines[0], "DateTime,Count_T,Count_B,Count_C")
         self.assertEqual(len(lines), 1441)
         first_cpm = lines[1].split(",")
@@ -143,7 +148,7 @@ class Phase2ProcessingTests(unittest.TestCase):
         # Check Day file (288 lines)
         day_file = build_processed_day_path(self.base_path, "day", self.target_date, "ACM0", "txt")
         self.assertTrue(day_file.exists())
-        day_lines = day_file.read_text(encoding="utf-8").strip().splitlines()
+        day_lines = read_csv_lines(day_file)
         self.assertEqual(day_lines[0], "DateTime,CPM_T,CPM_B,CPM_C,Mean_Temp,Mean_Pres,Neutrons")
         self.assertEqual(len(day_lines), 289)
         first_day = day_lines[1].split(",")
@@ -161,7 +166,7 @@ class Phase2ProcessingTests(unittest.TestCase):
         # Check ADC file (1024 lines)
         adc_file = build_processed_day_path(self.base_path, "adc", self.target_date, "ACM0", "txt")
         self.assertTrue(adc_file.exists())
-        adc_lines = adc_file.read_text(encoding="utf-8").strip().splitlines()
+        adc_lines = read_csv_lines(adc_file)
         self.assertEqual(adc_lines[0], "ADC_Value,Count_T,Count_B,Count_C")
         self.assertEqual(len(adc_lines), 1025)
         bin_200 = adc_lines[201].split(",")
@@ -181,13 +186,13 @@ class Phase2ProcessingTests(unittest.TestCase):
             / "2026-10-09.csv"
         )
         self.assertTrue(hour_file.exists())
-        hour_lines = hour_file.read_text(encoding="utf-8").strip().splitlines()
+        hour_lines = read_csv_lines(hour_file)
         self.assertEqual(len(hour_lines), 25)
 
         # Check summary.csv
         summary_file = build_daily_summary_path(self.base_path)
         self.assertTrue(summary_file.exists())
-        summary_lines = summary_file.read_text(encoding="utf-8").strip().splitlines()
+        summary_lines = read_csv_lines(summary_file)
         self.assertEqual(len(summary_lines), 2)
         parts = summary_lines[1].split(",")
         self.assertEqual(parts[0], "2026-10-09 00:00:00")
@@ -232,7 +237,7 @@ class Phase2ProcessingTests(unittest.TestCase):
 
         week_file = build_processed_day_path(self.base_path, "week", self.target_date, "ACM0", "txt")
         self.assertTrue(week_file.exists())
-        lines = week_file.read_text(encoding="utf-8").strip().splitlines()
+        lines = read_csv_lines(week_file)
         self.assertEqual(lines[0], "DateTime,CPM_T,CPM_B,CPM_C,Mean_Temp,Mean_Pres,Neutrons")
         self.assertEqual(len(lines), 1009)
 
@@ -286,7 +291,7 @@ class Phase2ProcessingTests(unittest.TestCase):
 
         self.assertEqual(process_daily(self.target_date, self.base_path), 0)
         summary_path = build_daily_summary_path(self.base_path)
-        summary_row = summary_path.read_text(encoding="utf-8").splitlines()[1]
+        summary_row = read_csv_lines(summary_path)[1]
         self.assertEqual(summary_row.split(",")[8], "1")
 
     def test_period_with_insufficient_history_is_skipped(self):

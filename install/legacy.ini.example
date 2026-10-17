@@ -1,0 +1,10 @@
+# legacy serial data for UKRAA PicoMuon
+# Set these to the detector's actual settings before starting collection.
+# Used ONLY when the detector omits all four settings; never for historical backfill.
+# Values must be non-negative integers in the units used by the detector firmware.
+# Restart collection after editing if you need an unambiguous observation boundary.
+[legacy]
+threshold_top = 200
+reset_top = 100
+threshold_bottom = 200
+reset_bottom = 100

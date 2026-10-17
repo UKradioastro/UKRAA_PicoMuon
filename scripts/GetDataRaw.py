@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 from datetime import datetime, timezone
+import configparser
+import csv
 import json
 import os
 from pathlib import Path
@@ -11,6 +13,7 @@ import time
 from typing import Optional, TextIO, Tuple
 
 import serial
+from picomuon_metadata import RawEventWriter, split_payload
 
 from picomuon_common import (
     build_raw_day_path,
@@ -27,12 +30,10 @@ PROCESS_NAME = "GetDataRaw.py"
 
 
 def parse_and_validate_line(line_str: str) -> Optional[tuple[str, str, int, int, int, int, float, float, str]]:
-    """Validate 8-field serial payload from detector:
-    Event,EventCount,ADC,Elapsed_ms,Dead_ms,Temp_C,Pres_hPa,DetectorName
-    The 8th element (DetectorName) can contain arbitrary characters; we split on up to 7 commas.
-    """
-    parts = line_str.split(",", 7)
-    if len(parts) != 8:
+    """Validate either legacy 8-field or extended 12-field detector payloads."""
+    try:
+        parts, _ = split_payload(line_str)
+    except (ValueError, csv.Error):
         return None
 
     event, event_count_s, adc_s, elapsed_s, dead_s, temp_s, pres_s, detector_name = parts
@@ -110,6 +111,7 @@ def main() -> None:
     usb_options = get_usb_options(base_path)
     serial_port = usb_options["serial_port"]
     label = usb_options["label"] or None
+    writer = RawEventWriter(base_path)
 
     log_message(PROCESS_NAME, f"Starting raw data collector on {serial_port}")
 
@@ -210,10 +212,12 @@ def main() -> None:
                         )
                         known_detector_name = det_name
 
-                    # Write valid 9-field row: RPiTimestamp,Event,EventCount,ADC,Elapsed_ms,Dead_ms,Temp_C,Pres_hPa,DetectorName
-                    # buffering=1 and flush() ensure data is written immediately
                     if file_handle:
-                        print(f"{timestamp_str},{line_str}", file=file_handle, flush=True)
+                        try:
+                            writer.write(file_handle, timestamp_str, line_str)
+                        except (OSError, ValueError, configparser.Error) as exc:
+                            log_error(PROCESS_NAME, f"Cannot record detector metadata: {exc}")
+                            raise SystemExit(1) from exc
                         events_today += 1
 
                     # Update status JSON periodically (at most once every 5 seconds)

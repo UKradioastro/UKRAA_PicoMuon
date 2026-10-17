@@ -8,6 +8,8 @@ This project uses calendar versioning in the format `YYYY.MM.patch`.
 ## [Unreleased]
 
 ### Added
+- Backward-compatible 8/12-field detector capture: append legacy settings from `config/legacy.ini` only when absent, preserve detector-reported settings, reject malformed suffixes, and record capture-time public observation metadata without observer email.
+- Self-contained metadata comments in daily, hourly, summary and period products, preserving consecutive settings/source changes and historical unknowns without altering numerical columns. Installer provisions/merges legacy and observation templates.
 - `scripts/AddRawHeaders.py`: preview and safely add column headers to historic and current raw event files while collectors are stopped, with byte-exact backups and atomic per-file replacement.
 - Phase 2 high-speed processing engine replacing the 9+ hour multi-pass bubble-sort:
   - `scripts/ProcessDaily.py`: Single-pass streaming daily parser that simultaneously computes 1,440-minute CPM, 288 5-minute Day records merged with NMDB neutron flux, 1,024-bin ADC energy spectra, 24 hourly L2 summaries with missing-event tracking, and daily quality metrics written to `data/daily/summary.csv`.
@@ -24,6 +26,8 @@ This project uses calendar versioning in the format `YYYY.MM.patch`.
 - Dynamic installation-root lookup for the legacy processing and plot scripts.
 
 ### Changed
+- Standardise runtime logs as UTC timestamp, aligned process name and message. Shared command logging formats external diagnostics without double-prefixing existing entries, preserves exit codes and prefixes multiline Python messages and tracebacks.
+- Daily processing, reprocessing and standalone plotting share gnuplot logging and input checks. Missing period products are skipped, real plot failures count towards the final failure status, and plots use the requested UTC target date.
 - Raw collectors write one column-header line to new or empty event files; current and legacy raw readers support both headered and headerless files without changing event counts or column order.
 - Correct daily web publishing to copy generated PNGs from `temp/`, not stale assets in `WWW/temp/`. Log source, destination and file count, fail explicitly when no PNGs exist, and capture pipeline/publishing command errors in `log-error.txt`. Published images have web-readable permissions.
 - `scripts/ProcessDaily.py` and `scripts/ProcessPeriod.py` support `--date` as an alias for `--target-date`.

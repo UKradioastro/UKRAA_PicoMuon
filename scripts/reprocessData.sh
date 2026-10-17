@@ -131,27 +131,6 @@ if [ "$DRY_RUN" = "true" ]; then
     exit 0
 fi
 
-run_as_owner() {
-    # If already running as the file owner, execute directly without su/password prompt
-    if [ "$(id -un 2>/dev/null || true)" = "$PICOMUON_FILE_OWNER" ]; then
-        (
-            export PICOMUON_BASE_PATH="$BASE_PATH" TZ=UTC TERM=dumb
-            cd "$BASE_PATH"
-            "$@"
-        )
-        return $?
-    fi
-
-    local command_text=""
-    local argument
-    for argument in "$@"; do
-        printf -v argument '%q' "$argument"
-        command_text+="$argument "
-    done
-    su -s /bin/bash "$PICOMUON_FILE_OWNER" -c \
-        "export PICOMUON_BASE_PATH=$(printf '%q' "$BASE_PATH") TZ=UTC TERM=dumb; cd $(printf '%q' "$BASE_PATH") && $command_text"
-}
-
 log_msg "Started reprocessing ${#TARGET_DATES[@]} day(s) from ${TARGET_DATES[0]} to ${TARGET_DATES[-1]}"
 
 FAILURES=0
@@ -161,7 +140,7 @@ TOTAL=${#TARGET_DATES[@]}
 for day in "${TARGET_DATES[@]}"; do
     COUNT=$((COUNT + 1))
     printf '[%d/%d] Reprocessing %s\n' "$COUNT" "$TOTAL" "$day"
-    if ! run_as_owner "$PYTHON" "$BASE_PATH/scripts/ProcessDaily.py" --target-date "$day" >> "$MAIN_LOG" 2>> "$ERROR_LOG"; then
+    if ! run_logged_command "ProcessDaily.py" run_as_owner "$PYTHON" "$BASE_PATH/scripts/ProcessDaily.py" --target-date "$day"; then
         log_err "FAILED daily reprocessing for $day"
         FAILURES=$((FAILURES + 1))
     fi
@@ -169,7 +148,7 @@ done
 
 if [ "$RUN_PERIOD" = "true" ]; then
     log_msg "Refreshing period products for ${TO_DATE}"
-    if run_as_owner "$PYTHON" "$BASE_PATH/scripts/ProcessPeriod.py" --target-date "$TO_DATE" >> "$MAIN_LOG" 2>> "$ERROR_LOG"; then
+    if run_logged_command "ProcessPeriod.py" run_as_owner "$PYTHON" "$BASE_PATH/scripts/ProcessPeriod.py" --target-date "$TO_DATE"; then
         log_msg "Completed period products refresh"
     else
         log_err "FAILED period products refresh"
@@ -187,7 +166,7 @@ if [ "$RUN_PLOTS" = "true" ]; then
         PlotDataWeekACM0.gp \
         PlotDataMonthACM0.gp
     do
-        run_as_owner "$GNUPLOT" "$BASE_PATH/scripts/$plot_script" >> "$MAIN_LOG" 2>> "$ERROR_LOG" || FAILURES=$((FAILURES + 1))
+        run_logged_plot "$plot_script" "$TO_DATE" || FAILURES=$((FAILURES + 1))
     done
 fi
 

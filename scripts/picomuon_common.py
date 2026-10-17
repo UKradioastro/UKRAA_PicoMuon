@@ -9,13 +9,15 @@ from pathlib import Path
 import re
 import subprocess
 import sys
+import traceback
 from typing import Any, Dict, Iterable, Iterator, Optional, TextIO, Tuple
 
 _VERSION_PATTERN = re.compile(r"^\d{4}\.(0[1-9]|1[0-2])\.\d+$")
 
 # Column width for process name in aligned log format
 LOG_PROCESS_WIDTH = 26
-RAW_HEADER = "RPiTimestamp,Event,EventCount,ADC,Elapsed_ms,Dead_ms,Temp_C,Pres_hPa,DetectorName"
+LEGACY_RAW_HEADER = "RPiTimestamp,Event,EventCount,ADC,Elapsed_ms,Dead_ms,Temp_C,Pres_hPa,DetectorName"
+RAW_HEADER = LEGACY_RAW_HEADER + ",threshold_top,reset_top,threshold_bottom,reset_bottom"
 
 
 def open_raw_file(path: Path) -> TextIO:
@@ -34,7 +36,7 @@ def open_raw_file(path: Path) -> TextIO:
 def raw_data_lines(lines: Iterable[str]) -> Iterator[str]:
     """Read both historic headerless and headered raw event files."""
     for line in lines:
-        if line.rstrip("\r\n") != RAW_HEADER:
+        if not line.startswith("#") and line.rstrip("\r\n") not in (RAW_HEADER, LEGACY_RAW_HEADER):
             yield line
 
 
@@ -81,19 +83,23 @@ def format_log_entry(timestamp: datetime, process_name: str, message: str) -> st
 
 def log_message(process_name: str, message: str) -> None:
     """Print aligned informational log message to stdout."""
-    print(format_log_entry(utc_now(), process_name, message), flush=True)
+    timestamp = utc_now()
+    for line in message.splitlines() or [""]:
+        print(format_log_entry(timestamp, process_name, line), flush=True)
 
 
 def log_error(process_name: str, message: str) -> None:
     """Print aligned error log message to stderr."""
-    print(format_log_entry(utc_now(), process_name, message), file=sys.stderr, flush=True)
+    timestamp = utc_now()
+    for line in message.splitlines() or [""]:
+        print(format_log_entry(timestamp, process_name, line), file=sys.stderr, flush=True)
 
 
 def _log_uncaught_exception(exc_type: Any, exc_value: Any, exc_traceback: Any) -> None:
     """Ensure unhandled Python exceptions produce a timestamped entry in log-error.txt."""
     script_name = Path(sys.argv[0]).name if sys.argv and sys.argv[0] else "python"
     log_error(script_name, f"ERROR - unhandled {exc_type.__name__}: {exc_value}")
-    sys.__excepthook__(exc_type, exc_value, exc_traceback)
+    log_error(script_name, "".join(traceback.format_exception(exc_type, exc_value, exc_traceback)))
 
 
 sys.excepthook = _log_uncaught_exception

@@ -122,14 +122,39 @@ The code receives the event data from the UKRAA PicoMuon detector via serial ove
 
 The raw data will be processed overnight, via CRON, to get counts per minute, the frequency of the counts per minute and the frequency of the adc values for your previous day's data.
 
-Processed products are stored directly under `data/` in their own folders (for example, `data/cpm/`, `data/day/`, and `data/adc/`); they are no longer nested under `data/processed/`. Processed data files and newly created raw event files include a first-line column header.
+Processed products are stored directly under `data/` in their own folders (for example, `data/cpm/`, `data/day/`, and `data/adc/`); they are no longer nested under `data/processed/`. Files have a column header. Processed products also contain metadata comments, described below.
+
+### Observation and legacy detector configuration
+
+The installer creates `config/legacy.ini` and `config/user.ini` from the templates in `install/`, without overwriting existing values. For a manual upgrade, copy `install/legacy.ini.example` and `install/user.ini.example` to those configuration paths if they do not already exist. Stop collection before upgrading, configure the files, then restart the service.
+
+**Check all four values in `config/legacy.ini` against your detector's actual settings before collecting data.** The example values are not a calibration or an automatic measurement. The collector accepts either:
+
+```text
+Event,EventCount,ADC,Elapsed_ms,Dead_ms,Temp_C,Pres_hPa,DetectorName
+Event,EventCount,ADC,Elapsed_ms,Dead_ms,Temp_C,Pres_hPa,DetectorName,threshold_top,reset_top,threshold_bottom,reset_bottom
+```
+
+When the detector provides all four settings, those values take precedence. When it omits all four, the collector reads them from `[legacy]` in `config/legacy.ini`. Values must be non-negative integers in the firmware's native units; no unverified upper limit or threshold/reset relationship is imposed. Partial or invalid setting suffixes are rejected, not silently replaced. A missing or invalid legacy configuration stops collection with a logged error when an old-format event needs it. New-format detectors do not require this file.
+
+Use CSV quoting if a detector name contains commas, particularly a numeric suffix. A limited compatibility path accepts historic unquoted names such as `MyDetector,Unit1`, but an unquoted numeric suffix is ambiguous with partial settings and is rejected. Stored names are CSV-escaped.
+
+Fill in `config/user.ini` with information you are willing to share:
+
+- Station identifier, name, location, decimal-degree latitude/longitude (north/east positive), coordinate datum, and altitude in metres with its height reference.
+- Observer name and optional public identifier (for example ORCID).
+- Detector model, firmware version, settings units, calibration reference/date, orientation, scintillator dimensions, detector separation, shielding, and installation notes.
+
+Blank values mean unspecified, not zero. Latitude and longitude must be finite numbers within their geographic ranges; altitude must be finite. `observatory_tz` describes the site timezone (for example `Europe/London`); recorded timestamps remain UTC. **Non-empty public fields, including names and coordinates, are embedded in data files.** Choose location precision accordingly. `observer_email` is private contact information and is never copied into raw or processed metadata. No uploading is implemented.
+
+The collector saves a snapshot when these public details, the detector name, the settings, or their source change. Configuration files are reread for each event, so subsequent events use edits without requiring a restart. Metadata is emitted again in each new daily file. This preserves what was known at collection time rather than applying today's settings or location to older observations.
 
 ### Raw event columns
 
 Raw files have this header:
 
 ```text
-RPiTimestamp,Event,EventCount,ADC,Elapsed_ms,Dead_ms,Temp_C,Pres_hPa,DetectorName
+RPiTimestamp,Event,EventCount,ADC,Elapsed_ms,Dead_ms,Temp_C,Pres_hPa,DetectorName,threshold_top,reset_top,threshold_bottom,reset_bottom
 ```
 
 | Column | Meaning |
@@ -143,8 +168,28 @@ RPiTimestamp,Event,EventCount,ADC,Elapsed_ms,Dead_ms,Temp_C,Pres_hPa,DetectorNam
 | Temp_C | Detector temperature in degrees Celsius |
 | Pres_hPa | Detector pressure in hectopascals |
 | DetectorName | Detector identification string |
+| threshold_top | Top detector threshold setting |
+| reset_top | Top detector reset setting |
+| threshold_bottom | Bottom detector threshold setting |
+| reset_bottom | Bottom detector reset setting |
 
-The event rows and their column order are unchanged. Readers accept both headered and older headerless files. Appending to an existing headerless file does not insert a header mid-file; migrate it using the procedure below.
+New events always contain these 13 columns, including the Raspberry Pi timestamp. Readers accept old 9-column events and the new 13-column events, with or without headers. Existing event bytes are not rewritten: on the first new write to an old-format or headerless file, the collector appends the extended column header and a metadata snapshot before new events. Such a transition file can therefore contain both row widths and repeated headers. PicoMuon readers ignore both header formats and `#` comment lines.
+
+### Metadata in processed and shared data
+
+Metadata belongs in a labelled preamble, **not in the column names**. CPM, day, ADC, hourly and period products include a line beginning `# picomuon_metadata: ` containing a JSON object, followed by the ordinary, unchanged CSV column header. For example, a compact daily file can begin:
+
+```text
+# picomuon_metadata: {"schema_version":1,"time_basis":"UTC","segments":[{"detector_name":"Detector","settings":{"threshold_top":200,"reset_top":100,"threshold_bottom":200,"reset_bottom":100},"settings_source":"legacy.ini","observation":{},"first_event_utc":"2026-10-16 00:00:01.000000","last_event_utc":"2026-10-16 00:00:01.000000","event_count":1}]}
+DateTime,Count_T,Count_B,Count_C
+2026-10-16 00:00:00,0,0,1
+```
+
+Each consecutive configuration segment records the detector, all four settings, their source (`detector`, `legacy.ini` or `unknown`), public observation details, first/last event timestamps and event count. These timestamps bound observed events, not the precise instant a setting was changed. A file can contain multiple segments; do not assume one setting applies throughout a day, ADC spectrum or aggregate bin. Numerical products remain aggregated as before; use the raw events if you need to split them by configuration.
+
+Period products carry the metadata of each available source day. `data/daily/summary.csv` keeps its ordinary header and places a metadata comment immediately before each day's row; reprocessing one day preserves the other days' metadata. Older files without capture-time metadata retain unknown settings/location: historical reprocessing does **not** guess from current INI files. Unknown settings are JSON `null`.
+
+This keeps each shared file self-contained, including changes during the observation. Existing files gain processed metadata when reprocessed; no historical metadata can be recovered if it was never recorded. Gnuplot ignores `#` comments. For external readers, filter comment lines before CSV parsing, or use `pandas.read_csv(path, comment="#")`. The legacy processing scripts also accept these comments; existing non-empty outputs from their append-only workflow must be removed or archived before regeneration.
 
 ### Adding headers to historic and current raw files
 
@@ -172,7 +217,7 @@ python3 scripts/AddRawHeaders.py --apply --collectors-stopped
 
 `--collectors-stopped` is your confirmation, not an automatic service check. The migration includes today's file, historic files and detector-labelled subfolders under `data/raw/`. Files in `data/raw/rejected/` are excluded because malformed serial rows do not have a fixed column schema.
 
-Each changed file gets a byte-exact `*.txt.pre-header.bak` backup alongside it. The original event bytes are preserved unchanged after the new header, and replacement is atomic per file. Keep enough free disk space for the backups and a temporary copy of the largest file. Re-running skips files that already have the header. If a backup already exists for a headerless file, the migration stops rather than overwriting it; investigate before retrying.
+Each changed file gets a byte-exact `*.txt.pre-header.bak` backup alongside it. The original event bytes are preserved unchanged after the new header, and replacement is atomic per file. The migration chooses the old or extended header to match the first event; it does not add missing settings or invent historical metadata. Keep enough free disk space for the backups and a temporary copy of the largest file. Re-running skips files that already have either recognised header. If a backup already exists for a headerless file, the migration stops rather than overwriting it; investigate before retrying.
 
 Only after the migration succeeds, restart collection and check it:
 
@@ -183,6 +228,26 @@ head -n 2 "data/raw/$(date -u +%Y/%Y-%m/%F).txt"
 ```
 
 The service should be `active`. If using a detector label (including the legacy `ACM0` layout), include that folder between `raw/` and the year in the last command. Raw data collection pauses during migration; no missed events can be recovered by this procedure. There is no need to reprocess data just because a header was added.
+
+### Log format
+
+New runtime entries use UTC timestamps and an aligned process name:
+
+```text
+2026-10-16 17:44:19 UTC : ProcessDaily.py            : Completed processing for 2026-10-15
+2026-10-16 17:44:20 UTC : PlotDataWeekACM0.gp        : Skipped: no week product for 2026-10-15 (see period-processing entries)
+2026-10-16 17:44:21 UTC : PlotDataDayACM0.gp         : ERROR: command failed (exit code 1)
+```
+
+- `logfiles/log-PicoMuon.txt` contains normal progress, completions, summaries and expected skips.
+- `logfiles/log-error.txt` contains errors, warnings and command diagnostics.
+- Python uses the shared logging functions in `scripts/picomuon_common.py`. Shell scripts use `scripts/logging.sh`, which also runs external commands, formats each output line and preserves failure exit codes. Already formatted lines are not prefixed a second time. Python tracebacks retain their details with the same prefix on every line.
+- The collector service routes stdout/stderr to the two logs. Daily processing, reprocessing, plotting and cron use the shared command wrapper for the same routing, including gnuplot diagnostics.
+- Plot Started/Completed/Skipped messages come from the shell wrapper rather than the gnuplot files. Missing week/month products are skipped; missing required daily products and non-zero gnuplot exits are failures. Failure counts and final exit statuses reflect these failures.
+- Use `bash scripts/plots.sh [YYYY-MM-DD]` to run plots with logging. Reprocessing with `--plot` uses its requested end date for plot inputs, titles and time ranges.
+- Historic log entries are not rewritten.
+
+For a WinSCP update, upload the revised shell and Python scripts together with all six `PlotData*.gp` scripts; the plot scripts and wrapper must be updated together. Restart `PicoMuon.service` after updating `picomuon_common.py` so the running collector loads the revised logging helper. No raw-data migration or reprocessing is needed just for the logging update.
 
 Three plots will be created:
 * counts per minute

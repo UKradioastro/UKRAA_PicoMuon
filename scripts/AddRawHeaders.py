@@ -4,21 +4,23 @@
 from __future__ import annotations
 
 import argparse
+import csv
 import os
 from pathlib import Path
 import shutil
 import tempfile
 from typing import Optional
 
-from picomuon_common import RAW_HEADER, get_base_path, log_error, log_message
+from picomuon_common import LEGACY_RAW_HEADER, RAW_HEADER, get_base_path, log_error, log_message
 
 SCRIPT_NAME = "AddRawHeaders.py"
-HEADER_BYTES = (RAW_HEADER + "\n").encode("ascii")
 
 
 def needs_header(path: Path) -> bool:
     with path.open("rb") as source:
-        return source.readline().rstrip(b"\r\n") != RAW_HEADER.encode("ascii")
+        return source.readline().rstrip(b"\r\n") not in (
+            RAW_HEADER.encode("ascii"), LEGACY_RAW_HEADER.encode("ascii"),
+        )
 
 
 def add_header(path: Path) -> bool:
@@ -41,7 +43,10 @@ def add_header(path: Path) -> bool:
     try:
         with tempfile.NamedTemporaryFile(mode="wb", dir=path.parent, delete=False) as output:
             temporary = Path(output.name)
-            output.write(HEADER_BYTES)
+            with backup.open("r", encoding="utf-8") as source:
+                first = next((line for line in source if line.strip() and not line.startswith("#")), "")
+            header = RAW_HEADER if len(next(csv.reader([first]))) >= 13 else LEGACY_RAW_HEADER
+            output.write((header + "\n").encode("ascii"))
             with backup.open("rb") as source:
                 shutil.copyfileobj(source, output)
             output.flush()

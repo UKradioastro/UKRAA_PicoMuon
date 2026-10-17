@@ -22,6 +22,7 @@ import math
 from pathlib import Path
 import sys
 from typing import Dict, List, Optional, Tuple
+from picomuon_metadata import data_lines, metadata_from_product, write_metadata
 
 from picomuon_common import (
     build_daily_summary_path,
@@ -77,7 +78,7 @@ def load_day_file(day_file: Path) -> List[Tuple[datetime, float, float, float, f
         return rows
 
     with day_file.open(mode="r", encoding="utf-8", errors="replace") as f:
-        for line in f:
+        for line in data_lines(f):
             line = line.strip()
             if not line:
                 continue
@@ -160,6 +161,14 @@ def process_period_data(
     intervals_per_step = step_mins // 5
 
     with temp_out.open(mode="w", encoding="utf-8") as out:
+        write_metadata(out, {
+            "schema_version": 1, "time_basis": "UTC",
+            "period_start": start_str, "period_end": date_str,
+            "daily_metadata": [
+                {"date": day.isoformat(), "metadata": metadata_from_product(path)}
+                for day, path in sorted(day_files.items())
+            ],
+        })
         out.write("DateTime,CPM_T,CPM_B,CPM_C,Mean_Temp,Mean_Pres,Neutrons\n")
         cur_bin_time = start_dt
         row_idx = 0

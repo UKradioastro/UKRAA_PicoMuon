@@ -10,6 +10,7 @@ from typing import Dict, Optional, Tuple
 import serial
 
 from MergeConfig import set_config_values
+from GetDataRaw import parse_and_validate_line
 from picomuon_common import (
     build_usb_ini_path,
     get_base_path,
@@ -57,18 +58,9 @@ def probe_detector_sample(device_path: str, timeout_seconds: float = 8.0) -> Opt
                 if not raw_line:
                     continue
                 line_str = raw_line.decode("utf-8", "ignore").strip()
-                # Detector emits 8 fields before host timestamping:
-                # Event,EventCount,ADC,Elapsed_ms,Dead_ms,Temp_C,Pres_hPa,DetectorName
-                parts = line_str.split(",", 7)
-                if len(parts) == 8 and parts[0] in ("T", "B", "C"):
-                    try:
-                        int(parts[1].strip())
-                        float(parts[5].strip())
-                        float(parts[6].strip())
-                    except (ValueError, TypeError):
-                        continue
-                    detector_name = parts[7].strip()
-                    return detector_name
+                validated = parse_and_validate_line(line_str)
+                if validated is not None:
+                    return validated[8]
     except (OSError, serial.SerialException):
         pass
     return None
