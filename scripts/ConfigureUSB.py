@@ -1,9 +1,14 @@
 #!/usr/bin/env python3
 
+import argparse
+import configparser
 import glob
 import os
+from pathlib import Path
 import re
+import shutil
 import sys
+import tempfile
 import time
 from typing import Dict, Optional, Tuple
 
@@ -11,6 +16,9 @@ import serial
 
 from MergeConfig import set_config_values
 from GetDataRaw import parse_and_validate_line
+from picomuon_detectors import (
+    detectors_from_config, get_detectors, read_usb_config, validate_label,
+)
 from picomuon_common import (
     build_usb_ini_path,
     get_base_path,
@@ -47,6 +55,7 @@ def probe_detector_sample(device_path: str, timeout_seconds: float = 8.0) -> Opt
             parity=serial.PARITY_NONE,
             stopbits=serial.STOPBITS_ONE,
             timeout=1.0,
+            exclusive=True,
         ) as ser:
             # Flush initial buffer so we don't start reading a partial line mid-transmission
             ser.reset_input_buffer()
@@ -72,6 +81,8 @@ def configure_usb(
     serial_port: Optional[str] = None,
     label: Optional[str] = None,
 ) -> Tuple[Dict[str, str], str]:
+    if detectors_from_config(read_usb_config(Path(config_path))):
+        raise ValueError("Named detectors are registered; use --register LABEL instead of replacing [usb]")
     if not os.path.exists(device_path):
         raise ValueError(f"Device does not exist: {device_path}")
 
@@ -106,7 +117,84 @@ def configure_usb(
     return identity, selected_port
 
 
+def configure_detector(
+    device_path: str,
+    config_path: str,
+    label: str,
+    serial_port: str,
+    detector_name: Optional[str] = None,
+) -> Tuple[Dict[str, str], str]:
+    """Validate a staged update, then replace USB.ini once; retain all other units."""
+    validate_label(label)
+    if not os.path.exists(device_path) or not os.path.exists(serial_port):
+        raise ValueError("Both the device and its stable by-id serial path must exist during registration")
+    if os.path.realpath(device_path) != os.path.realpath(serial_port):
+        raise ValueError("The selected serial path does not resolve to the supplied device")
+    identity = get_usb_identity(serial_port)
+    options = {
+        "id_serial": identity.get("ID_SERIAL", "").strip(),
+        "id_serial_short": identity.get("ID_SERIAL_SHORT", "").strip(),
+    }
+    if detector_name is not None:
+        if "\n" in detector_name or "\r" in detector_name:
+            raise ValueError("Detector name must be a single line")
+        options["detector_name"] = detector_name.strip()
+    path = Path(config_path)
+    original = path.read_bytes() if path.exists() else None
+    path.parent.mkdir(parents=True, exist_ok=True)
+    temporary: Optional[Path] = None
+    try:
+        with tempfile.NamedTemporaryFile(dir=path.parent, delete=False) as staged:
+            temporary = Path(staged.name)
+            staged.write(original if original is not None else b"[usb]\n")
+        if original is not None:
+            shutil.copystat(path, temporary)
+            if hasattr(os, "chown"):
+                stat = path.stat()
+                os.chown(temporary, stat.st_uid, stat.st_gid)
+        set_config_values(str(temporary), "detectors", {label: serial_port})
+        set_config_values(str(temporary), f"detector:{label}", options)
+        detectors_from_config(read_usb_config(temporary))
+        current = path.read_bytes() if path.exists() else None
+        if current != original:
+            raise RuntimeError("USB.ini changed during registration; retry without concurrent configuration edits")
+        temporary.replace(path)
+    finally:
+        if temporary is not None and temporary.exists():
+            temporary.unlink()
+    return identity, serial_port
+
+
 def main() -> int:
+    parser = argparse.ArgumentParser(description="Configure single USB or register a Phase 2a pilot detector.")
+    parser.add_argument("--register", metavar="LABEL", help="Register/edit one named detector without replacing others")
+    parser.add_argument("--device", help="Device to register, e.g. /dev/ttyACM0")
+    parser.add_argument("--serial-port", help="Stable /dev/serial/by-id/ alias (otherwise discovered)")
+    parser.add_argument("--detector-name", help="Optional known name for cable-swap detection; not an identity key")
+    args = parser.parse_args()
+    config_path = str(build_usb_ini_path(get_base_path()))
+    if args.register:
+        if not args.device:
+            parser.error("--register requires --device")
+        try:
+            port = args.serial_port or find_by_id_alias(args.device)
+            if not port:
+                raise ValueError("No stable by-id alias found; supply --serial-port")
+            identity, port = configure_detector(args.device, config_path, args.register, port, args.detector_name)
+        except (OSError, RuntimeError, ValueError, configparser.Error) as error:
+            print(f"Detector registration failed: {error}", file=sys.stderr)
+            return 1
+        print(f"Registered {args.register} in {config_path}.")
+        print(f"serial_port = {port}")
+        print(f"id_serial = {identity.get('ID_SERIAL', '')}")
+        print(f"id_serial_short = {identity.get('ID_SERIAL_SHORT', '')}")
+        print("Collection pilot only: production processing, web output and automatic service activation are pending.")
+        return 0
+    if args.device or args.serial_port or args.detector_name:
+        parser.error("--device, --serial-port and --detector-name require --register")
+    if get_detectors(get_base_path()):
+        print("Named detectors are configured; use --register LABEL --device PATH to edit them.", file=sys.stderr)
+        return 1
     default_dev = "/dev/ttyACM0"
     device_input = input(f"PicoMuon device path [{default_dev}]: ").strip()
     device_path = device_input or default_dev
@@ -131,7 +219,6 @@ def main() -> int:
     label_prompt = "Detector label (leave blank for single-detector mode): "
     final_label = input(label_prompt).strip()
 
-    config_path = str(build_usb_ini_path(get_base_path()))
     try:
         identity, selected_port = configure_usb(
             device_path, config_path, selected_port, final_label

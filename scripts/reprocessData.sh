@@ -18,6 +18,8 @@ PYTHON=/usr/bin/python3
 GNUPLOT=/usr/bin/gnuplot
 
 mkdir -p "$LOG_DIR"
+PYTHONPATH="$BASE_PATH/scripts" "$PYTHON" -c \
+    'from picomuon_common import get_usb_options; get_usb_options()'
 
 log_msg() {
     write_log_entry "reprocessData.sh" "$1" >> "$MAIN_LOG"

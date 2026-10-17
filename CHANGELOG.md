@@ -8,6 +8,11 @@ This project uses calendar versioning in the format `YYYY.MM.patch`.
 ## [Unreleased]
 
 ### Added
+- Phase 2a collection-pilot foundation (not yet a production multi-detector pipeline):
+  - Validated `[detectors]` mappings with case-preserving labels, mandatory stable by-id paths and per-unit USB identity, duplicate device/alias checks, and atomic `ConfigureUSB.py --register` updates.
+  - Explicit `GetDataRaw.py --detector LABEL`, isolated raw/rejected/status output and labelled logs, plus an opt-in `PicoMuon@.service` template with separate log paths (not auto-installed).
+  - Independent `[legacy:LABEL]` fallback settings with no shared-default inheritance, and stable detector labels in capture-time metadata.
+  - Concurrent simulated collector tests, independent reconnect/UTC rollover, identity mismatch and processing safety checks; POSIX pseudo-terminal exclusive-access test for the RPi.
 - Backward-compatible 8/12-field detector capture: append legacy settings from `config/legacy.ini` only when absent, preserve detector-reported settings, reject malformed suffixes, and record capture-time public observation metadata without observer email.
 - Self-contained metadata comments in daily, hourly, summary and period products, preserving consecutive settings/source changes and historical unknowns without altering numerical columns. Installer provisions/merges legacy and observation templates.
 - `scripts/AddRawHeaders.py`: preview and safely add column headers to historic and current raw event files while collectors are stopped, with byte-exact backups and atomic per-file replacement.
@@ -26,6 +31,8 @@ This project uses calendar versioning in the format `YYYY.MM.patch`.
 - Dynamic installation-root lookup for the legacy processing and plot scripts.
 
 ### Changed
+- USB identity failures now prevent opening the serial port, including in single-detector mode; collectors and detector probing use exclusive serial access.
+- Until the next Phase 2a milestone, installer/processing/plot orchestration refuse named multi-detector mode instead of producing misleading shared output. The implementation plan records deferred Phase 2 exposure/L2/long-period work and pending RPi acceptance.
 - Standardise runtime logs as UTC timestamp, aligned process name and message. Shared command logging formats external diagnostics without double-prefixing existing entries, preserves exit codes and prefixes multiline Python messages and tracebacks.
 - Daily processing, reprocessing and standalone plotting share gnuplot logging and input checks. Missing period products are skipped, real plot failures count towards the final failure status, and plots use the requested UTC target date.
 - Raw collectors write one column-header line to new or empty event files; current and legacy raw readers support both headered and headerless files without changing event counts or column order.

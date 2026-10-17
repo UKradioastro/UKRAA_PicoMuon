@@ -25,13 +25,21 @@ def parse_settings(values: Iterable[str]) -> Settings:
     return items[0], items[1], items[2], items[3]
 
 
-def load_legacy_settings(base: Path) -> Settings:
+def load_legacy_settings(base: Path, detector_label: Optional[str] = None) -> Settings:
     path = base / "config" / "legacy.ini"
     parser = configparser.ConfigParser(interpolation=None)
     with path.open(encoding="utf-8-sig") as source:
         parser.read_file(source)
+    section = "legacy"
+    if detector_label is not None:
+        from picomuon_detectors import validate_label
+
+        section = f"legacy:{validate_label(detector_label)}"
+    # A named unit must never inherit another detector's shared defaults.
+    if detector_label is not None and parser.defaults():
+        raise ValueError(f"Remove [DEFAULT] from {path}; [{section}] must explicitly contain all four settings")
     try:
-        return parse_settings(parser.get("legacy", key) for key in SETTINGS_KEYS)
+        return parse_settings(parser.get(section, key) for key in SETTINGS_KEYS)
     except (ValueError, configparser.Error) as exc:
         raise ValueError(f"Invalid detector settings in {path}: {exc}") from exc
 
@@ -120,6 +128,7 @@ def data_lines(lines: Iterable[str]) -> Iterable[str]:
 @dataclass
 class RawEventWriter:
     base: Path
+    detector_label: Optional[str] = None
     previous_metadata: Optional[Dict[str, Any]] = None
     previous_handle: Optional[TextIO] = None
 
@@ -127,7 +136,7 @@ class RawEventWriter:
         parts, settings = split_payload(payload)
         source = "detector"
         if settings is None:
-            settings = load_legacy_settings(self.base)
+            settings = load_legacy_settings(self.base, self.detector_label)
             source = "legacy.ini"
         metadata = {
             "observation": load_observation(self.base),
@@ -135,6 +144,8 @@ class RawEventWriter:
             "settings": dict(zip(SETTINGS_KEYS, settings)),
             "settings_source": source,
         }
+        if self.detector_label is not None:
+            metadata["detector_label"] = self.detector_label
         if (
             metadata != self.previous_metadata or self.previous_handle is None
             or handle.name != self.previous_handle.name
@@ -178,6 +189,8 @@ class MetadataHistory:
             "settings_source": self.context.get("settings_source", "unknown") if matched else "unknown",
             "observation": self.context.get("observation", {}),
         }
+        if "detector_label" in self.context:
+            segment["detector_label"] = self.context["detector_label"]
         if self.segments and all(self.segments[-1][key] == value for key, value in segment.items()):
             self.segments[-1]["last_event_utc"] = timestamp
             self.segments[-1]["event_count"] += 1

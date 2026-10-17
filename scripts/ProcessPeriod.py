@@ -29,6 +29,7 @@ from picomuon_common import (
     build_processed_day_path,
     get_base_path,
     get_target_date,
+    get_usb_options,
     log_error,
     log_message,
 )
@@ -106,6 +107,7 @@ def process_period_data(
     min_percent: float = 90.0,
 ) -> int:
     base = base_path or get_base_path()
+    get_usb_options(base)
     cfg = PERIOD_CONFIGS[period_name]
     num_days = cfg["days"]
     step_mins = cfg["step_minutes"]

@@ -140,14 +140,22 @@ not an available feature yet.
 PicoMagnetometer suite, with no detector level:
 `data/raw/2026/2026-10/2026-10-09.txt`, `plots/day/…`, and so on.
 
-**Optional multi-detector mode (Phase 2a).** It will be enabled by listing more than one
-detector in `config/USB.ini`:
+**Optional multi-detector mode (Phase 2a).** Named mode is selected by any
+non-empty `[detectors]` mapping in `config/USB.ini`, including a pilot with one
+unit. It is currently a collection-only development milestone, not a production
+processing mode; see the Phase 2a status below.
 
 ```ini
 [detectors]
-# label (your choice, max 16 chars, file-safe) = stable serial port. Only needed for 2+ detectors.
+# label (your choice, max 16 chars, file-safe) = stable serial port.
 V56-123-456 = /dev/serial/by-id/usb-Raspberry_Pi_Pico_E6614103E7xxxxxx-if00
 roof-east   = /dev/serial/by-id/usb-Raspberry_Pi_Pico_E6614864D3yyyyyy-if00
+
+[detector:V56-123-456]
+id_serial_short = E6614103E7xxxxxx
+
+[detector:roof-east]
+id_serial_short = E6614864D3yyyyyy
 ```
 
 In this mode every data, plot, and log path gets a `<detector>` level, for
@@ -157,7 +165,9 @@ scripts loop over the configured labels.
 
 **What `<detector>` should be.** It should be a **label the RPi owner chooses
 once in `USB.ini`**, bound to the stable `/dev/serial/by-id` path. It must be
-file-safe (`[A-Za-z0-9_-]`, maximum 16 characters). `ConfigureUSB.py` proposes
+file-safe (`[A-Za-z0-9][A-Za-z0-9_-]*`, maximum 16 characters; `single` and
+`rejected` are reserved). Labels retain case and must be unique ignoring case.
+`ConfigureUSB.py` proposes
 a default from the `DetectorName` it reads at setup time, with `/` replaced
 by `-` (for example `V56-123-456`). After that, the label never changes
 automatically. Reasons:
@@ -183,8 +193,9 @@ as **metadata, never as a key**:
   `EventCount` drop starts a new run segment, and the missing seconds are
   recorded as reduced exposure for that minute or hour, so no fake dip
   appears.
-- The parser takes the name as "everything after the 8th comma". A name
-  containing a comma therefore can't break the field count.
+- The parser accepts the old payload and the extended four-setting suffix.
+  CSV-quote names containing commas; do not confuse an unquoted numeric name
+  suffix with partial settings.
 - The daily summary records every name seen that day, and plots show the
   **current** name in the title. Anyone looking back can see when the rename
   happened.
@@ -301,6 +312,29 @@ day.
    pressure) for the web page and alerts.
 
 ### Phase 2 – Fast processing (item 3)
+
+**Status at 2026-10-17:** implementation is in use; 53 Python tests passed on
+the RPi and live single-detector collection with metadata was verified. Final
+acceptance still requires a full scheduled daily/plot/publish run, its measured
+Pi4 runtime (target below), and the UTC-midnight transition on the RPi.
+
+**Explicitly deferred items (not silently counted as complete):**
+- The minute CPM product currently contains counts only, not per-minute live
+  exposure or the full proposed L1 schema. Hourly exposure/missing-event
+  accounting exists; minute-level exposure and associated acceptance tests
+  remain work to do.
+- Period products currently aggregate five-minute day products, not hourly L2.
+  A switch to L2 must preserve counts and the existing plot schema and needs
+  separate parity/completeness tests.
+- Six-month/year aggregation options exist, but the normal `--period all`
+  schedule currently runs week/month/3month only. Scheduled long-period
+  products and plots remain deferred.
+- Upper-air input, correction coefficients and FTP in the target chain below
+  are future-phase work, not part of the current deployed chain.
+
+The numbered list below remains the target specification, not a claim that
+every item has already shipped.
+
 1. `ProcessDaily.py`: one pass over L0 produces the L1 minute file, ADC
    histogram, and L2 hourly file, and merges NMDB data by timestamp. It uses
    `EventCount` and `Elapsed_ms` deltas (section 2a) to get exposure per
@@ -324,6 +358,35 @@ the outputs match the legacy outputs for a sample day. A pytest test compares
 them.
 
 ### Phase 2a – Concurrent multi-detector support (before Phase 3)
+
+**Development status at 2026-10-17: first collection milestone implemented;
+Phase 2a is not complete or ready to replace the production installation.**
+
+- Implemented: validated case-preserving label/by-id mappings and USB identities;
+  staged atomic registration that preserves other units and comments; duplicate
+  identity, alias and label checks; explicit `GetDataRaw.py --detector LABEL`;
+  independent raw/rejected/status output; labelled log messages and per-unit
+  log paths in the new service template; fail-closed USB identity checks,
+  exclusive serial opens, UTC rollover and independent reconnects.
+- Implemented: `[legacy:LABEL]` sections in `config/legacy.ini`, each containing
+  all four settings for its own detector. Named units never fall back to
+  `[legacy]` or `[DEFAULT]`. Detector-reported settings always take precedence;
+  new firmware does not require a legacy section. Raw metadata includes the
+  stable detector label as well as the mutable detector name.
+- Implemented safeguards: installer, modern and legacy processors, reprocessing
+  and plot orchestration reject named mode until detector-specific processing
+  is wired. The template `PicoMuon@.service` is not automatically installed or
+  enabled by this milestone. Existing `[usb]` mode and its paths are retained.
+- Automated checks cover concurrent simulated streams, disconnection of one
+  while the other continues, UTC rollover, swapped ACM enumeration, metadata
+  and fallback isolation, malformed rows, duplicate/invalid configuration,
+  identity/name mismatch and single-detector regressions. A POSIX-only
+  pseudo-terminal test checks exclusive serial access on the RPi.
+- Remaining: detector-selected daily/period/reprocessing and locks; isolated
+  processed/summary/plot/temp/web output; safe installer and service-instance
+  migration; explicit dry-run historical mapping and same-day label-change
+  handling; live two-detector RPi acceptance. Do not rename labels or move raw
+  archives as part of this collection pilot.
 
 Phases 0-2 have implementation entries in the changelog; Phase 3 was the next
 planned feature. Insert this phase first: two physical detectors have now been
@@ -349,6 +412,11 @@ software configuration alone could not resolve that hardware issue.
    and `data/raw/unit_2/YYYY/YYYY-MM/YYYY-MM-DD.txt`, for example. No shared
    status file, summary or generated filename may overwrite another unit's
    output. Keep the default single-detector layout unchanged.
+   Each configured detector must also have independent legacy fallback
+   settings, never shared inferred settings. Use `[legacy:LABEL]` sections;
+   preserve `[legacy]` for the existing single-detector installation. Observer
+   and observatory details can remain common for co-located units; detector
+   descriptions/calibration may need per-unit overrides in the next milestone.
 4. Make daily, period and historical reprocessing operate on explicitly
    selected detectors, with scheduled processing covering all configured
    units. Scope locks appropriately and keep counts, exposure and summaries

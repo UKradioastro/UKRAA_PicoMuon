@@ -4,3 +4,19 @@ serial_port = /dev/ttyACM0
 id_serial =
 id_serial_short =
 label =
+
+# Phase 2a collection pilot only; NOT yet supported by production processing.
+# Do not enable in a production installation until the remaining Phase 2a work
+# is complete. A separate pilot copy avoids interrupting single-detector jobs.
+# One or more entries select named-detector mode; even one requires --detector.
+# [detectors]
+# unit_1 = /dev/serial/by-id/usb-Raspberry_Pi_Pico_SERIAL1-if00
+# unit_2 = /dev/serial/by-id/usb-Raspberry_Pi_Pico_SERIAL2-if00
+#
+# [detector:unit_1]
+# id_serial_short = SERIAL1
+# detector_name = optional-current-name
+#
+# [detector:unit_2]
+# id_serial_short = SERIAL2
+# detector_name =

@@ -9,6 +9,8 @@ ERROR_LOG="$PICOMUON_BASE_PATH/logfiles/log-error.txt"
 GNUPLOT=/usr/bin/gnuplot
 TARGET_DATE="${1:-${PICOMUON_TARGET_DATE:-$(date -u -d yesterday +%F)}}"
 mkdir -p "$PICOMUON_BASE_PATH/logfiles"
+PYTHONPATH="$PICOMUON_BASE_PATH/scripts" /usr/bin/python3 -c \
+    'from picomuon_common import get_usb_options; get_usb_options()'
 FAILURES=0
 for plot_script in \
     PlotDataCpmACM0.gp \

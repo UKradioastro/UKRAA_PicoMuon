@@ -5,10 +5,12 @@ from picomuon_common import build_raw_day_path, get_base_path, open_raw_file
 from picomuon_common import log_error
 from picomuon_metadata import RawEventWriter
 from GetDataRaw import parse_and_validate_line
+from picomuon_detectors import select_detector
 
 # main
 def main():
     base_path = get_base_path()
+    select_detector(base_path, None)
     writer = RawEventWriter(base_path)
 
     # set up usb serial variables
@@ -16,7 +18,8 @@ def main():
                         baudrate = 115200,
                         bytesize = serial.EIGHTBITS,
                         parity = serial.PARITY_NONE,
-                        stopbits = serial.STOPBITS_ONE)
+                        stopbits = serial.STOPBITS_ONE,
+                        exclusive = True)
        
     for line in ser:
         # if data write to file

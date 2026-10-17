@@ -3,7 +3,9 @@
 from __future__ import annotations
 
 from datetime import datetime, timezone
+import argparse
 import configparser
+from contextlib import ExitStack
 import csv
 import json
 import os
@@ -14,6 +16,7 @@ from typing import Optional, TextIO, Tuple
 
 import serial
 from picomuon_metadata import RawEventWriter, split_payload
+from picomuon_detectors import check_detector_name, get_detectors, select_detector
 
 from picomuon_common import (
     build_raw_day_path,
@@ -99,23 +102,37 @@ def open_daily_file(base_path: Path, current_time: datetime, label: Optional[str
     return handle, target_path
 
 
-def open_rejected_file(base_path: Path, current_time: datetime) -> TextIO:
+def open_rejected_file(
+    base_path: Path, current_time: datetime, detector_label: Optional[str] = None,
+) -> TextIO:
     rejected_dir = base_path / "data" / "raw" / "rejected"
+    if detector_label is not None:
+        rejected_dir = base_path / "data" / "raw" / detector_label / "rejected"
     rejected_dir.mkdir(parents=True, exist_ok=True)
     rej_path = rejected_dir / f"{current_time.strftime('%Y-%m-%d')}.txt"
     return open(rej_path, mode="a", encoding="utf-8", buffering=1)
 
 
-def main() -> None:
+def main(detector_label: Optional[str] = None) -> None:
+    with ExitStack() as files:
+        _collect(detector_label, files)
+
+
+def _collect(detector_label: Optional[str], files: ExitStack) -> None:
     base_path = get_base_path()
-    usb_options = get_usb_options(base_path)
+    selected = select_detector(base_path, detector_label)
+    detectors = get_detectors(base_path) if selected is not None else {}
+    usb_options = selected.usb_options() if selected is not None else get_usb_options(base_path)
     serial_port = usb_options["serial_port"]
     label = usb_options["label"] or None
-    writer = RawEventWriter(base_path)
+    writer = RawEventWriter(base_path, detector_label=detector_label)
+    process_name = f"GetDataRaw.py[{detector_label}]" if selected is not None else PROCESS_NAME
 
-    log_message(PROCESS_NAME, f"Starting raw data collector on {serial_port}")
+    log_message(process_name, f"Starting raw data collector on {serial_port}")
 
     status_path = base_path / "data" / "status" / "current.json"
+    if selected is not None:
+        status_path = base_path / "data" / "status" / selected.label / "current.json"
     reconnect_delay = 2.0
     max_reconnect_delay = 30.0
 
@@ -132,7 +149,10 @@ def main() -> None:
             try:
                 verify_usb_identity(serial_port, usb_options)
             except RuntimeError as err:
-                log_error(PROCESS_NAME, f"USB identity check failed: {err}")
+                log_error(process_name, f"USB identity check failed: {err}. Not opening serial port.")
+                time.sleep(reconnect_delay)
+                reconnect_delay = min(reconnect_delay * 1.5, max_reconnect_delay)
+                continue
 
             with serial.Serial(
                 port=serial_port,
@@ -141,12 +161,13 @@ def main() -> None:
                 parity=serial.PARITY_NONE,
                 stopbits=serial.STOPBITS_ONE,
                 timeout=5.0,
+                exclusive=True,
             ) as ser:
                 # Discard any incomplete line captured mid-stream on port open
                 ser.reset_input_buffer()
                 ser.readline()
 
-                log_message(PROCESS_NAME, f"Connected to serial port {serial_port}")
+                log_message(process_name, f"Connected to serial port {serial_port}")
                 reconnect_delay = 2.0  # Reset backoff on successful connection
 
                 while True:
@@ -159,16 +180,16 @@ def main() -> None:
 
                     # Handle midnight UTC rollover
                     if now_day_str != current_day:
-                        if file_handle:
-                            file_handle.close()
-                        if rejected_handle:
-                            rejected_handle.close()
+                        files.close()
                         file_handle, _ = open_daily_file(base_path, now, label)
-                        rejected_handle = open_rejected_file(base_path, now)
+                        files.enter_context(file_handle)
+                        rejected_handle = files.enter_context(
+                            open_rejected_file(base_path, now, detector_label)
+                        )
                         current_day = now_day_str
                         events_today = 0
                         log_message(
-                            PROCESS_NAME,
+                            process_name,
                             f"Rolled raw log to {now_day_str}.txt (label={label or 'single'})",
                         )
 
@@ -182,7 +203,7 @@ def main() -> None:
                     if validated is None:
                         # Log and record malformed/rejected row
                         log_error(
-                            PROCESS_NAME,
+                            process_name,
                             f"Malformed raw row rejected ({len(line_str)} chars): {line_str[:80]!r}",
                         )
                         if rejected_handle:
@@ -201,13 +222,20 @@ def main() -> None:
                         det_name,
                     ) = validated
 
+                    if selected is not None:
+                        try:
+                            check_detector_name(det_name, selected, detectors)
+                        except RuntimeError as exc:
+                            log_error(process_name, str(exc))
+                            raise SystemExit(1) from exc
+
                     # Track detector name changes
                     if known_detector_name is None:
                         known_detector_name = det_name
-                        log_message(PROCESS_NAME, f"Detector identified as '{det_name}'")
+                        log_message(process_name, f"Detector identified as '{det_name}'")
                     elif det_name != known_detector_name:
                         log_message(
-                            PROCESS_NAME,
+                            process_name,
                             f"Detector name changed: '{known_detector_name}' -> '{det_name}'",
                         )
                         known_detector_name = det_name
@@ -216,7 +244,7 @@ def main() -> None:
                         try:
                             writer.write(file_handle, timestamp_str, line_str)
                         except (OSError, ValueError, configparser.Error) as exc:
-                            log_error(PROCESS_NAME, f"Cannot record detector metadata: {exc}")
+                            log_error(process_name, f"Cannot record detector metadata: {exc}")
                             raise SystemExit(1) from exc
                         events_today += 1
 
@@ -236,15 +264,14 @@ def main() -> None:
 
         except (serial.SerialException, OSError) as exc:
             log_error(
-                PROCESS_NAME,
+                process_name,
                 f"Serial connection error on {serial_port}: {exc}. Reconnecting in {reconnect_delay:.1f}s",
             )
             time.sleep(reconnect_delay)
             reconnect_delay = min(reconnect_delay * 1.5, max_reconnect_delay)
-        except Exception as unhandled:
-            log_error(PROCESS_NAME, f"Unexpected error in collector loop: {unhandled}")
-            time.sleep(reconnect_delay)
 
 
 if __name__ == "__main__":
-    main()
+    parser = argparse.ArgumentParser(description="Collect one explicitly selected PicoMuon detector.")
+    parser.add_argument("--detector", help="Registered USB.ini label (Phase 2a collection pilot)")
+    main(parser.parse_args().detector)

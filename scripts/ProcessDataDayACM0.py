@@ -5,10 +5,11 @@ from datetime import datetime, timedelta
 import csv
 import os
 from pathlib import Path
-from picomuon_common import get_base_path, raw_data_lines
+from picomuon_common import get_base_path, get_usb_options, raw_data_lines
 from picomuon_metadata import metadata_from_raw, write_metadata
 
 BASE_PATH = str(get_base_path())
+get_usb_options(get_base_path())
 
 # print message to log file to say started
 

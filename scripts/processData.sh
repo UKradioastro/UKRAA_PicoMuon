@@ -14,7 +14,7 @@ export PICOMUON_TARGET_DATE="$TARGET_DATE"
 
 mkdir -p "$BASE_PATH/logfiles"
 SOFTWARE_VERSION=$(PYTHONPATH="$BASE_PATH/scripts" "$PYTHON" -c \
-    'from picomuon_common import get_version; print(get_version())')
+    'from picomuon_common import get_usb_options, get_version; get_usb_options(); print(get_version())')
 
 log_message() {
     write_log_entry "processData.sh" "$1" >> "$MAIN_LOG"

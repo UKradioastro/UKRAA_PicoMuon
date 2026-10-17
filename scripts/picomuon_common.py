@@ -116,6 +116,13 @@ def build_usb_ini_path(base_path: Optional[Path] = None) -> Path:
 
 def get_usb_options(base_path: Optional[Path] = None) -> Dict[str, str]:
     """Read USB.ini or return safe defaults."""
+    from picomuon_detectors import get_detectors
+
+    if get_detectors(base_path):
+        raise ValueError(
+            "Multi-detector configuration requires explicit detector selection. "
+            "Single-detector processing cannot safely process this configuration yet."
+        )
     config_file = build_usb_ini_path(base_path)
     parser = configparser.ConfigParser(interpolation=None)
     if config_file.exists():

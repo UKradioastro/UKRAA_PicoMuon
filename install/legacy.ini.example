@@ -8,3 +8,18 @@ threshold_top = 200
 reset_top = 100
 threshold_bottom = 200
 reset_bottom = 100
+
+# Phase 2a pilot: named units require their OWN complete section.
+# There is no fallback from [legacy:LABEL] to [legacy] or [DEFAULT].
+# Values below are illustrative: set each unit's actual firmware settings.
+# [legacy:unit_1]
+# threshold_top = 200
+# reset_top = 100
+# threshold_bottom = 200
+# reset_bottom = 100
+#
+# [legacy:unit_2]
+# threshold_top = 250
+# reset_top = 120
+# threshold_bottom = 250
+# reset_bottom = 120

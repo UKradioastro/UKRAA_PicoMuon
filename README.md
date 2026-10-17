@@ -149,6 +149,118 @@ Blank values mean unspecified, not zero. Latitude and longitude must be finite n
 
 The collector saves a snapshot when these public details, the detector name, the settings, or their source change. Configuration files are reread for each event, so subsequent events use edits without requiring a restart. Metadata is emitted again in each new daily file. This preserves what was known at collection time rather than applying today's settings or location to older observations.
 
+### Phase 2a development: named-detector collection pilot
+
+**This is the first Phase 2a milestone, not a production multi-detector release.**
+Leave the working RPi's `[usb]` configuration unchanged. Multi-detector
+daily/period processing, plotting, web publishing, service migration and
+historical-data mapping are still pending. See the
+[implementation status and deferred work](docs/implementation-plan.md#phase-2a--concurrent-multi-detector-support-before-phase-3).
+The installer and processing/plot entry points refuse named mode rather than
+mixing detector output. Do not run the installer against a pilot configuration.
+
+For development, prepare a separate, empty pilot copy from the updated code,
+without copying or moving the production archive:
+
+```bash
+cd ~/UKRAA_PicoMuon
+PILOT=$(mktemp -d "$HOME/UKRAA_PicoMuon-pilot.XXXXXX")
+cp -a scripts install VERSION "$PILOT/"
+mkdir -p "$PILOT/config"
+cp install/USB.ini.example "$PILOT/config/USB.ini"
+cp install/legacy.ini.example "$PILOT/config/legacy.ini"
+cp install/user.ini.example "$PILOT/config/user.ini"
+echo "$PILOT"
+```
+
+Register each physical unit using its current device path. Registration resolves
+the stable by-id alias and records its udev identity without probing the serial
+stream. Check that the printed path/identity belongs to the intended unit.
+The second registration preserves the first and the existing `[usb]` section:
+
+```bash
+PICOMUON_BASE_PATH="$PILOT" python3 "$PILOT/scripts/ConfigureUSB.py" \
+    --register East --device /dev/ttyACM0
+PICOMUON_BASE_PATH="$PILOT" python3 "$PILOT/scripts/ConfigureUSB.py" \
+    --register West --device /dev/ttyACM1
+```
+
+Use `--serial-port /dev/serial/by-id/...` if alias discovery is unavailable.
+Labels retain case, start with a letter/digit and contain at most 16
+letters/digits, underscores or hyphens. `single` and `rejected` are reserved.
+Duplicate labels ignoring case, duplicate USB identities and aliases resolving
+to the same device are rejected. One or more entries in `[detectors]` selects
+named mode; even one named unit requires `--detector LABEL`. An optional
+`--detector-name "known current name"` enables cross-unit name checks; USB
+identity, not the mutable detector name, remains authoritative.
+
+Edit the pilot's `config/legacy.ini` to add **complete, correct** sections for
+each old-firmware unit, for example:
+
+```ini
+[legacy:East]
+threshold_top = 200
+reset_top = 100
+threshold_bottom = 200
+reset_bottom = 100
+
+[legacy:West]
+threshold_top = 250
+reset_top = 120
+threshold_bottom = 250
+reset_bottom = 120
+```
+
+These are examples, not measurements. Named units do **not** inherit from
+`[legacy]`, another label or `[DEFAULT]`; a missing/incomplete section stops that
+collector when an old-format event arrives. Detector-provided settings take
+precedence, so new firmware does not require a legacy section. The existing
+single-detector mode continues to use `[legacy]`. Public observation details
+remain common to the pilot installation for now.
+
+Before live testing, stop any production collector using either device
+(`PicoMuon.service`, `PicoMuonACM0.service` or a manually started process).
+**Never run production and pilot collectors against the same serial port.**
+This introduces an intentional gap in production capture; pilot data will not
+automatically merge back into the archive. Keep the test short and preserve
+the pilot data for any later explicit migration.
+
+In one terminal, run East in the foreground, saving its log output:
+
+```bash
+mkdir -p "$PILOT/logfiles/detectors/East" "$PILOT/logfiles/detectors/West"
+PICOMUON_BASE_PATH="$PILOT" python3 -u "$PILOT/scripts/GetDataRaw.py" --detector East \
+    >> "$PILOT/logfiles/detectors/East/log-PicoMuon.txt" \
+    2>> "$PILOT/logfiles/detectors/East/log-error.txt"
+```
+
+In a second terminal, set `PILOT` to the same printed directory and run the
+equivalent command with `West`. Use Ctrl+C to stop each foreground collector
+before restarting the production service. Expected pilot outputs:
+
+- `data/raw/East/YYYY/YYYY-MM/YYYY-MM-DD.txt` and the equivalent West path.
+- `data/raw/East/rejected/YYYY-MM-DD.txt`, independently for each unit.
+- `data/status/East/current.json` and `data/status/West/current.json`.
+- A stable `detector_label` and the correct unit's fallback settings in raw
+  metadata. A reported detector-name change does not change the output folder.
+
+An identity mismatch is logged and retried with backoff **without opening the
+serial port**. A name registered to another unit stops collection with an
+explicit cable-swap error. Serial access is exclusive; disconnecting one unit
+must not stop the other. Reconnecting/swapping ACM enumeration must still use
+the same stable aliases and folders. Two units may require a powered USB hub.
+
+`install/PicoMuon@.service` supplies a future per-label service template with
+separate log paths and conflicts with the old single-collector services, but is
+deliberately **not installed or enabled automatically** in this milestone.
+Do not rename labels, move raw files or adopt pilot data into production yet:
+safe mapping, same-day transitions and processing isolation are the next work.
+Raw data is never migrated by registration.
+
+Run `python3 -m unittest discover -s tests -p 'test_*.py'` from the updated
+repository. Named-detector tests use isolated data and simulated streams; the
+POSIX exclusive-access test uses a local pseudo-terminal, not your detector.
+
 ### Raw event columns
 
 Raw files have this header:

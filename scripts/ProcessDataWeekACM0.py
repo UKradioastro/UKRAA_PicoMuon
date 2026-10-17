@@ -5,10 +5,11 @@ from datetime import datetime, timedelta
 import csv
 import os
 import shutil
-from picomuon_common import build_processed_day_path, get_base_path
+from picomuon_common import build_processed_day_path, get_base_path, get_usb_options
 from picomuon_metadata import data_lines, metadata_from_product, write_metadata
 
 BASE_PATH = str(get_base_path())
+get_usb_options(get_base_path())
 
 # print message to log file to say started
 print('ProcessDataWeekACM0.py :', \
