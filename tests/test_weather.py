@@ -221,7 +221,7 @@ class CpmRenderingTests(unittest.TestCase):
                 ), encoding="utf-8",
             )
             (base / "plots" / "cpm" / "ACM0").mkdir(parents=True)
-            (base / "temp").mkdir()
+            (base / "temp" / "yesterday").mkdir(parents=True)
             source = (REPO / "scripts" / "PlotDataCpmACM0.gp").read_text(encoding="utf-8")
             if os.name == "nt":
                 source = source.replace("DejaVuSansCondensed", "Arial")
@@ -264,7 +264,7 @@ class CpmRenderingTests(unittest.TestCase):
                         self.assertEqual(result.returncode, 0, result.stderr)
                         self.assertEqual(result.stderr.strip(), "")
                         outputs = list((base / "plots" / "cpm" / "ACM0").glob("*.png"))
-                        outputs += list((base / "temp").glob("*.png"))
+                        outputs += list((base / "temp" / "yesterday").glob("*.png"))
                         self.assertEqual(len(outputs), 6)
                         for output in outputs:
                             data = output.read_bytes()

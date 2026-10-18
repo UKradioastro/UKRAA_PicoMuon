@@ -105,7 +105,7 @@ plot FileData using 1:2 linetype 1 linewidth 1 linecolor rgb "#0000FF" title "Fr
 set terminal pngcairo enhanced font "DejaVuSansCondensed, 10" rounded size 640,540 
 
 # Path to directory to store file
-pathPlot = basePath."/temp/ACM0_T-Adc"
+pathPlot = basePath."/temp/yesterday/ACM0_T-Adc"
 
 # set output path to Plot folder
 set output pathPlot.".png"
@@ -124,7 +124,7 @@ plot FileData using 1:3 linetype 1 linewidth 1 linecolor rgb "#FF0000" title "Fr
 set terminal pngcairo enhanced font "DejaVuSansCondensed, 10" rounded size 640,540 
 
 # Path to directory to store file
-pathPlot = basePath."/temp/ACM0_B-Adc"
+pathPlot = basePath."/temp/yesterday/ACM0_B-Adc"
 
 # set output path to Plot folder
 set output pathPlot.".png"
@@ -143,7 +143,7 @@ plot FileData using 1:4 linetype 1 linewidth 1 linecolor rgb "#00FF00" title "Fr
 set terminal pngcairo enhanced font "DejaVuSansCondensed, 10" rounded size 640,540 
 
 # Path to directory to store file
-pathPlot = basePath."/temp/ACM0_C-Adc"
+pathPlot = basePath."/temp/yesterday/ACM0_C-Adc"
 
 # set output path to Plot folder
 set output pathPlot.".png"

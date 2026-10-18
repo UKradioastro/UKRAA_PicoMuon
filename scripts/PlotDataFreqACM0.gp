@@ -122,7 +122,7 @@ plot FileData using (rounded($2)):(1) smooth frequency with boxes linecolor "#00
 set terminal pngcairo enhanced font "DejaVuSansCondensed, 10" rounded size 640,540 
 
 # Path to directory to store file
-pathPlot = basePath."/temp/ACM0_T-Freq"
+pathPlot = basePath."/temp/yesterday/ACM0_T-Freq"
 
 # set output path to Plot folder
 set output pathPlot.".png"
@@ -141,7 +141,7 @@ plot FileData using (rounded($3)):(1) smooth frequency with boxes linecolor "#FF
 set terminal pngcairo enhanced font "DejaVuSansCondensed, 10" rounded size 640,540 
 
 # Path to directory to store file
-pathPlot = basePath."/temp/ACM0_B-Freq"
+pathPlot = basePath."/temp/yesterday/ACM0_B-Freq"
 
 # set output path to Plot folder
 set output pathPlot.".png"
@@ -160,7 +160,7 @@ plot FileData using (rounded($4)):(1) smooth frequency with boxes linecolor "#00
 set terminal pngcairo enhanced font "DejaVuSansCondensed, 10" rounded size 640,540 
 
 # Path to directory to store file
-pathPlot = basePath."/temp/ACM0_C-Freq"
+pathPlot = basePath."/temp/yesterday/ACM0_C-Freq"
 
 # set output path to Plot folder
 set output pathPlot.".png"

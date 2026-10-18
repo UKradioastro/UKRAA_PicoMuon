@@ -34,6 +34,7 @@ This project uses calendar versioning in the format `YYYY.MM.patch`.
 - Dynamic installation-root lookup for the legacy processing and plot scripts.
 
 ### Changed
+- Group temporary CPM/ADC/frequency plots in `temp/yesterday/` and day/week/month plots in `temp/periods/`. Plotting creates the folders automatically; publishing uses both groups while preserving existing flat web image URLs and ignoring obsolete flat temporary PNGs.
 - Raw collectors no longer emit JSON metadata comments or embed observation details. ADC/CPM/day/hour/all period products now include detector name and four settings as CSV columns; day/period and hourly products include `neutrons,station`, retaining hourly pressure.
 - Per-bin differing metadata fields are `mixed`, without splitting or changing counts. At the user's explicit request, missing historical settings are filled from current legacy configuration with an assumption logged. Recorded settings take precedence.
 - Daily summaries no longer write JSON comments; legacy processing entry points use the shared writers. Day/week/month plots select the neutron column for either historical or new layouts.

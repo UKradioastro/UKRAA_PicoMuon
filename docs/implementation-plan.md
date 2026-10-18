@@ -28,6 +28,13 @@ review of the code running on the RPi (`examples/UKRAA_PicoMuon`).
 
 ## 2. Target layout (mirrors PicoMagnetometer)
 
+Temporary latest-copy plots are now grouped in `temp/yesterday/` (CPM, ADC
+and frequency) and `temp/periods/` (day, week and month; also the destination
+for future longer-period plots). Plot orchestration creates these folders as
+the project owner. Publishing reads the grouped files but retains existing
+flat web image URLs; dated plot archives are unchanged. Old flat temporary
+PNGs are ignored, not automatically deleted.
+
 ```text
 UKRAA_PicoMuon/
 ├── VERSION                     # 2026.11.0  (CalVer YYYY.MM.patch – already started)

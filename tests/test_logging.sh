@@ -74,6 +74,13 @@ grep -F 'Skipped:' "$MAIN_LOG"
 [ ! -s "$ERROR_LOG" ]
 ! grep -q 'gnuplot target=' "$MAIN_LOG"
 run_logged_plot PlotDataDayACM0.gp "$target"
+[ -d "$PICOMUON_BASE_PATH/temp/periods" ]
+for script in PlotDataDayACM0.gp PlotDataWeekACM0.gp PlotDataMonthACM0.gp; do
+    grep -q 'basePath."/temp/periods/ACM0_' "$REPO_PATH/scripts/$script"
+done
+for script in PlotDataCpmACM0.gp PlotDataAdcACM0.gp PlotDataFreqACM0.gp; do
+    [ "$(grep -c 'basePath."/temp/yesterday/ACM0_' "$REPO_PATH/scripts/$script")" -eq 3 ]
+done
 grep -F 'gnuplot target=2026-10-09' "$MAIN_LOG"
 grep -Eq 'PlotDataDayACM0.gp +: Completed plot' "$MAIN_LOG"
 grep -Eq 'PlotDataDayACM0.gp +: gnuplot diagnostic' "$ERROR_LOG"
@@ -108,6 +115,7 @@ printf 'data\n' > "$cpm_dir/$target.txt"
 PLOT_STATUS=0
 : > "$MAIN_LOG"
 run_logged_plot PlotDataCpmACM0.gp "$target"
+[ -d "$PICOMUON_BASE_PATH/temp/yesterday" ]
 grep -F 'Temperature overlay unavailable:' "$MAIN_LOG"
 grep -F 'plotWeather=0' "$MAIN_LOG"
 printf 'weather\n' > "$weather_dir/$target.txt"

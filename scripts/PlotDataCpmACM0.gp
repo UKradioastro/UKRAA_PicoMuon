@@ -133,7 +133,7 @@ if (plotWeather) {
 set terminal pngcairo enhanced font "DejaVuSansCondensed, 10" rounded size 640,540 
 
 # Path to directory to store file
-pathPlot = basePath."/temp/ACM0_T-Cpm"
+pathPlot = basePath."/temp/yesterday/ACM0_T-Cpm"
 
 # set output path to Plot folder
 set output pathPlot.".png"
@@ -157,7 +157,7 @@ if (plotWeather) {
 set terminal pngcairo enhanced font "DejaVuSansCondensed, 10" rounded size 640,540 
 
 # Path to directory to store file
-pathPlot = basePath."/temp/ACM0_B-Cpm"
+pathPlot = basePath."/temp/yesterday/ACM0_B-Cpm"
 
 # set output path to Plot folder
 set output pathPlot.".png"
@@ -181,7 +181,7 @@ if (plotWeather) {
 set terminal pngcairo enhanced font "DejaVuSansCondensed, 10" rounded size 640,540 
 
 # Path to directory to store file
-pathPlot = basePath."/temp/ACM0_C-Cpm"
+pathPlot = basePath."/temp/yesterday/ACM0_C-Cpm"
 
 # set output path to Plot folder
 set output pathPlot.".png"

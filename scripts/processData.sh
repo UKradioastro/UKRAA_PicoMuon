@@ -60,9 +60,14 @@ if [ -d "/var/www/html" ]; then
     if [ -w "/var/www/html" ]; then
         PLOT_SOURCE="$BASE_PATH/temp"
         PLOT_DEST=/var/www/html/temp
-        PLOT_FILES=("$PLOT_SOURCE"/*.png)
+        PLOT_FILES=()
+        for PLOT_GROUP in yesterday periods; do
+            for PLOT_FILE in "$PLOT_SOURCE/$PLOT_GROUP/"*.png; do
+                [ -f "$PLOT_FILE" ] && PLOT_FILES+=("$PLOT_FILE")
+            done
+        done
         log_message "Publishing plot assets from $PLOT_SOURCE to $PLOT_DEST"
-        if [ -f "${PLOT_FILES[0]}" ]; then
+        if [ "${#PLOT_FILES[@]}" -gt 0 ]; then
             if run_logged_command "processData.sh" install -d -m 0755 "$PLOT_DEST" &&
                 run_logged_command "processData.sh" install -p -m 0644 "${PLOT_FILES[@]}" "$PLOT_DEST/"; then
                 log_message "Published ${#PLOT_FILES[@]} plot assets from $PLOT_SOURCE to $PLOT_DEST"

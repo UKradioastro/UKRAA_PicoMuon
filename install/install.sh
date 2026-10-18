@@ -65,7 +65,8 @@ install -d -o "$PICOMUON_USER" -g "$PICOMUON_GROUP" -m 0755 \
     "$BASE_PATH/plots/freq/ACM0" \
     "$BASE_PATH/plots/month/ACM0" \
     "$BASE_PATH/plots/week/ACM0" \
-    "$BASE_PATH/temp" \
+    "$BASE_PATH/temp/yesterday" \
+    "$BASE_PATH/temp/periods" \
     "$BASE_PATH/WWW/temp"
 
 if [ ! -f "$BASE_PATH/config/USB.ini" ] && [ -f "$BASE_PATH/install/USB.ini.example" ]; then

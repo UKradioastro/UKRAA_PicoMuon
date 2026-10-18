@@ -88,6 +88,14 @@ run_logged_plot() {
         write_log_entry "$plot_script" "ERROR: required input missing: $input" >> "$ERROR_LOG"
         return 1
     fi
+    local temp_group=yesterday
+    if [[ "$category" = day || "$category" = week || "$category" = month ]]; then
+        temp_group=periods
+    fi
+    if ! run_logged_command "$plot_script" run_as_owner mkdir -p \
+        "$PICOMUON_BASE_PATH/temp/$temp_group"; then
+        return 1
+    fi
     write_log_entry "$plot_script" "Started plot for $target_date" >> "$MAIN_LOG"
     local plot_weather=0
     if [ "$plot_script" = PlotDataCpmACM0.gp ]; then

@@ -140,7 +140,7 @@ plot FileData using 1:(((($4/MUON_mean)*100)-100)) linetype 1 linewidth 1 lineco
 set terminal pngcairo enhanced font "DejaVuSansCondensed, 10" rounded size 640,540 
 
 # Path to directory to store file
-pathPlot = basePath."/temp/ACM0_week_plot"
+pathPlot = basePath."/temp/periods/ACM0_week_plot"
 
 # set output path to Plot folder
 set output pathPlot.".png"

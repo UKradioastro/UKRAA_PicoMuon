@@ -14,6 +14,29 @@ This software was written to suit a specific set-up, feel free to use as you see
 
 Instructions for setting up a Raspberry Pi4/5 are included in the **docs** folder
 
+### Temporary plots
+
+Latest plot copies are grouped below `temp/`:
+
+```text
+temp/
+  yesterday/   # CPM, ADC and frequency plots (T, B and C)
+  periods/     # day, week and month plots
+```
+
+Plotting entry points create these directories automatically as the project
+owner, including on existing installations. Dated archives under `plots/`
+are unchanged. Daily publishing reads both groups and keeps the existing flat
+web image URLs, so no web-page update is required.
+
+For a manual upgrade, copy all six `scripts/PlotData*ACM0.gp` files together
+with `scripts/logging.sh` and `scripts/processData.sh`. The next plotting run
+populates the new directories; no reinstall or collector restart is needed.
+Old PNGs directly under `temp/` are no longer updated or published. After
+checking the new plots, those obsolete flat copies can be removed manually.
+Historical reprocessing with `--plot` also refreshes these latest-copy folders
+for its requested date, as before.
+
 ---
 
 &nbsp;
