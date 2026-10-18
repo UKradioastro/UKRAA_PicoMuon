@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Prepend column headers to existing raw files while all collectors are stopped."""
+"""Safely add raw column headers or remove obsolete JSON comments with collectors stopped."""
 
 from __future__ import annotations
 
@@ -23,15 +23,21 @@ def needs_header(path: Path) -> bool:
         )
 
 
-def add_header(path: Path) -> bool:
-    """Keep a byte-exact backup, then atomically prepend the header once."""
+def has_metadata_comments(path: Path) -> bool:
+    with path.open("rb") as source:
+        return any(line.startswith(b"# picomuon_metadata:") for line in source)
+
+
+def add_header(path: Path, remove_metadata: bool = False) -> bool:
+    """Keep a byte-exact backup, then atomically apply one raw-file migration."""
     if path.is_symlink():
         raise ValueError(f"Refusing to modify symbolic link: {path}")
-    if not needs_header(path):
+    if not (has_metadata_comments(path) if remove_metadata else needs_header(path)):
         return False
 
     original = path.stat()
-    backup = path.with_name(path.name + ".pre-header.bak")
+    suffix = ".pre-metadata-removal.bak" if remove_metadata else ".pre-header.bak"
+    backup = path.with_name(path.name + suffix)
     # Exclusive creation prevents overwriting an earlier backup.
     with path.open("rb") as source, backup.open("xb") as destination:
         shutil.copyfileobj(source, destination)
@@ -43,12 +49,18 @@ def add_header(path: Path) -> bool:
     try:
         with tempfile.NamedTemporaryFile(mode="wb", dir=path.parent, delete=False) as output:
             temporary = Path(output.name)
-            with backup.open("r", encoding="utf-8") as source:
-                first = next((line for line in source if line.strip() and not line.startswith("#")), "")
-            header = RAW_HEADER if len(next(csv.reader([first]))) >= 13 else LEGACY_RAW_HEADER
-            output.write((header + "\n").encode("ascii"))
-            with backup.open("rb") as source:
-                shutil.copyfileobj(source, output)
+            if remove_metadata:
+                with backup.open("rb") as source:
+                    for line in source:
+                        if not line.startswith(b"# picomuon_metadata:"):
+                            output.write(line)
+            else:
+                with backup.open("r", encoding="utf-8") as source:
+                    first = next((line for line in source if line.strip() and not line.startswith("#")), "")
+                header = RAW_HEADER if len(next(csv.reader([first]))) >= 13 else LEGACY_RAW_HEADER
+                output.write((header + "\n").encode("ascii"))
+                with backup.open("rb") as source:
+                    shutil.copyfileobj(source, output)
             output.flush()
             os.fsync(output.fileno())
         shutil.copystat(path, temporary)
@@ -70,6 +82,10 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--apply", action="store_true", help="Modify files (default: preview only)")
     parser.add_argument(
+        "--remove-metadata", action="store_true",
+        help="Remove only # picomuon_metadata: comments instead of adding column headers",
+    )
+    parser.add_argument(
         "--collectors-stopped", action="store_true",
         help="Confirm all raw-data collectors have been stopped before applying changes",
     )
@@ -90,12 +106,14 @@ def main() -> int:
                 continue
             if path.is_symlink():
                 raise ValueError(f"Refusing to modify symbolic link: {path}")
-            if not needs_header(path):
+            required = has_metadata_comments(path) if args.remove_metadata else needs_header(path)
+            if not required:
                 skipped += 1
                 continue
             if args.apply:
-                add_header(path)
-            log_message(SCRIPT_NAME, f"{'Added header' if args.apply else 'Would add header'}: {path}")
+                add_header(path, remove_metadata=args.remove_metadata)
+            action = "Remove metadata comments" if args.remove_metadata else "Add header"
+            log_message(SCRIPT_NAME, f"{'Applied' if args.apply else 'Would apply'} {action}: {path}")
             changed += 1
     except (OSError, ValueError, RuntimeError) as exc:
         log_error(SCRIPT_NAME, f"Migration stopped: {exc}. Resolve the error before restarting collection.")
@@ -104,7 +122,7 @@ def main() -> int:
     log_message(
         SCRIPT_NAME,
         f"{'Updated' if args.apply else 'Would update'} {changed} raw files; "
-        f"{skipped} already have headers. Rejected rows are unchanged.",
+        f"{skipped} need no change. Rejected rows are unchanged.",
     )
     return 0
 

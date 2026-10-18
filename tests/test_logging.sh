@@ -77,6 +77,14 @@ run_logged_plot PlotDataDayACM0.gp "$target"
 grep -F 'gnuplot target=2026-10-09' "$MAIN_LOG"
 grep -Eq 'PlotDataDayACM0.gp +: Completed plot' "$MAIN_LOG"
 grep -Eq 'PlotDataDayACM0.gp +: gnuplot diagnostic' "$ERROR_LOG"
+grep -F 'neutronColumn=7' "$MAIN_LOG"
+
+# New CSV schemas move neutrons behind the five detector/settings columns.
+printf 'DateTime,CPM_T,CPM_B,CPM_C,Mean_Temp,Mean_Pres,detector_name,threshold_top,reset_top,threshold_bottom,reset_bottom,neutrons,station\n' \
+    > "$day_dir/$target.txt"
+: > "$MAIN_LOG"
+run_logged_plot PlotDataDayACM0.gp "$target"
+grep -F 'neutronColumn=12' "$MAIN_LOG"
 
 : > "$MAIN_LOG"
 : > "$ERROR_LOG"

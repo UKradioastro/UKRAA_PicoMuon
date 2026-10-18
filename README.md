@@ -122,7 +122,7 @@ The code receives the event data from the UKRAA PicoMuon detector via serial ove
 
 The raw data will be processed overnight, via CRON, to get counts per minute, the frequency of the counts per minute and the frequency of the adc values for your previous day's data.
 
-Processed products are stored directly under `data/` in their own folders (for example, `data/cpm/`, `data/day/`, and `data/adc/`); they are no longer nested under `data/processed/`. Files have a column header. Processed products also contain metadata comments, described below.
+Processed products are stored directly under `data/` in their own folders (for example, `data/cpm/`, `data/day/`, and `data/adc/`); they are no longer nested under `data/processed/`. Raw and processed detector files have ordinary CSV column headers, with detector/settings values on each data row. New output does not contain `# picomuon_metadata:` JSON comments.
 
 ### Observation and legacy detector configuration
 
@@ -139,15 +139,15 @@ When the detector provides all four settings, those values take precedence. When
 
 Use CSV quoting if a detector name contains commas, particularly a numeric suffix. A limited compatibility path accepts historic unquoted names such as `MyDetector,Unit1`, but an unquoted numeric suffix is ambiguous with partial settings and is rejected. Stored names are CSV-escaped.
 
-Fill in `config/user.ini` with information you are willing to share:
+Keep observation details in `config/user.ini` for future sharing/upload features:
 
 - Station identifier, name, location, decimal-degree latitude/longitude (north/east positive), coordinate datum, and altitude in metres with its height reference.
 - Observer name and optional public identifier (for example ORCID).
 - Detector model, firmware version, settings units, calibration reference/date, orientation, scintillator dimensions, detector separation, shielding, and installation notes.
 
-Blank values mean unspecified, not zero. Latitude and longitude must be finite numbers within their geographic ranges; altitude must be finite. `observatory_tz` describes the site timezone (for example `Europe/London`); recorded timestamps remain UTC. **Non-empty public fields, including names and coordinates, are embedded in data files.** Choose location precision accordingly. `observer_email` is private contact information and is never copied into raw or processed metadata. No uploading is implemented.
+Blank values mean unspecified, not zero. Latitude and longitude must be finite numbers within their geographic ranges; altitude must be finite. `observatory_tz` describes the site timezone (for example `Europe/London`); recorded timestamps remain UTC. Observation details, observer contact information and calibration descriptions are **not copied into new detector data files**. No uploading is implemented.
 
-The collector saves a snapshot when these public details, the detector name, the settings, or their source change. Configuration files are reread for each event, so subsequent events use edits without requiring a restart. Metadata is emitted again in each new daily file. This preserves what was known at collection time rather than applying today's settings or location to older observations.
+The collector records the detector name and four settings on every raw event. Legacy settings are reread whenever an event needs them, so edits apply to subsequent events without a restart. Existing recorded settings are never overwritten during processing. At the user's explicit request, processing historical rows without settings now uses current `config/legacy.ini` values and logs an `ASSUMPTION` message; this is not proof of historical configuration. Missing/invalid required legacy settings cause an explicit failure rather than invented defaults.
 
 ### Phase 2a development: named-detector collection pilot
 
@@ -241,8 +241,8 @@ before restarting the production service. Expected pilot outputs:
 - `data/raw/East/YYYY/YYYY-MM/YYYY-MM-DD.txt` and the equivalent West path.
 - `data/raw/East/rejected/YYYY-MM-DD.txt`, independently for each unit.
 - `data/status/East/current.json` and `data/status/West/current.json`.
-- A stable `detector_label` and the correct unit's fallback settings in raw
-  metadata. A reported detector-name change does not change the output folder.
+- The correct unit's fallback settings on every event. The folder identifies
+  the stable label; a detector-name change does not change that folder.
 
 An identity mismatch is logged and retried with backoff **without opening the
 serial port**. A name registered to another unit stops collection with an
@@ -285,23 +285,62 @@ RPiTimestamp,Event,EventCount,ADC,Elapsed_ms,Dead_ms,Temp_C,Pres_hPa,DetectorNam
 | threshold_bottom | Bottom detector threshold setting |
 | reset_bottom | Bottom detector reset setting |
 
-New events always contain these 13 columns, including the Raspberry Pi timestamp. Readers accept old 9-column events and the new 13-column events, with or without headers. Existing event bytes are not rewritten: on the first new write to an old-format or headerless file, the collector appends the extended column header and a metadata snapshot before new events. Such a transition file can therefore contain both row widths and repeated headers. PicoMuon readers ignore both header formats and `#` comment lines.
+New events always contain these 13 columns, including the Raspberry Pi timestamp. Readers accept old 9-column events and the new 13-column events, with or without headers. Existing event bytes are not rewritten: on the first new write to an old-format or headerless file, the collector appends the extended column header before new events. Such a transition file can contain both row widths and repeated headers. PicoMuon readers ignore both header formats and historical `#` comment lines.
 
 ### Metadata in processed and shared data
 
-Metadata belongs in a labelled preamble, **not in the column names**. CPM, day, ADC, hourly and period products include a line beginning `# picomuon_metadata: ` containing a JSON object, followed by the ordinary, unchanged CSV column header. For example, a compact daily file can begin:
+Detector metadata is stored in ordinary CSV columns on every row, not in a JSON preamble. The exact layouts are:
 
 ```text
-# picomuon_metadata: {"schema_version":1,"time_basis":"UTC","segments":[{"detector_name":"Detector","settings":{"threshold_top":200,"reset_top":100,"threshold_bottom":200,"reset_bottom":100},"settings_source":"legacy.ini","observation":{},"first_event_utc":"2026-10-16 00:00:01.000000","last_event_utc":"2026-10-16 00:00:01.000000","event_count":1}]}
-DateTime,Count_T,Count_B,Count_C
-2026-10-16 00:00:00,0,0,1
+ADC_Value,Count_T,Count_B,Count_C,detector_name,threshold_top,reset_top,threshold_bottom,reset_bottom
+DateTime,Count_T,Count_B,Count_C,detector_name,threshold_top,reset_top,threshold_bottom,reset_bottom
+DateTime,CPM_T,CPM_B,CPM_C,Mean_Temp,Mean_Pres,detector_name,threshold_top,reset_top,threshold_bottom,reset_bottom,neutrons,station
+DateTime,T,B,C,live_seconds,missing_events,temp,pres,detector_name,threshold_top,reset_top,threshold_bottom,reset_bottom,neutrons,station
 ```
 
-Each consecutive configuration segment records the detector, all four settings, their source (`detector`, `legacy.ini` or `unknown`), public observation details, first/last event timestamps and event count. These timestamps bound observed events, not the precise instant a setting was changed. A file can contain multiple segments; do not assume one setting applies throughout a day, ADC spectrum or aggregate bin. Numerical products remain aggregated as before; use the raw events if you need to split them by configuration.
+The third layout is shared by day, week, month, 3month, 6month and year files. The hourly layout retains `pres` after `temp`. Neutron columns are lowercase `neutrons,station`; the station identifies the NMDB source (currently OULU), not your local observatory. A CPM example is:
 
-Period products carry the metadata of each available source day. `data/daily/summary.csv` keeps its ordinary header and places a metadata comment immediately before each day's row; reprocessing one day preserves the other days' metadata. Older files without capture-time metadata retain unknown settings/location: historical reprocessing does **not** guess from current INI files. Unknown settings are JSON `null`.
+```text
+DateTime,Count_T,Count_B,Count_C,detector_name,threshold_top,reset_top,threshold_bottom,reset_bottom
+2026-10-17 00:00:00,132,130,18,56/148/627,200,100,200,100
+```
 
-This keeps each shared file self-contained, including changes during the observation. Existing files gain processed metadata when reprocessed; no historical metadata can be recovered if it was never recorded. Gnuplot ignores `#` comments. For external readers, filter comment lines before CSV parsing, or use `pandas.read_csv(path, comment="#")`. The legacy processing scripts also accept these comments; existing non-empty outputs from their append-only workflow must be removed or archived before regeneration.
+Counts, numerical averaging and the number of bins are unchanged. Metadata comes from events contributing to each bin (for ADC, events contributing to that ADC channel). If values differ within a bin, only the differing fields contain `mixed`; counts remain combined in one row. A bin without detector events uses the day's detector/settings combination, or `mixed` if the day itself varies. An entirely empty raw file yields blank detector metadata. A period bin without detector events similarly uses the available period's detector/settings combination. Missing neutron data yields `nan` and a blank station; stations combined within a period bin are marked `mixed`.
+
+Periods read both the new day columns and older seven-column day files, including historical JSON comments. Old day files lack a detector-name column, so that field remains blank unless they are first regenerated from raw events. Their missing settings use the same explicit legacy assumption. Legacy neutron files without a station header are treated as OULU (the existing downloader's fixed station), with that assumption logged.
+
+`data/daily/summary.csv` retains its existing numerical schema and no longer writes JSON comments. Old processing script names delegate to the shared daily/period writers: daily compatibility scripts rebuild all daily products rather than appending duplicate rows. Week/month compatibility scripts use the shared completeness rule.
+
+### Neutron file attribution and headers
+
+New neutron downloads include readable NMDB/source, station, UTC and request-URL comments followed by:
+
+```text
+DateTime,Pressure_hPa,Uncorrected,PressureCorrected,EfficiencyCorrected
+2026-10-17 00:00:00,1010.59,90.8,98.202,98.388
+```
+
+Readers accept both headered and older headerless neutron files. The weather attribution/header is unchanged. Plot orchestration selects neutron column 12 for new day/period files and column 7 for historical files, so existing products can still be viewed before reprocessing.
+
+### Upgrading existing data files
+
+Stop the collector before replacing its scripts, copy the updated scripts, plots and tests together, then restart. New raw events no longer emit JSON comments; existing raw files are not automatically rewritten. Regenerate processed files with `reprocessData.sh` to get the new columns and remove their obsolete JSON comments. This leaves raw events untouched. Check the current legacy settings before backfilling, since they are now the explicit assumption for historic events that lack settings.
+
+Optional cleanup removes only `# picomuon_metadata:` lines from existing raw files. Preview first:
+
+```bash
+python3 scripts/AddRawHeaders.py --remove-metadata
+```
+
+Stop **all** collectors and any other raw-file writers before applying:
+
+```bash
+sudo systemctl stop PicoMuon.service
+python3 scripts/AddRawHeaders.py --remove-metadata --apply --collectors-stopped
+sudo systemctl start PicoMuon.service
+```
+
+Use the appropriate service name(s) for your installation. The confirmation flag is not an automatic service check. Each changed raw file gets a byte-exact `*.txt.pre-metadata-removal.bak`; event/header bytes, other comments and timestamps are preserved. Rejected files are excluded. Re-running skips clean files; a conflicting backup stops migration instead of being overwritten. Keep sufficient space for backups and a temporary copy of the largest file.
 
 ### Adding headers to historic and current raw files
 

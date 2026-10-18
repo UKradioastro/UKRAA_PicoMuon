@@ -18,6 +18,7 @@ from picomuon_common import (
 from ProcessDaily import parse_arguments as parse_daily_args, process_daily
 from ProcessPeriod import parse_arguments as parse_period_args, process_period_data
 from picomuon_metadata import data_lines
+from picomuon_products import ADC_COLUMNS, CPM_COLUMNS, DAY_COLUMNS
 
 
 def read_csv_lines(path):
@@ -66,6 +67,11 @@ class Phase2ProcessingTests(unittest.TestCase):
         self.temp_dir = tempfile.mkdtemp()
         self.base_path = Path(self.temp_dir)
         self.target_date = date(2026, 10, 9)
+        config = self.base_path / "config"
+        config.mkdir()
+        (config / "legacy.ini").write_text(
+            "[legacy]\nthreshold_top = 200\nreset_top = 100\nthreshold_bottom = 200\nreset_bottom = 100\n"
+        )
 
         # Check if local example files exist (local developer environment)
         repo_root = Path(__file__).resolve().parents[1]
@@ -132,7 +138,7 @@ class Phase2ProcessingTests(unittest.TestCase):
         cpm_file = build_processed_day_path(self.base_path, "cpm", self.target_date, "ACM0", "txt")
         self.assertTrue(cpm_file.exists())
         lines = read_csv_lines(cpm_file)
-        self.assertEqual(lines[0], "DateTime,Count_T,Count_B,Count_C")
+        self.assertEqual(lines[0], ",".join(CPM_COLUMNS))
         self.assertEqual(len(lines), 1441)
         first_cpm = lines[1].split(",")
         self.assertEqual(first_cpm[0], "2026-10-09 00:00:00")
@@ -149,7 +155,7 @@ class Phase2ProcessingTests(unittest.TestCase):
         day_file = build_processed_day_path(self.base_path, "day", self.target_date, "ACM0", "txt")
         self.assertTrue(day_file.exists())
         day_lines = read_csv_lines(day_file)
-        self.assertEqual(day_lines[0], "DateTime,CPM_T,CPM_B,CPM_C,Mean_Temp,Mean_Pres,Neutrons")
+        self.assertEqual(day_lines[0], ",".join(DAY_COLUMNS))
         self.assertEqual(len(day_lines), 289)
         first_day = day_lines[1].split(",")
         self.assertEqual(first_day[0], "2026-10-09 00:00:00")
@@ -159,7 +165,7 @@ class Phase2ProcessingTests(unittest.TestCase):
             self.assertEqual(first_day[3], "78")
             self.assertEqual(first_day[4], "22.9")
             self.assertEqual(first_day[5], "1015.5")
-            self.assertEqual(first_day[6], "505.674")
+            self.assertEqual(first_day[11], "505.674")
         else:
             self.assertEqual(first_day[3], "5")
 
@@ -167,7 +173,7 @@ class Phase2ProcessingTests(unittest.TestCase):
         adc_file = build_processed_day_path(self.base_path, "adc", self.target_date, "ACM0", "txt")
         self.assertTrue(adc_file.exists())
         adc_lines = read_csv_lines(adc_file)
-        self.assertEqual(adc_lines[0], "ADC_Value,Count_T,Count_B,Count_C")
+        self.assertEqual(adc_lines[0], ",".join(ADC_COLUMNS))
         self.assertEqual(len(adc_lines), 1025)
         bin_200 = adc_lines[201].split(",")
         self.assertEqual(bin_200[0], "200")
@@ -238,7 +244,7 @@ class Phase2ProcessingTests(unittest.TestCase):
         week_file = build_processed_day_path(self.base_path, "week", self.target_date, "ACM0", "txt")
         self.assertTrue(week_file.exists())
         lines = read_csv_lines(week_file)
-        self.assertEqual(lines[0], "DateTime,CPM_T,CPM_B,CPM_C,Mean_Temp,Mean_Pres,Neutrons")
+        self.assertEqual(lines[0], ",".join(DAY_COLUMNS))
         self.assertEqual(len(lines), 1009)
 
         first_week = lines[1].split(",")
@@ -247,7 +253,7 @@ class Phase2ProcessingTests(unittest.TestCase):
             self.assertEqual(first_week[3], "143")
             self.assertEqual(first_week[4], "27.5")
             self.assertEqual(first_week[5], "1028.2")
-            self.assertEqual(first_week[6], "1036.100")
+            self.assertEqual(first_week[11], "1036.100")
         else:
             self.assertEqual(first_week[3], "150")
 

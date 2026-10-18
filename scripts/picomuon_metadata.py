@@ -129,34 +129,18 @@ def data_lines(lines: Iterable[str]) -> Iterable[str]:
 class RawEventWriter:
     base: Path
     detector_label: Optional[str] = None
-    previous_metadata: Optional[Dict[str, Any]] = None
     previous_handle: Optional[TextIO] = None
 
     def write(self, handle: TextIO, timestamp: str, payload: str) -> None:
         parts, settings = split_payload(payload)
-        source = "detector"
         if settings is None:
             settings = load_legacy_settings(self.base, self.detector_label)
-            source = "legacy.ini"
-        metadata = {
-            "observation": load_observation(self.base),
-            "detector_name": parts[7],
-            "settings": dict(zip(SETTINGS_KEYS, settings)),
-            "settings_source": source,
-        }
-        if self.detector_label is not None:
-            metadata["detector_label"] = self.detector_label
-        if (
-            metadata != self.previous_metadata or self.previous_handle is None
-            or handle.name != self.previous_handle.name
-        ):
-            if self.previous_handle is None or handle.name != self.previous_handle.name:
-                with Path(handle.name).open(encoding="utf-8") as existing:
-                    first_line = existing.readline().rstrip("\r\n")
-                if first_line != RAW_HEADER:
-                    handle.write("\n" + RAW_HEADER + "\n")
-            write_metadata(handle, metadata)
-            self.previous_metadata = metadata
+        if self.previous_handle is None or handle.name != self.previous_handle.name:
+            handle.flush()
+            with Path(handle.name).open(encoding="utf-8") as existing:
+                first_line = existing.readline().rstrip("\r\n")
+            if first_line != RAW_HEADER:
+                handle.write("\n" + RAW_HEADER + "\n")
             self.previous_handle = handle
         handle.write(csv_line([timestamp, *parts, *settings]) + "\n")
         handle.flush()

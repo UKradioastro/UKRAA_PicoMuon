@@ -2,6 +2,7 @@ import datetime as dt
 import pandas as pd
 import os
 from picomuon_common import get_base_path, log_message, utc_yesterday
+from picomuon_neutrons import write_neutron_header
 
 # local library that generates the html strings to download NEST data
 import nest
@@ -69,7 +70,15 @@ names.insert(0, "start_date_time") # add header for first column
 df = pd.read_table(download, sep=";", comment="#", header=0, names=names)
 
 # Save panda dataframe to csv file
-df.to_csv(outfile,  sep=",", index=False, header=False, encoding='utf-8')
+temporary = outfile + ".tmp"
+try:
+    with open(temporary, "w", encoding="utf-8", newline="") as output:
+        write_neutron_header(output, station, download)
+        df.to_csv(output, sep=",", index=False, header=False)
+    os.replace(temporary, outfile)
+finally:
+    if os.path.exists(temporary):
+        os.unlink(temporary)
 
 # =============================================================================
 # Message to log file at end of program

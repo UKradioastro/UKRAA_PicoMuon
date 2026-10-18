@@ -147,9 +147,9 @@ class DetectorTests(unittest.TestCase):
                 handle, "2026-10-17 00:00:00.000000", PAYLOAD + ",500,200,500,200",
             )
         meta = metadata_from_raw(path)["segments"][0]
-        self.assertEqual(meta["settings_source"], "detector")
+        self.assertEqual(meta["settings_source"], "unknown")
         self.assertEqual(meta["settings"]["threshold_top"], 500)
-        self.assertEqual(meta["detector_label"], "East")
+        self.assertNotIn("# picomuon_metadata:", path.read_text())
 
     def test_registration_is_atomic_preserves_comments_and_other_units(self):
         self.usb.write_text(BASE_CONFIG)

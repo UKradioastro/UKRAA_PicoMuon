@@ -22,7 +22,9 @@ import math
 from pathlib import Path
 import sys
 from typing import Dict, List, Optional, Tuple
-from picomuon_metadata import data_lines, metadata_from_product, write_metadata
+from picomuon_metadata import SETTINGS_KEYS, csv_line
+from picomuon_products import DAY_COLUMNS, BinMetadata, HistoricalSettings, product_rows
+from picomuon_neutrons import DEFAULT_STATION
 
 from picomuon_common import (
     build_daily_summary_path,
@@ -70,33 +72,35 @@ def parse_arguments() -> argparse.Namespace:
     return parser.parse_args()
 
 
-def load_day_file(day_file: Path) -> List[Tuple[datetime, float, float, float, float, float, float]]:
-    """Read a 288-row 5-minute day file.
-    Returns list of (dt, cnt_T, cnt_B, cnt_C, temp, pres, neutrons).
-    """
-    rows: List[Tuple[datetime, float, float, float, float, float, float]] = []
+DayRow = Tuple[datetime, float, float, float, float, float, float, Tuple[str, ...], str]
+
+
+def load_day_file(day_file: Path, base_path: Optional[Path] = None) -> List[DayRow]:
+    """Read new or historical day rows, retaining detector fields and NMDB station."""
+    rows: List[DayRow] = []
     if not day_file.exists():
         return rows
 
-    with day_file.open(mode="r", encoding="utf-8", errors="replace") as f:
-        for line in data_lines(f):
-            line = line.strip()
-            if not line:
-                continue
-            parts = [p.strip() for p in line.split(",")]
-            if len(parts) < 7:
-                continue
-            try:
-                dt_val = datetime.strptime(parts[0], "%Y-%m-%d %H:%M:%S")
-                c_T = float(parts[1]) if parts[1] != "nan" else 0.0
-                c_B = float(parts[2]) if parts[2] != "nan" else 0.0
-                c_C = float(parts[3]) if parts[3] != "nan" else 0.0
-                temp = float(parts[4]) if parts[4] != "nan" else math.nan
-                pres = float(parts[5]) if parts[5] != "nan" else math.nan
-                neutrons = float(parts[6]) if parts[6] != "nan" else 0.0
-                rows.append((dt_val, c_T, c_B, c_C, temp, pres, neutrons))
-            except (ValueError, IndexError):
-                continue
+    legacy = HistoricalSettings(base_path or get_base_path())
+    assumed_station = False
+    for row in product_rows(day_file):
+        dt_val = datetime.strptime(row["DateTime"], "%Y-%m-%d %H:%M:%S")
+        counts = tuple(float(row[key]) if row[key] != "nan" else 0.0
+                       for key in ("CPM_T", "CPM_B", "CPM_C"))
+        temp = float(row["Mean_Temp"])
+        pres = float(row["Mean_Pres"])
+        neutron_text = row.get("neutrons", row.get("Neutrons", "nan"))
+        neutrons = float(neutron_text) if neutron_text != "nan" else 0.0
+        settings = tuple(row.get(key, "") for key in SETTINGS_KEYS)
+        if not any(settings):
+            settings = tuple(str(value) for value in legacy.resolve(None))
+        metadata = (row.get("detector_name", ""), *settings)
+        station = row.get("station", DEFAULT_STATION)
+        assumed_station = assumed_station or "station" not in row
+        rows.append((dt_val, *counts, temp, pres, neutrons, metadata, station))
+    legacy.report(SCRIPT_NAME)
+    if assumed_station:
+        log_message(SCRIPT_NAME, f"ASSUMPTION - station OULU for historical day file without station column: {day_file}")
     return rows
 
 
@@ -143,11 +147,15 @@ def process_period_data(
         return 0
 
     # Load 5-minute entries across the available days
-    all_5min_rows: List[Tuple[datetime, float, float, float, float, float, float]] = []
+    all_5min_rows: List[DayRow] = []
     for d_offset in range(num_days):
         cur_date = start_date + timedelta(days=d_offset)
         if cur_date in day_files:
-            all_5min_rows.extend(load_day_file(day_files[cur_date]))
+            all_5min_rows.extend(load_day_file(day_files[cur_date], base))
+    all_metadata = BinMetadata()
+    for row in all_5min_rows:
+        if sum(row[1:4]) > 0:
+            all_metadata.add(row[7])
 
     # Set up output path
     period_out = build_processed_day_path(base, period_name, target_date, "ACM0", "txt")
@@ -163,15 +171,7 @@ def process_period_data(
     intervals_per_step = step_mins // 5
 
     with temp_out.open(mode="w", encoding="utf-8") as out:
-        write_metadata(out, {
-            "schema_version": 1, "time_basis": "UTC",
-            "period_start": start_str, "period_end": date_str,
-            "daily_metadata": [
-                {"date": day.isoformat(), "metadata": metadata_from_product(path)}
-                for day, path in sorted(day_files.items())
-            ],
-        })
-        out.write("DateTime,CPM_T,CPM_B,CPM_C,Mean_Temp,Mean_Pres,Neutrons\n")
+        out.write(csv_line(DAY_COLUMNS) + "\n")
         cur_bin_time = start_dt
         row_idx = 0
         num_rows = len(all_5min_rows)
@@ -187,11 +187,17 @@ def process_period_data(
             neutrons_sum = 0.0
             temp_count = 0
             pres_count = 0
+            metadata = BinMetadata()
+            stations = set()
 
             # Advance rows within [cur_bin_time, bin_end_time)
             while row_idx < num_rows and all_5min_rows[row_idx][0] < bin_end_time:
-                r_dt, r_T, r_B, r_M, r_temp, r_pres, r_neut = all_5min_rows[row_idx]
+                r_dt, r_T, r_B, r_M, r_temp, r_pres, r_neut, r_metadata, r_station = all_5min_rows[row_idx]
                 if r_dt >= cur_bin_time:
+                    if r_T + r_B + r_M > 0:
+                        metadata.add(r_metadata)
+                    if r_station:
+                        stations.add(r_station)
                     cnt_T += r_T
                     cnt_B += r_B
                     cnt_M += r_M
@@ -226,7 +232,9 @@ def process_period_data(
                 c_N = "nan"
 
             ts_str = cur_bin_time.strftime("%Y-%m-%d %H:%M:%S")
-            out.write(f"{ts_str},{c_T},{c_B},{c_M},{avg_t},{avg_p},{c_N}\n")
+            station = next(iter(stations)) if len(stations) == 1 else ("mixed" if stations else "")
+            out.write(csv_line([ts_str, c_T, c_B, c_M, avg_t, avg_p,
+                                *metadata.columns(all_metadata), c_N, station]) + "\n")
 
             cur_bin_time = bin_end_time
 

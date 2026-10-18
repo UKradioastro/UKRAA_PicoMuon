@@ -21,9 +21,11 @@ import math
 from pathlib import Path
 import sys
 from typing import Dict, List, Optional, Tuple
-from picomuon_metadata import (
-    MetadataHistory, csv_line, read_metadata, split_payload, write_metadata,
+from picomuon_metadata import csv_line, split_payload
+from picomuon_products import (
+    ADC_COLUMNS, CPM_COLUMNS, DAY_COLUMNS, HOUR_COLUMNS, BinMetadata, HistoricalSettings,
 )
+from picomuon_neutrons import load_neutrons
 
 from picomuon_common import (
     build_daily_summary_path,
@@ -55,30 +57,8 @@ def parse_arguments() -> argparse.Namespace:
 
 
 def load_neutron_data(neutron_file: Path) -> Dict[str, float]:
-    """Read scraped NMDB neutron file and map HH:MM to efficiency-corrected neutron count."""
-    neutron_counts: Dict[str, float] = {}
-    if not neutron_file.exists():
-        return neutron_counts
-
-    try:
-        with neutron_file.open(mode="r", encoding="utf-8", errors="replace") as nf:
-            for line in nf:
-                line = line.strip()
-                if not line:
-                    continue
-                parts = [p.strip() for p in line.split(",")]
-                if len(parts) >= 5:
-                    try:
-                        # parts[0]: YYYY-MM-DD HH:MM:SS
-                        # parts[4]: EfficiencyCorrected
-                        hh_mm = parts[0][11:16]
-                        neutron_counts[hh_mm] = float(parts[4])
-                    except (ValueError, IndexError):
-                        continue
-    except OSError as err:
-        log_error(SCRIPT_NAME, f"WARNING - could not read neutron file {neutron_file}: {err}")
-
-    return neutron_counts
+    """Compatibility helper for callers needing only neutron counts."""
+    return load_neutrons(neutron_file)[0]
 
 
 def find_raw_file(base_path: Path, target_date: date, label: Optional[str]) -> Optional[Path]:
@@ -125,7 +105,7 @@ def process_daily(target_date: date, base_path: Optional[Path] = None) -> int:
 
     # Load neutron data for the day
     neutron_file = build_neutron_path(base, target_date)
-    neutron_by_minute = load_neutron_data(neutron_file)
+    neutron_by_minute, neutron_station = load_neutrons(neutron_file)
 
     # 1. 1440 1-minute bins: count_T, count_B, count_C
     cpm_bins = [[0, 0, 0] for _ in range(1440)]
@@ -146,12 +126,15 @@ def process_daily(target_date: date, base_path: Optional[Path] = None) -> int:
     prev_elapsed_ms: Optional[int] = None
     prev_hour_idx: Optional[int] = None
     prev_det_name: Optional[str] = None
-    history = MetadataHistory()
+    legacy = HistoricalSettings(base)
+    all_metadata = BinMetadata()
+    minute_metadata = [BinMetadata() for _ in cpm_bins]
+    day_metadata = [BinMetadata() for _ in day_bins]
+    adc_metadata = [BinMetadata() for _ in adc_bins]
+    hour_metadata = [BinMetadata() for _ in hour_bins]
 
     with raw_file.open(mode="r", encoding="utf-8", errors="replace") as rf:
-        for line in rf:
-            if history.consume_comment(line) or not list(raw_data_lines([line])):
-                continue
+        for line in raw_data_lines(rf):
             line = line.strip()
             if not line:
                 continue
@@ -198,7 +181,8 @@ def process_daily(target_date: date, base_path: Optional[Path] = None) -> int:
             det_name = parts[8] if len(parts) >= 9 else ""
             if det_name and not detector_name:
                 detector_name = det_name
-            history.add(dt_str, det_name, settings)
+            metadata = (det_name, *legacy.resolve(settings))
+            all_metadata.add(metadata)
 
             total_events += 1
             pos_idx = 0 if pos == "T" else (1 if pos == "B" else 2)
@@ -206,6 +190,9 @@ def process_daily(target_date: date, base_path: Optional[Path] = None) -> int:
             min_idx = dt_val.hour * 60 + dt_val.minute
             day_idx = min_idx // 5
             hour_idx = dt_val.hour
+            minute_metadata[min_idx].add(metadata)
+            day_metadata[day_idx].add(metadata)
+            hour_metadata[hour_idx].add(metadata)
 
             # Bins accumulation
             cpm_bins[min_idx][pos_idx] += 1
@@ -216,6 +203,7 @@ def process_daily(target_date: date, base_path: Optional[Path] = None) -> int:
 
             if 0 <= adc_val < 1024:
                 adc_bins[adc_val][pos_idx] += 1
+                adc_metadata[adc_val].add(metadata)
 
             hour_bins[hour_idx][pos_idx] += 1
             hour_bins[hour_idx][5] += temp_val
@@ -245,6 +233,7 @@ def process_daily(target_date: date, base_path: Optional[Path] = None) -> int:
             prev_hour_idx = hour_idx
             prev_det_name = det_name
 
+    legacy.report(SCRIPT_NAME)
     # Output 1: Minute CPM file (1440 lines)
     # Compatible format: YYYY-MM-DD HH:MM:00,cpm_T,cpm_B,cpm_M
     cpm_out = build_processed_day_path(base, "cpm", target_date, "ACM0", "txt")
@@ -252,14 +241,14 @@ def process_daily(target_date: date, base_path: Optional[Path] = None) -> int:
     temp_cpm = cpm_out.with_suffix(".tmp")
 
     with temp_cpm.open(mode="w", encoding="utf-8") as out:
-        write_metadata(out, history.metadata())
-        out.write("DateTime,Count_T,Count_B,Count_C\n")
+        out.write(csv_line(CPM_COLUMNS) + "\n")
         for m in range(1440):
             hh = m // 60
             mm = m % 60
             ts_str = f"{date_str} {hh:02d}:{mm:02d}:00"
             cnt_T, cnt_B, cnt_C = cpm_bins[m]
-            out.write(f"{ts_str},{cnt_T},{cnt_B},{cnt_C}\n")
+            out.write(csv_line([ts_str, cnt_T, cnt_B, cnt_C,
+                                *minute_metadata[m].columns(all_metadata)]) + "\n")
     temp_cpm.replace(cpm_out)
 
     # Output 2: 5-minute Day file (288 lines)
@@ -269,8 +258,7 @@ def process_daily(target_date: date, base_path: Optional[Path] = None) -> int:
     temp_day = day_out.with_suffix(".tmp")
 
     with temp_day.open(mode="w", encoding="utf-8") as out:
-        write_metadata(out, history.metadata())
-        out.write("DateTime,CPM_T,CPM_B,CPM_C,Mean_Temp,Mean_Pres,Neutrons\n")
+        out.write(csv_line(DAY_COLUMNS) + "\n")
         for b in range(288):
             min_start = b * 5
             hh = min_start // 60
@@ -300,7 +288,8 @@ def process_daily(target_date: date, base_path: Optional[Path] = None) -> int:
             # Legacy threshold: count_N > 400
             c_N = f"{neutron_sum:.3f}" if (neutron_count > 0 and neutron_sum > 400.0) else "nan"
 
-            out.write(f"{ts_str},{c_T},{c_B},{c_C},{avg_t},{avg_p},{c_N}\n")
+            out.write(csv_line([ts_str, c_T, c_B, c_C, avg_t, avg_p,
+                                *day_metadata[b].columns(all_metadata), c_N, neutron_station]) + "\n")
     temp_day.replace(day_out)
 
     # Output 3: ADC distribution (1024 lines)
@@ -310,11 +299,11 @@ def process_daily(target_date: date, base_path: Optional[Path] = None) -> int:
     temp_adc = adc_out.with_suffix(".tmp")
 
     with temp_adc.open(mode="w", encoding="utf-8") as out:
-        write_metadata(out, history.metadata())
-        out.write("ADC_Value,Count_T,Count_B,Count_C\n")
+        out.write(csv_line(ADC_COLUMNS) + "\n")
         for adc_val in range(1024):
             cnt_T, cnt_B, cnt_C = adc_bins[adc_val]
-            out.write(f"{adc_val},{cnt_T},{cnt_B},{cnt_C}\n")
+            out.write(csv_line([adc_val, cnt_T, cnt_B, cnt_C,
+                                *adc_metadata[adc_val].columns(all_metadata)]) + "\n")
     temp_adc.replace(adc_out)
 
     # Output 4: Hourly L2 file (24 lines)
@@ -330,8 +319,7 @@ def process_daily(target_date: date, base_path: Optional[Path] = None) -> int:
     valid_hours = 0
 
     with temp_hour.open(mode="w", encoding="utf-8") as out:
-        write_metadata(out, history.metadata())
-        out.write("DateTime,T,B,C,live_seconds,missing_events,temp,pres,neutrons\n")
+        out.write(csv_line(HOUR_COLUMNS) + "\n")
         for h in range(24):
             ts_str = f"{date_str} {h:02d}:00:00"
             cnt_T, cnt_B, cnt_C, live_ms, missing, sum_t, sum_p = hour_bins[h]
@@ -355,7 +343,9 @@ def process_daily(target_date: date, base_path: Optional[Path] = None) -> int:
                     neutron_h_count += 1
             n_str = f"{neutron_h_sum:.3f}" if neutron_h_count > 0 else "nan"
 
-            out.write(f"{ts_str},{cnt_T},{cnt_B},{cnt_C},{live_sec:.1f},{missing},{avg_t},{avg_p},{n_str}\n")
+            out.write(csv_line([ts_str, cnt_T, cnt_B, cnt_C, f"{live_sec:.1f}", missing,
+                                avg_t, avg_p, *hour_metadata[h].columns(all_metadata),
+                                n_str, neutron_station]) + "\n")
     temp_hour.replace(hour_out)
 
     # Output 5: Update/Append data/daily/summary.csv
@@ -373,37 +363,26 @@ def process_daily(target_date: date, base_path: Optional[Path] = None) -> int:
     coverage_pct = (valid_hours / 24.0) * 100.0
 
     summary_rows: Dict[str, str] = {}
-    summary_metadata = {}
     if summary_path.exists():
         with summary_path.open(mode="r", encoding="utf-8", errors="replace") as sf:
-            context = None
             for line in sf:
                 if line.startswith("#"):
-                    context = read_metadata(line)
                     continue
                 line = line.strip()
                 if line and not line.startswith("DateTime,"):
                     key = next(csv.reader([line]))[0]
                     summary_rows[key] = line
-                    if context is not None:
-                        summary_metadata[key] = context
-                    context = None
 
     new_row = csv_line([
         f"{date_str} 00:00:00", day_cnt_T, day_cnt_B, day_cnt_C, mean_temp,
         mean_pres, valid_hours, f"{coverage_pct:.1f}", total_missing, detector_name,
     ])
     summary_rows[f"{date_str} 00:00:00"] = new_row
-    summary_metadata[f"{date_str} 00:00:00"] = history.metadata()
 
     temp_summary = summary_path.with_suffix(".tmp")
     with temp_summary.open(mode="w", encoding="utf-8") as sf:
         sf.write("DateTime,Count_T,Count_B,Count_C,Mean_Temp,Mean_Pres,ValidHours,CoveragePercent,MissingEvents,DetectorName\n")
         for key in sorted(summary_rows.keys()):
-            write_metadata(sf, summary_metadata.get(key, {
-                "schema_version": 1, "time_basis": "UTC", "segments": [],
-                "metadata_status": "unknown",
-            }))
             sf.write(f"{summary_rows[key]}\n")
     temp_summary.replace(summary_path)
 

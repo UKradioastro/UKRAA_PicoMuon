@@ -1,7 +1,6 @@
 # Observation metadata for UKRAA PicoMuon
-# Non-empty observation fields except observer_email are embedded in raw/processed files.
-# Sharing those files discloses your name and location: use only the precision
-# you are happy to publish. Blank means unspecified, not zero.
+# Observation descriptions remain in this file; they are not embedded in new
+# raw/processed detector files. Blank means unspecified, not zero.
 [Observatory]
 # Stable public identifier, especially useful if the station is renamed.
 station_id =

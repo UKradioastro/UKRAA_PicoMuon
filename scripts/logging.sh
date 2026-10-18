@@ -99,9 +99,19 @@ run_logged_plot() {
             write_log_entry "$plot_script" "Temperature overlay unavailable: no weather product for $target_date; plotting counts only" >> "$MAIN_LOG"
         fi
     fi
+    local neutron_column=7 header
+    if [[ "$category" = day || "$category" = week || "$category" = month ]]; then
+        while IFS= read -r header; do
+            [[ "$header" = \#* || -z "$header" ]] && continue
+            if [[ "$header" = *",detector_name,"* ]]; then
+                neutron_column=12
+            fi
+            break
+        done < "$input"
+    fi
     local status=0
     PICOMUON_TARGET_DATE=$target_date run_logged_command "$plot_script" \
-        run_as_owner "$GNUPLOT" -e "plotWeather=$plot_weather" "$PICOMUON_BASE_PATH/scripts/$plot_script" || status=$?
+        run_as_owner "$GNUPLOT" -e "plotWeather=$plot_weather;neutronColumn=$neutron_column" "$PICOMUON_BASE_PATH/scripts/$plot_script" || status=$?
     if [ "$status" -eq 0 ]; then
         write_log_entry "$plot_script" "Completed plot for $target_date" >> "$MAIN_LOG"
     fi

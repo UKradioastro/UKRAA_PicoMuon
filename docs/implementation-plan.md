@@ -377,8 +377,12 @@ Phase 2a is not complete or ready to replace the production installation.**
 - Implemented: `[legacy:LABEL]` sections in `config/legacy.ini`, each containing
   all four settings for its own detector. Named units never fall back to
   `[legacy]` or `[DEFAULT]`. Detector-reported settings always take precedence;
-  new firmware does not require a legacy section. Raw metadata includes the
-  stable detector label as well as the mutable detector name.
+  new firmware does not require a legacy section. The stable detector label is
+  represented by the raw folder; the event contains the mutable detector name.
+  Update 2026-10-18: raw/processed JSON metadata comments have been replaced
+  by ordinary CSV detector/settings columns. Historical missing settings use
+  current legacy configuration as an explicitly logged user-authorised assumption.
+  Bin counts remain combined; differing metadata fields are `mixed`.
 - Implemented safeguards: installer, modern and legacy processors, reprocessing
   and plot orchestration reject named mode until detector-specific processing
   is wired. The template `PicoMuon@.service` is not automatically installed or

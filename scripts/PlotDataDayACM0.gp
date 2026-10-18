@@ -42,7 +42,8 @@ set datafile commentschars "#"
 
 # undertake stats before setting timeformat and xdata
 stats FileData using 4 output prefix "MUON" nooutput
-stats FileData using 7 output prefix "NEUTRON" nooutput
+if (!exists("neutronColumn")) { neutronColumn = 12 }
+stats FileData using neutronColumn output prefix "NEUTRON" nooutput
 
 # Guard against missing/nan neutron stats so gnuplot does not fail with undefined variable
 if (!exists("NEUTRON_min")) { NEUTRON_min = 1.0; NEUTRON_max = 1.0; NEUTRON_mean = 1.0 }
@@ -132,7 +133,7 @@ GraphTitle = GraphTitle3
 set key title GraphTitle
 set output pathPlot3
 plot FileData using 1:(((($4/MUON_mean)*100)-100)) linetype 1 linewidth 1 linecolor rgb "dark-violet" notitle "5-min averages of muons detected" with lines, \
-     FileData using 1:(((($7/NEUTRON_mean)*100)-100)) linetype 1 linewidth 1 linecolor rgb "black" axes x1y2 notitle "Oulu neutron flux (cpm)" with lines
+     FileData using 1:((((column(neutronColumn)/NEUTRON_mean)*100)-100)) linetype 1 linewidth 1 linecolor rgb "black" axes x1y2 notitle "NMDB neutron flux (cpm)" with lines
 
 # Replot to terminal and create .png image with data tag for future upload to web page
 set terminal pngcairo enhanced font "DejaVuSansCondensed, 10" rounded size 640,540 

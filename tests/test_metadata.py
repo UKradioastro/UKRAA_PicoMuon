@@ -71,13 +71,14 @@ class MetadataTests(unittest.TestCase):
         self.assertEqual(rows[1][-4:], ["300", "110", "301", "111"])
         self.assertEqual(rows[2][-4:], rows[0][-4:])
         history = metadata_from_raw(self.raw)["segments"]
-        self.assertEqual([s["settings_source"] for s in history], ["legacy.ini", "detector", "legacy.ini"])
+        self.assertEqual([s["settings"]["threshold_top"] for s in history], [200, 300, 200])
+        self.assertNotIn(METADATA_PREFIX, self.raw.read_text())
         self.assertNotIn("private@example.org", self.raw.read_text())
 
     def test_extended_firmware_needs_no_legacy_file(self):
         (self.config / "legacy.ini").unlink()
         self.capture([PAYLOAD + ",300,110,301,111"])
-        self.assertEqual(metadata_from_raw(self.raw)["segments"][0]["settings_source"], "detector")
+        self.assertEqual(metadata_from_raw(self.raw)["segments"][0]["settings"]["threshold_top"], 300)
 
     def test_missing_or_invalid_legacy_is_not_silently_defaulted(self):
         (self.config / "legacy.ini").unlink()
@@ -166,26 +167,24 @@ class MetadataTests(unittest.TestCase):
             rows = list(csv.DictReader(data_lines(source)))
         self.assertEqual(rows[0]["DetectorName"], "MyDetector,Unit1")
 
-    def test_capture_snapshot_survives_later_config_edits_in_every_product(self):
+    def test_recorded_settings_survive_config_edits_without_json_comments(self):
         self.capture([PAYLOAD, PAYLOAD + ",300,110,301,111"])
         self.set_legacy(999)
         (self.config / "user.ini").write_text("[Observer]\nobserver_name = Later observer\n")
         self.process()
         for category in ("cpm", "day", "adc"):
             product = build_processed_day_path(self.base, category, self.day)
-            metadata = metadata_from_product(product)
-            segments = metadata["segments"]
-            self.assertEqual(len(segments), 2)
-            self.assertEqual(segments[0]["settings"]["threshold_top"], 200)
-            self.assertEqual(segments[1]["settings"]["threshold_top"], 300)
-            self.assertEqual(segments[0]["observation"]["Observer"]["observer_name"], "Test Observer")
+            rows = list(csv.DictReader(product.read_text().splitlines()))
+            populated = rows[200] if category == "adc" else rows[0]
+            self.assertEqual(populated["threshold_top"], "mixed")
+            self.assertEqual(populated["detector_name"], "Detector")
+            self.assertNotIn(METADATA_PREFIX, product.read_text())
+            self.assertNotIn("Observer", product.read_text())
             self.assertNotIn("private@example.org", product.read_text())
         hour = self.base / "data" / "hour" / "2026" / "2026-10" / "2026-10-09.csv"
-        self.assertEqual(metadata_from_product(hour)["segments"], segments)
+        self.assertEqual(list(csv.DictReader(hour.read_text().splitlines()))[0]["threshold_top"], "mixed")
         summary = self.base / "data" / "daily" / "summary.csv"
-        snapshots = [read_metadata(line) for line in summary.read_text().splitlines()
-                     if line.startswith(METADATA_PREFIX)]
-        self.assertEqual(snapshots[0]["segments"], segments)
+        self.assertNotIn(METADATA_PREFIX, summary.read_text())
 
     def test_config_changes_and_midnight_are_captured(self):
         writer = RawEventWriter(self.base)
@@ -201,15 +200,15 @@ class MetadataTests(unittest.TestCase):
         self.assertEqual([s["event_count"] for s in segments], [1, 2])
         self.assertEqual(metadata_from_raw(next_raw)["segments"][0]["settings"]["threshold_top"], 250)
 
-    def test_history_without_metadata_is_unknown_not_today_configuration(self):
+    def test_missing_historical_settings_use_explicit_legacy_assumption(self):
         self.raw.parent.mkdir(parents=True)
         original = "2026-10-09 00:00:00.000000," + PAYLOAD + "\n"
         self.raw.write_text(LEGACY_RAW_HEADER + "\n" + original)
         self.process()
-        segments = metadata_from_product(build_processed_day_path(self.base, "day", self.day))["segments"]
-        self.assertIsNone(segments[0]["settings"])
-        self.assertEqual(segments[0]["settings_source"], "unknown")
-        self.assertEqual(segments[0]["observation"], {})
+        product = build_processed_day_path(self.base, "day", self.day)
+        row = next(csv.DictReader(product.read_text().splitlines()))
+        self.assertEqual(row["threshold_top"], "200")
+        self.assertEqual(row["reset_bottom"], "101")
         self.capture([PAYLOAD])
         self.assertIn(original, self.raw.read_text())
         self.assertIn(RAW_HEADER, self.raw.read_text())
@@ -239,12 +238,11 @@ class MetadataTests(unittest.TestCase):
         with patch("sys.stdout", new_callable=io.StringIO):
             self.assertEqual(process_period_data("week", self.day, self.base, min_percent=0), 0)
         product = build_processed_day_path(self.base, "week", self.day)
-        meta = metadata_from_product(product)
-        self.assertEqual(meta["daily_metadata"][0]["date"], "2026-10-09")
-        self.assertEqual(meta["daily_metadata"][0]["metadata"]["segments"][0]["settings_source"], "legacy.ini")
+        self.assertNotIn(METADATA_PREFIX, product.read_text())
         rows = list(csv.DictReader(data_lines(product.read_text().splitlines())))
         self.assertEqual(len(rows), 1008)
         self.assertEqual(rows[-144]["CPM_C"], "1")
+        self.assertEqual(rows[-144]["threshold_top"], "200")
 
     def test_old_and_extended_input_produce_identical_numeric_products(self):
         self.raw.parent.mkdir(parents=True)
@@ -283,9 +281,9 @@ class MetadataTests(unittest.TestCase):
             for category, days in (("week", 7), ("month", 31)):
                 runpy.run_path(str(scripts / f"ProcessData{category.title()}ACM0.py"), run_name="__main__")
                 path = build_processed_day_path(self.base, category, yesterday)
-                meta = metadata_from_product(path)
-                self.assertEqual(len(meta["daily_metadata"]), days)
-                self.assertEqual(meta["daily_metadata"][0]["metadata"]["station_id"], "Test-01")
+                rows = list(csv.DictReader(path.read_text().splitlines()))
+                self.assertEqual(rows[0]["threshold_top"], "200")
+                self.assertNotIn(METADATA_PREFIX, path.read_text())
 
     def test_migration_uses_extended_header_for_headerless_extended_rows(self):
         self.raw.parent.mkdir(parents=True)

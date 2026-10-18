@@ -11,7 +11,7 @@ from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
 
-from AddRawHeaders import add_header, main as migrate_main
+from AddRawHeaders import add_header, has_metadata_comments, main as migrate_main
 from GetDataRaw import open_daily_file
 from picomuon_common import LEGACY_RAW_HEADER, RAW_HEADER, raw_data_lines
 from picomuon_metadata import data_lines
@@ -27,6 +27,11 @@ class RawHeaderTests(unittest.TestCase):
         self.directory = tempfile.TemporaryDirectory()
         self.addCleanup(self.directory.cleanup)
         self.base = Path(self.directory.name)
+        config = self.base / "config"
+        config.mkdir()
+        (config / "legacy.ini").write_text(
+            "[legacy]\nthreshold_top = 200\nreset_top = 100\nthreshold_bottom = 200\nreset_bottom = 100\n"
+        )
         self.now = datetime(2026, 10, 9, tzinfo=timezone.utc)
         self.raw = self.base / "data" / "raw" / "2026" / "2026-10" / "2026-10-09.txt"
         self.raw.parent.mkdir(parents=True)
@@ -84,6 +89,46 @@ class RawHeaderTests(unittest.TestCase):
         self.assertFalse(add_header(self.raw))
         self.assertEqual(self.raw.read_bytes(), original)
 
+    def test_remove_metadata_preserves_every_other_byte_backup_and_mtime(self):
+        original = (
+            RAW_HEADER.encode() + b"\r\n# picomuon_metadata: {\"old\": true}\r\n"
+            + EVENT + b"\r\n# keep this comment\n# picomuon_metadata: {}\n" + EVENT
+        )
+        expected = RAW_HEADER.encode() + b"\r\n" + EVENT + b"\r\n# keep this comment\n" + EVENT
+        self.raw.write_bytes(original)
+        mtime = self.raw.stat().st_mtime_ns
+        self.assertTrue(has_metadata_comments(self.raw))
+        self.assertTrue(add_header(self.raw, remove_metadata=True))
+        self.assertEqual(self.raw.read_bytes(), expected)
+        self.assertEqual(self.raw.with_name(self.raw.name + ".pre-metadata-removal.bak").read_bytes(), original)
+        self.assertEqual(self.raw.stat().st_mtime_ns, mtime)
+        self.assertFalse(add_header(self.raw, remove_metadata=True))
+
+    def test_remove_metadata_cli_is_preview_by_default_and_excludes_rejected(self):
+        content = b"# picomuon_metadata: {}\n" + EVENT + b"\n"
+        self.raw.write_bytes(content)
+        rejected = self.base / "data" / "raw" / "rejected" / "2026-10-09.txt"
+        rejected.parent.mkdir()
+        rejected.write_bytes(content)
+        with patch.dict(os.environ, {"PICOMUON_BASE_PATH": str(self.base)}), \
+                patch("sys.stdout", new_callable=io.StringIO):
+            with patch("sys.argv", ["AddRawHeaders.py", "--remove-metadata"]):
+                self.assertEqual(migrate_main(), 0)
+            self.assertEqual(self.raw.read_bytes(), content)
+            with patch("sys.argv", ["AddRawHeaders.py", "--remove-metadata", "--apply",
+                                    "--collectors-stopped"]):
+                self.assertEqual(migrate_main(), 0)
+        self.assertEqual(self.raw.read_bytes(), EVENT + b"\n")
+        self.assertEqual(rejected.read_bytes(), content)
+
+    def test_remove_metadata_backup_collision_leaves_original_unchanged(self):
+        content = b"# picomuon_metadata: {}\n" + EVENT
+        self.raw.write_bytes(content)
+        self.raw.with_name(self.raw.name + ".pre-metadata-removal.bak").write_bytes(b"prior backup")
+        with self.assertRaises(FileExistsError):
+            add_header(self.raw, remove_metadata=True)
+        self.assertEqual(self.raw.read_bytes(), content)
+
     def test_backup_collision_leaves_original_unchanged(self):
         self.raw.write_bytes(EVENT)
         backup = self.raw.with_name(self.raw.name + ".pre-header.bak")
@@ -129,7 +174,7 @@ class RawHeaderTests(unittest.TestCase):
         for category, index in (("adc", 201), ("cpm", 1)):
             output = (self.base / "data" / category / "ACM0" / yesterday.strftime("%Y")
                       / yesterday.strftime("%Y-%m") / raw.name)
-            self.assertEqual(list(data_lines(output.read_text().splitlines()))[index].split(",")[-1], "1")
+            self.assertEqual(list(data_lines(output.read_text().splitlines()))[index].split(",")[3], "1")
 
     def test_daily_outputs_identical_before_and_after_raw_migration(self):
         self.raw.write_bytes(EVENT + b"\n")

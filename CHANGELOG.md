@@ -8,14 +8,16 @@ This project uses calendar versioning in the format `YYYY.MM.patch`.
 ## [Unreleased]
 
 ### Added
+- Readable NMDB attribution, station and request comments plus a CSV column header in new neutron downloads; readers retain headerless-file compatibility.
+- Optional `AddRawHeaders.py --remove-metadata` preview/apply cleanup of obsolete raw JSON comments, preserving event bytes and byte-exact backups while collectors are stopped.
 - Optional Open-Meteo hourly modelled 2 m outdoor temperature overlays on all three CPM plots, using the existing observatory coordinates and an opt-in `[weather]` section in `config/user.ini`, UTC daily downloads and historical-forecast retrieval for older dates. Weather/source attribution is retained in data, images and the web page; day/week/month images also carry a short NMDB/Oulu credit alongside the existing full web acknowledgements.
 - Phase 2a collection-pilot foundation (not yet a production multi-detector pipeline):
   - Validated `[detectors]` mappings with case-preserving labels, mandatory stable by-id paths and per-unit USB identity, duplicate device/alias checks, and atomic `ConfigureUSB.py --register` updates.
   - Explicit `GetDataRaw.py --detector LABEL`, isolated raw/rejected/status output and labelled logs, plus an opt-in `PicoMuon@.service` template with separate log paths (not auto-installed).
-  - Independent `[legacy:LABEL]` fallback settings with no shared-default inheritance, and stable detector labels in capture-time metadata.
+  - Independent `[legacy:LABEL]` fallback settings with no shared-default inheritance; stable labels are retained in raw paths.
   - Concurrent simulated collector tests, independent reconnect/UTC rollover, identity mismatch and processing safety checks; POSIX pseudo-terminal exclusive-access test for the RPi.
-- Backward-compatible 8/12-field detector capture: append legacy settings from `config/legacy.ini` only when absent, preserve detector-reported settings, reject malformed suffixes, and record capture-time public observation metadata without observer email.
-- Self-contained metadata comments in daily, hourly, summary and period products, preserving consecutive settings/source changes and historical unknowns without altering numerical columns. Installer provisions/merges legacy and observation templates.
+- Backward-compatible 8/12-field detector capture: append legacy settings from `config/legacy.ini` only when absent, preserve detector-reported settings, and reject malformed suffixes.
+- Installer provisioning/merging of legacy and observation configuration templates.
 - `scripts/AddRawHeaders.py`: preview and safely add column headers to historic and current raw event files while collectors are stopped, with byte-exact backups and atomic per-file replacement.
 - Phase 2 high-speed processing engine replacing the 9+ hour multi-pass bubble-sort:
   - `scripts/ProcessDaily.py`: Single-pass streaming daily parser that simultaneously computes 1,440-minute CPM, 288 5-minute Day records merged with NMDB neutron flux, 1,024-bin ADC energy spectra, 24 hourly L2 summaries with missing-event tracking, and daily quality metrics written to `data/daily/summary.csv`.
@@ -32,6 +34,9 @@ This project uses calendar versioning in the format `YYYY.MM.patch`.
 - Dynamic installation-root lookup for the legacy processing and plot scripts.
 
 ### Changed
+- Raw collectors no longer emit JSON metadata comments or embed observation details. ADC/CPM/day/hour/all period products now include detector name and four settings as CSV columns; day/period and hourly products include `neutrons,station`, retaining hourly pressure.
+- Per-bin differing metadata fields are `mixed`, without splitting or changing counts. At the user's explicit request, missing historical settings are filled from current legacy configuration with an assumption logged. Recorded settings take precedence.
+- Daily summaries no longer write JSON comments; legacy processing entry points use the shared writers. Day/week/month plots select the neutron column for either historical or new layouts.
 - USB identity failures now prevent opening the serial port, including in single-detector mode; collectors and detector probing use exclusive serial access.
 - Until the next Phase 2a milestone, installer/processing/plot orchestration refuse named multi-detector mode instead of producing misleading shared output. The implementation plan records deferred Phase 2 exposure/L2/long-period work and pending RPi acceptance.
 - Standardise runtime logs as UTC timestamp, aligned process name and message. Shared command logging formats external diagnostics without double-prefixing existing entries, preserves exit codes and prefixes multiline Python messages and tracebacks.
