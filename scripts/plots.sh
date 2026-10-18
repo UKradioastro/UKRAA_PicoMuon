@@ -7,11 +7,14 @@ source "$(dirname "${BASH_SOURCE[0]}")/logging.sh"
 MAIN_LOG="$PICOMUON_BASE_PATH/logfiles/log-PicoMuon.txt"
 ERROR_LOG="$PICOMUON_BASE_PATH/logfiles/log-error.txt"
 GNUPLOT=/usr/bin/gnuplot
+PYTHON=/usr/bin/python3
 TARGET_DATE="${1:-${PICOMUON_TARGET_DATE:-$(date -u -d yesterday +%F)}}"
 mkdir -p "$PICOMUON_BASE_PATH/logfiles"
-PYTHONPATH="$PICOMUON_BASE_PATH/scripts" /usr/bin/python3 -c \
+PYTHONPATH="$PICOMUON_BASE_PATH/scripts" "$PYTHON" -c \
     'from picomuon_common import get_usb_options; get_usb_options()'
 FAILURES=0
+run_logged_command "GetDataWeather.py" run_as_owner "$PYTHON" \
+    "$PICOMUON_BASE_PATH/scripts/GetDataWeather.py" --date "$TARGET_DATE" || FAILURES=$((FAILURES + 1))
 for plot_script in \
     PlotDataCpmACM0.gp \
     PlotDataFreqACM0.gp \

@@ -89,9 +89,19 @@ run_logged_plot() {
         return 1
     fi
     write_log_entry "$plot_script" "Started plot for $target_date" >> "$MAIN_LOG"
+    local plot_weather=0
+    if [ "$plot_script" = PlotDataCpmACM0.gp ]; then
+        local weather_input="$PICOMUON_BASE_PATH/data/weather/${target_date:0:4}/${target_date:0:7}/$target_date.txt"
+        if [ -f "$weather_input" ]; then
+            plot_weather=1
+            write_log_entry "$plot_script" "Using stored modelled 2 m air temperature for $target_date" >> "$MAIN_LOG"
+        else
+            write_log_entry "$plot_script" "Temperature overlay unavailable: no weather product for $target_date; plotting counts only" >> "$MAIN_LOG"
+        fi
+    fi
     local status=0
     PICOMUON_TARGET_DATE=$target_date run_logged_command "$plot_script" \
-        run_as_owner "$GNUPLOT" "$PICOMUON_BASE_PATH/scripts/$plot_script" || status=$?
+        run_as_owner "$GNUPLOT" -e "plotWeather=$plot_weather" "$PICOMUON_BASE_PATH/scripts/$plot_script" || status=$?
     if [ "$status" -eq 0 ]; then
         write_log_entry "$plot_script" "Completed plot for $target_date" >> "$MAIN_LOG"
     fi

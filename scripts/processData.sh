@@ -40,6 +40,7 @@ run_stage() {
 
 FAILURES=0
 run_stage "NMDB download" "$PYTHON" "$BASE_PATH/scripts/GetDataNeutron.py" || FAILURES=$((FAILURES + 1))
+run_stage "weather download" "$PYTHON" "$BASE_PATH/scripts/GetDataWeather.py" --date "$TARGET_DATE" || FAILURES=$((FAILURES + 1))
 run_stage "fast daily processing" "$PYTHON" "$BASE_PATH/scripts/ProcessDaily.py" --date "$TARGET_DATE" || FAILURES=$((FAILURES + 1))
 run_stage "multi-day period processing" "$PYTHON" "$BASE_PATH/scripts/ProcessPeriod.py" --date "$TARGET_DATE" || FAILURES=$((FAILURES + 1))
 

@@ -1,6 +1,7 @@
 # Local temporary validation output
 .tmp_*/
 examples/
+/config/user.ini
 
 # Python bytecode and cache files
 __pycache__/

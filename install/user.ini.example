@@ -1,5 +1,5 @@
 # Observation metadata for UKRAA PicoMuon
-# Non-empty fields except observer_email are embedded in raw/processed files.
+# Non-empty observation fields except observer_email are embedded in raw/processed files.
 # Sharing those files discloses your name and location: use only the precision
 # you are happy to publish. Blank means unspecified, not zero.
 [Observatory]
@@ -37,3 +37,9 @@ scintillator_dimensions =
 detector_separation =
 shielding =
 notes =
+
+# Optional modelled 2 m outdoor temperature from Open-Meteo for CPM plots.
+# Uses observatory_latitude/observatory_longitude above; coordinates are sent
+# to Open-Meteo when enabled. This section is not embedded in detector metadata.
+[weather]
+enabled = false

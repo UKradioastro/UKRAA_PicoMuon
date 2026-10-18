@@ -341,6 +341,74 @@ head -n 2 "data/raw/$(date -u +%Y/%Y-%m/%F).txt"
 
 The service should be `active`. If using a detector label (including the legacy `ACM0` layout), include that folder between `raw/` and the year in the last command. Raw data collection pauses during migration; no missed events can be recovered by this procedure. There is no need to reprocess data just because a header was added.
 
+### Outdoor temperature on CPM plots
+
+The top, bottom and coincidence CPM plots can overlay **modelled outdoor air
+temperature at 2 m** from [Open-Meteo](https://open-meteo.com/), on the right-hand
+axis in degrees Celsius. This is not a local thermometer reading, the detector's
+internal temperature, or upper-air effective temperature for muon corrections.
+Counts remain on the left-hand axis, with the existing colours and PNG filenames.
+The temperature axis auto-scales so values outside a fixed seasonal range remain visible.
+
+Use the existing observatory coordinates in `config/user.ini` and add a
+`[weather]` section to enable downloads. For the requested location, 51.6 N,
+0.10 W, the relevant entries are:
+
+```ini
+[Observatory]
+observatory_latitude = 51.6
+observatory_longitude = -0.10
+
+[weather]
+enabled = true
+```
+
+Edit the existing `[Observatory]` section rather than adding a duplicate, and
+preserve the other observation fields. There is no separate weather configuration
+file. If you used the initial `weather.ini` version, transfer its coordinates to
+these existing observatory fields and its enabled setting to `[weather]` in
+`user.ini`; `weather.ini` is no longer read.
+
+The installer merges a disabled weather default from `install/user.ini.example`
+for existing installations and preserves existing coordinates and preferences.
+Older user configurations without `[weather]` keep downloads disabled.
+The local user configuration is ignored by Git. Coordinates
+are sent to Open-Meteo and recorded in the downloaded product; choose appropriate
+location precision.
+
+`processData.sh`, `plots.sh` and `reprocessData.sh --plot` fetch weather for their
+plot target date. To download or refresh just one UTC day:
+
+```bash
+python3 scripts/GetDataWeather.py --date 2026-10-17
+bash scripts/plots.sh 2026-10-17
+```
+
+Hourly data is written atomically to `data/weather/YYYY/YYYY-MM/YYYY-MM-DD.txt`.
+Recent completed days use the Forecast API; dates more than five days old use
+the Historical Forecast API (model-dependent coverage, generally from 2021/2022).
+No API key or additional Python package is needed for the free, non-commercial
+service. Missing hourly temperatures stay as gaps, not zeroes; all-missing or
+invalid responses fail explicitly. Download failures reach `log-error.txt` and
+make the orchestration exit unsuccessfully, without stopping the other plots.
+Previously stored weather for the target date can still be plotted; without it,
+the wrapper explicitly logs that CPM plots contain counts only. Disabling downloads
+does not delete previously stored weather.
+
+For a WinSCP update, upload `GetDataWeather.py`, `logging.sh`, `processData.sh`,
+`plots.sh`, `reprocessData.sh`, the revised CPM/day/week/month gnuplot scripts and
+`WWW/index.html`, then update `config/user.ini` as above on the Pi. No raw-data
+reprocessing or collector restart is required. Run `plots.sh` for a completed day
+to verify the overlay; the next daily run publishes the updated images. Update
+the served web page as well if you deploy it separately.
+
+Keep the full NMDB/Oulu acknowledgement below neutron-containing plots on the
+website. A short credit is also embedded in day/week/month images so that it
+survives downloading and sharing. CPM images with weather contain an Open-Meteo
+credit; the web page adds links to the provider and
+[CC BY 4.0 licence](https://creativecommons.org/licenses/by/4.0/).
+Keep these credits with any exported or republished images.
+
 ### Log format
 
 New runtime entries use UTC timestamps and an aligned process name:

@@ -58,6 +58,7 @@ mkdir -p "$PICOMUON_BASE_PATH"
 GNUPLOT=mock_gnuplot
 mock_gnuplot() {
     printf 'gnuplot target=%s\n' "$PICOMUON_TARGET_DATE"
+    printf 'gnuplot arguments=%s\n' "$*"
     printf 'gnuplot diagnostic\n' >&2
     return "${PLOT_STATUS:-0}"
 }
@@ -91,6 +92,22 @@ run_logged_plot PlotDataAdcACM0.gp "$target" || status=$?
 grep -F 'required input missing:' "$ERROR_LOG"
 ! grep -Ev "$PATTERN" "$MAIN_LOG" "$ERROR_LOG"
 
+# CPM plots explicitly include or omit the optional weather overlay.
+cpm_dir="$PICOMUON_BASE_PATH/data/cpm/ACM0/2026/2026-10"
+weather_dir="$PICOMUON_BASE_PATH/data/weather/2026/2026-10"
+mkdir -p "$cpm_dir" "$weather_dir"
+printf 'data\n' > "$cpm_dir/$target.txt"
+PLOT_STATUS=0
+: > "$MAIN_LOG"
+run_logged_plot PlotDataCpmACM0.gp "$target"
+grep -F 'Temperature overlay unavailable:' "$MAIN_LOG"
+grep -F 'plotWeather=0' "$MAIN_LOG"
+printf 'weather\n' > "$weather_dir/$target.txt"
+: > "$MAIN_LOG"
+run_logged_plot PlotDataCpmACM0.gp "$target"
+grep -F 'Using stored modelled 2 m air temperature' "$MAIN_LOG"
+grep -F 'plotWeather=1' "$MAIN_LOG"
+
 # Run the real reprocessing orchestration with isolated command substitutes.
 BASE="$TEST_ROOT/reprocessing"
 mkdir -p "$BASE/scripts" "$BASE/data/raw/2026/2026-10"
@@ -108,6 +125,10 @@ fi
 if [ "$1" = -c ]; then
     printf '2026.10.0\n'
     exit 0
+fi
+if [[ "$1" = *GetDataWeather.py ]] && [ "${FAIL_WEATHER:-0}" -eq 1 ]; then
+    printf 'weather download unavailable\n' >&2
+    exit 7
 fi
 printf 'processor output\n'
 PYTHON
@@ -149,6 +170,28 @@ FAIL_PLOT=1 PICOMUON_BASE_PATH="$BASE" bash "$BASE/scripts/processData.sh" "$tar
 [ "$status" -eq 1 ]
 grep -F 'Completed daily processing with 4 failed stage(s)' "$BASE/logfiles/log-PicoMuon.txt"
 ! grep -Ev "$PATTERN" "$BASE/logfiles/log-PicoMuon.txt" "$BASE/logfiles/log-error.txt"
+
+# Weather failures are counted while all existing plots still run.
+: > "$BASE/logfiles/log-PicoMuon.txt"
+: > "$BASE/logfiles/log-error.txt"
+status=0
+FAIL_WEATHER=1 PICOMUON_BASE_PATH="$BASE" bash "$BASE/scripts/processData.sh" "$target" || status=$?
+[ "$status" -eq 1 ]
+grep -F 'weather download unavailable' "$BASE/logfiles/log-error.txt"
+grep -F 'Completed daily processing with 1 failed stage(s)' "$BASE/logfiles/log-PicoMuon.txt"
+grep -Eq 'PlotDataCpmACM0.gp +: Completed plot' "$BASE/logfiles/log-PicoMuon.txt"
+
+sed -e 's|PYTHON=/usr/bin/python3|PYTHON="$PICOMUON_BASE_PATH/scripts/fake-python"|' \
+    -e 's|GNUPLOT=/usr/bin/gnuplot|GNUPLOT="$PICOMUON_BASE_PATH/scripts/fake-gnuplot"|' \
+    "$REPO_PATH/scripts/plots.sh" > "$BASE/scripts/plots.sh"
+PICOMUON_BASE_PATH="$BASE" bash "$BASE/scripts/plots.sh" "$target"
+status=0
+FAIL_WEATHER=1 PICOMUON_BASE_PATH="$BASE" bash "$BASE/scripts/plots.sh" "$target" || status=$?
+[ "$status" -eq 1 ]
+status=0
+FAIL_WEATHER=1 PICOMUON_BASE_PATH="$BASE" bash "$BASE/scripts/reprocessData.sh" --to "$target" --plot || status=$?
+[ "$status" -eq 1 ]
+grep -F 'Completed reprocessing with 1 failure(s)' "$BASE/logfiles/log-PicoMuon.txt"
 
 # Simulate flock to test cron routing even on Git Bash, which lacks flock.
 flock() { return 0; }

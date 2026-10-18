@@ -159,6 +159,8 @@ if [ "$RUN_PERIOD" = "true" ]; then
 fi
 
 if [ "$RUN_PLOTS" = "true" ]; then
+    run_logged_command "GetDataWeather.py" run_as_owner "$PYTHON" \
+        "$BASE_PATH/scripts/GetDataWeather.py" --date "$TO_DATE" || FAILURES=$((FAILURES + 1))
     log_msg "Refreshing gnuplot plots"
     for plot_script in \
         PlotDataCpmACM0.gp \

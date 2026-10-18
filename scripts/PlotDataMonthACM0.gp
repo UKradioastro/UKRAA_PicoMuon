@@ -83,6 +83,8 @@ set grid layerdefault linetype 0 linecolor 0 linewidth 0.500 dashtype solid, \
 set key outside above center
 set key samplen 10
 set key nobox
+set bmargin 5
+set label 100 "Neutron data: NMDB (www.nmdb.eu) / Oulu, University of Oulu" at screen 0.5, 0.02 center font ",8"
 
 # X-axis tics
 set xtics border out scale 1,0.5 nomirror norotate  autojustify

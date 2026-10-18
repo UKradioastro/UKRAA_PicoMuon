@@ -8,6 +8,7 @@ This project uses calendar versioning in the format `YYYY.MM.patch`.
 ## [Unreleased]
 
 ### Added
+- Optional Open-Meteo hourly modelled 2 m outdoor temperature overlays on all three CPM plots, using the existing observatory coordinates and an opt-in `[weather]` section in `config/user.ini`, UTC daily downloads and historical-forecast retrieval for older dates. Weather/source attribution is retained in data, images and the web page; day/week/month images also carry a short NMDB/Oulu credit alongside the existing full web acknowledgements.
 - Phase 2a collection-pilot foundation (not yet a production multi-detector pipeline):
   - Validated `[detectors]` mappings with case-preserving labels, mandatory stable by-id paths and per-unit USB identity, duplicate device/alias checks, and atomic `ConfigureUSB.py --register` updates.
   - Explicit `GetDataRaw.py --detector LABEL`, isolated raw/rejected/status output and labelled logs, plus an opt-in `PicoMuon@.service` template with separate log paths (not auto-installed).

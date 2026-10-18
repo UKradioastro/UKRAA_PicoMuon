@@ -210,6 +210,12 @@ in that folder and asks you to confirm.
 
 ### 2c. Upper-air temperature from Open-Meteo (decision 5)
 
+The CPM plots now support a separate, optional **near-surface 2 m outdoor
+temperature** overlay via `GetDataWeather.py`, enabled in `config/user.ini`
+using its existing observatory coordinates. This is
+modelled hourly weather, not detector temperature or `T_eff`, and does not
+implement the atmospheric corrections described below.
+
 Checked on 2026-10-10:
 - **Recent days:** the Open-Meteo forecast API returns hourly
   `temperature_<level>hPa` (1000 → 30 hPa) and `geopotential_height_<level>hPa`

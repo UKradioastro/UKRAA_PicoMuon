@@ -35,6 +35,8 @@ YmdFile = "/".targetDate.".txt"
 
 # Path to each data file for graphing
 FileData = pathData.YearFolder.YearMonthFolder.YmdFile
+FileWeather = basePath."/data/weather".YearFolder.YearMonthFolder.YmdFile
+if (!exists("plotWeather")) { plotWeather = 0 }
 
 # date to be processed
 date = targetDate
@@ -71,6 +73,7 @@ set xdata time
 # Set format types
 set format x "%H:%M" timedate
 set format y "%.1f" 
+set format y2 "%.1f"
 set timefmt "%Y-%m-%d %H:%M:%S"
 
 # Set grid format
@@ -96,6 +99,15 @@ set ytics border out scale 1,0.5 nomirror norotate  autojustify
 set ytics norangelimit autofreq
 set ytics textcolor rgb "dark-violet"
 
+if (plotWeather) {
+    set my2tics 2
+    set y2tics border out nomirror textcolor rgb "grey30"
+    set y2label "Modelled 2 m air temperature (degC)" textcolor rgb "grey30"
+    set autoscale y2
+    set bmargin 5
+    set label 100 "Weather data by Open-Meteo.com (CC BY 4.0)" at screen 0.5, 0.02 center font ",8"
+}
+
 # X-axis label and ranges
 set xlabel "Time (UTC)" 
 set xlabel textcolor rgb "black" norotate
@@ -110,7 +122,12 @@ set yrange [ 0.00000 : * ] noreverse nowriteback
 GraphTitle = GraphTitle1
 set key title GraphTitle
 set output pathPlot1
-plot FileData using 1:2 linetype 1 linewidth 1 linecolor rgb "#0000FF" title "Cpm of events detected by top detector" with lines
+if (plotWeather) {
+    plot FileData using 1:2 linetype 1 linewidth 1 linecolor rgb "#0000FF" title "Cpm of events detected by top detector" with lines, \
+         FileWeather using 1:2 axes x1y2 linewidth 2 linecolor rgb "grey30" title "2 m air temperature (degC)" with lines
+} else {
+    plot FileData using 1:2 linetype 1 linewidth 1 linecolor rgb "#0000FF" title "Cpm of events detected by top detector" with lines
+}
 
 # Replot to terminal and create .png image with data tag for future upload to web page
 set terminal pngcairo enhanced font "DejaVuSansCondensed, 10" rounded size 640,540 
@@ -129,7 +146,12 @@ replot
 GraphTitle = GraphTitle2
 set key title GraphTitle
 set output pathPlot2
-plot FileData using 1:3 linetype 1 linewidth 1 linecolor rgb "#FF0000" title "Cpm of events detected by bottom detector" with lines
+if (plotWeather) {
+    plot FileData using 1:3 linetype 1 linewidth 1 linecolor rgb "#FF0000" title "Cpm of events detected by bottom detector" with lines, \
+         FileWeather using 1:2 axes x1y2 linewidth 2 linecolor rgb "grey30" title "2 m air temperature (degC)" with lines
+} else {
+    plot FileData using 1:3 linetype 1 linewidth 1 linecolor rgb "#FF0000" title "Cpm of events detected by bottom detector" with lines
+}
 
 # Replot to terminal and create .png image with data tag for future upload to web page
 set terminal pngcairo enhanced font "DejaVuSansCondensed, 10" rounded size 640,540 
@@ -148,7 +170,12 @@ replot
 GraphTitle = GraphTitle3
 set key title GraphTitle
 set output pathPlot3
-plot FileData using 1:4 linetype 1 linewidth 1 linecolor rgb "#00FF00" title "Cpm of muon detected" with lines
+if (plotWeather) {
+    plot FileData using 1:4 linetype 1 linewidth 1 linecolor rgb "#00FF00" title "Cpm of muon detected" with lines, \
+         FileWeather using 1:2 axes x1y2 linewidth 2 linecolor rgb "grey30" title "2 m air temperature (degC)" with lines
+} else {
+    plot FileData using 1:4 linetype 1 linewidth 1 linecolor rgb "#00FF00" title "Cpm of muon detected" with lines
+}
 
 # Replot to terminal and create .png image with data tag for future upload to web page
 set terminal pngcairo enhanced font "DejaVuSansCondensed, 10" rounded size 640,540 
