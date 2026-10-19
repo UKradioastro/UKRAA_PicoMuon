@@ -5,15 +5,54 @@
 
 # Python code for the UKRAA PicoMuon
 [![License](https://img.shields.io/badge/license-MIT-brightgreen.svg)](/LICENSE)
+[![Python 3](https://img.shields.io/badge/Python-3-blue.svg?logo=python)](https://www.python.org/)
+[![Bash](https://img.shields.io/badge/Shell-Bash-4EAA25.svg?logo=gnubash)](https://www.gnu.org/software/bash/)
+[![gnuplot](https://img.shields.io/badge/Plots-gnuplot-4F4F4F.svg)](https://www.gnuplot.info/)
+[![Raspberry Pi 4/5](https://img.shields.io/badge/Raspberry%20Pi-4%2F5-A22846.svg?logo=raspberrypi)](https://www.raspberrypi.com/)
+[![PicoMuon data](https://img.shields.io/badge/PicoMuon-Muon%20detector%20data-0078D4.svg)](https://github.com/UKradioastro/UKRAA_PicoMuon)
 
 
-Set of Python code to run on a RPi4/5 to get, process and present data from the UKRAA PicoMuon detector
+Set of Python, gnuplot and Bash scripts to run on a Raspberry Pi 4/5 to record, process and present data from the UKRAA PicoMuon detector.
 
 This software was written to suit a specific set-up, feel free to use as you see fit.
 
 
 Instructions for setting up a Raspberry Pi4/5 are included in the **docs** folder
 
+---
+
+&nbsp;
+<!-- =============================================================================== -->
+## Contents
+
+- [Temporary plots](#temporary-plots)
+- [Can I update to the latest version?](#can-i-update-to-latest-version)
+- [Where is my detector?](#where-is-my-detector)
+- [Getting the software onto your RPi](#getting-the-software-onto-your-rpi)
+- [Using the code](#using-the-code)
+- [Installing the software onto your RPi](#installing-the-software-onto-your-rpi)
+- [What does the code do?](#what-does-the-code-do)
+  - [Observation and legacy detector configuration](#observation-and-legacy-detector-configuration)
+  - [Phase 2a development: named-detector collection and processing pilot](#phase-2a-development-named-detector-collection-and-processing-pilot)
+    - [Explicit offline processing in the pilot](#explicit-offline-processing-in-the-pilot)
+  - [Raw event columns](#raw-event-columns)
+  - [Metadata in processed and shared data](#metadata-in-processed-and-shared-data)
+  - [Neutron file attribution and headers](#neutron-file-attribution-and-headers)
+  - [Upgrading existing data files](#upgrading-existing-data-files)
+  - [Adding headers to historic and current raw files](#adding-headers-to-historic-and-current-raw-files)
+  - [Outdoor temperature on CPM plots](#outdoor-temperature-on-cpm-plots)
+  - [Log format](#log-format)
+- [Check GetDataRaw.py is running](#check-getdatarawpy-is-running)
+- [Updating your software](#updating-your-software)
+- [License](#license)
+- [Contact us](#contact-us)
+
+&nbsp;
+
+---
+
+&nbsp;
+<!-- =============================================================================== -->
 ### Temporary plots
 
 Latest plot copies are grouped below `temp/`:
@@ -43,7 +82,7 @@ for its requested date, as before.
 <!-- =============================================================================== --> 
 ### Can I update to latest version?
 
-There is a section on updating your software to the latest version at the bottom of this README.
+See [Updating your software](#updating-your-software) for instructions.
 
 &nbsp;
 
@@ -84,7 +123,7 @@ ls /dev/tty*
 
 &nbsp;
 <!-- =============================================================================== --> 
-## Install the software onto your RPi
+## Getting the software onto your RPi
 
 1. Log into your Raspberry Pi4/5 using VNC.
 
@@ -113,7 +152,7 @@ The raw data collector resolves serial settings from `config/USB.ini`, with supp
 
 &nbsp;
 <!-- =============================================================================== --> 
-## Install the software onto your RPi
+## Installing the software onto your RPi
 
 
 1. Open a terminal window and type the following command and press enter
@@ -147,6 +186,12 @@ The raw data will be processed overnight, via CRON, to get counts per minute, th
 
 Processed products are stored directly under `data/` in their own folders (for example, `data/cpm/`, `data/day/`, and `data/adc/`); they are no longer nested under `data/processed/`. Raw and processed detector files have ordinary CSV column headers, with detector/settings values on each data row. New output does not contain `# picomuon_metadata:` JSON comments.
 
+[Back to Contents](#contents)
+
+---
+
+&nbsp;
+<!-- =============================================================================== -->
 ### Observation and legacy detector configuration
 
 The installer creates `config/legacy.ini` and `config/user.ini` from the templates in `install/`, without overwriting existing values. For a manual upgrade, copy `install/legacy.ini.example` and `install/user.ini.example` to those configuration paths if they do not already exist. Stop collection before upgrading, configure the files, then restart the service.
@@ -172,6 +217,12 @@ Blank values mean unspecified, not zero. Latitude and longitude must be finite n
 
 The collector records the detector name and four settings on every raw event. Legacy settings are reread whenever an event needs them, so edits apply to subsequent events without a restart. Existing recorded settings are never overwritten during processing. At the user's explicit request, processing historical rows without settings now uses current `config/legacy.ini` values and logs an `ASSUMPTION` message; this is not proof of historical configuration. Missing/invalid required legacy settings cause an explicit failure rather than invented defaults.
 
+[Back to Contents](#contents)
+
+---
+
+&nbsp;
+<!-- =============================================================================== -->
 ### Phase 2a development: named-detector collection and processing pilot
 
 **This is a development pilot, not a production multi-detector release.**
@@ -335,6 +386,12 @@ Run `python3 -m unittest discover -s tests -p 'test_*.py'` from the updated
 repository. Named-detector tests use isolated data and simulated streams; the
 POSIX exclusive-access test uses a local pseudo-terminal, not your detector.
 
+[Back to Contents](#contents)
+
+---
+
+&nbsp;
+<!-- =============================================================================== -->
 ### Raw event columns
 
 Raw files have this header:
@@ -361,6 +418,12 @@ RPiTimestamp,Event,EventCount,ADC,Elapsed_ms,Dead_ms,Temp_C,Pres_hPa,DetectorNam
 
 New events always contain these 13 columns, including the Raspberry Pi timestamp. Readers accept old 9-column events and the new 13-column events, with or without headers. Existing event bytes are not rewritten: on the first new write to an old-format or headerless file, the collector appends the extended column header before new events. Such a transition file can contain both row widths and repeated headers. PicoMuon readers ignore both header formats and historical `#` comment lines.
 
+[Back to Contents](#contents)
+
+---
+
+&nbsp;
+<!-- =============================================================================== -->
 ### Metadata in processed and shared data
 
 Detector metadata is stored in ordinary CSV columns on every row, not in a JSON preamble. The exact layouts are:
@@ -385,6 +448,12 @@ Periods read both the new day columns and older seven-column day files, includin
 
 `data/daily/summary.csv` retains its existing numerical schema and no longer writes JSON comments. Old processing script names delegate to the shared daily/period writers: daily compatibility scripts rebuild all daily products rather than appending duplicate rows. Week/month compatibility scripts use the shared completeness rule.
 
+[Back to Contents](#contents)
+
+---
+
+&nbsp;
+<!-- =============================================================================== -->
 ### Neutron file attribution and headers
 
 New neutron downloads include readable NMDB/source, station, UTC and request-URL comments followed by:
@@ -396,6 +465,12 @@ DateTime,Pressure_hPa,Uncorrected,PressureCorrected,EfficiencyCorrected
 
 Readers accept both headered and older headerless neutron files. The weather attribution/header is unchanged. Plot orchestration selects neutron column 12 for new day/period files and column 7 for historical files, so existing products can still be viewed before reprocessing.
 
+[Back to Contents](#contents)
+
+---
+
+&nbsp;
+<!-- =============================================================================== -->
 ### Upgrading existing data files
 
 Stop the collector before replacing its scripts, copy the updated scripts, plots and tests together, then restart. New raw events no longer emit JSON comments; existing raw files are not automatically rewritten. Regenerate processed files with `reprocessData.sh` to get the new columns and remove their obsolete JSON comments. This leaves raw events untouched. Check the current legacy settings before backfilling, since they are now the explicit assumption for historic events that lack settings.
@@ -416,6 +491,12 @@ sudo systemctl start PicoMuon.service
 
 Use the appropriate service name(s) for your installation. The confirmation flag is not an automatic service check. Each changed raw file gets a byte-exact `*.txt.pre-metadata-removal.bak`; event/header bytes, other comments and timestamps are preserved. Rejected files are excluded. Re-running skips clean files; a conflicting backup stops migration instead of being overwritten. Keep sufficient space for backups and a temporary copy of the largest file.
 
+[Back to Contents](#contents)
+
+---
+
+&nbsp;
+<!-- =============================================================================== -->
 ### Adding headers to historic and current raw files
 
 Copy the revised scripts (including `picomuon_common.py`, both raw collectors, the raw readers, and `AddRawHeaders.py`) to the RPi first. Do not run this migration while a collector or another process is writing raw files.
@@ -454,6 +535,12 @@ head -n 2 "data/raw/$(date -u +%Y/%Y-%m/%F).txt"
 
 The service should be `active`. If using a detector label (including the legacy `ACM0` layout), include that folder between `raw/` and the year in the last command. Raw data collection pauses during migration; no missed events can be recovered by this procedure. There is no need to reprocess data just because a header was added.
 
+[Back to Contents](#contents)
+
+---
+
+&nbsp;
+<!-- =============================================================================== -->
 ### Outdoor temperature on CPM plots
 
 The top, bottom and coincidence CPM plots can overlay **modelled outdoor air
@@ -522,6 +609,12 @@ credit; the web page adds links to the provider and
 [CC BY 4.0 licence](https://creativecommons.org/licenses/by/4.0/).
 Keep these credits with any exported or republished images.
 
+[Back to Contents](#contents)
+
+---
+
+&nbsp;
+<!-- =============================================================================== -->
 ### Log format
 
 New runtime entries use UTC timestamps and an aligned process name:
