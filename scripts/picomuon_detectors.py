@@ -1,4 +1,4 @@
-"""Explicit, validated detector identities for the Phase 2a collection pilot."""
+"""Explicit, validated detector identities for the Phase 2a development pilot."""
 
 from __future__ import annotations
 
@@ -112,7 +112,7 @@ def select_detector(base_path: Path, label: Optional[str]) -> Optional[DetectorC
         if detectors:
             raise ValueError(
                 "USB.ini contains [detectors]; select one explicitly with --detector LABEL. "
-                "Multi-detector processing/installer activation is not ready in this collection pilot."
+                "Production installer and plot activation remain disabled in this development pilot."
             )
         return None
     validate_label(label)

@@ -121,7 +121,7 @@ def get_usb_options(base_path: Optional[Path] = None) -> Dict[str, str]:
     if get_detectors(base_path):
         raise ValueError(
             "Multi-detector configuration requires explicit detector selection. "
-            "Single-detector processing cannot safely process this configuration yet."
+            "Use --detector LABEL with the modern processors; legacy entry points remain unsupported."
         )
     config_file = build_usb_ini_path(base_path)
     parser = configparser.ConfigParser(interpolation=None)
@@ -222,12 +222,14 @@ def build_processed_day_path(
     target_date: date,
     detector_label: str = "ACM0",
     extension: str = "txt",
+    named_detector: bool = False,
 ) -> Path:
-    """Build standard processed file path: data/<category>/<detector>/YYYY/YYYY-MM/YYYY-MM-DD.<ext>"""
+    """Keep legacy paths; place explicitly named products in a separate namespace."""
+    root = base_path / "data" / category
+    if named_detector:
+        root = root / "detectors"
     return (
-        base_path
-        / "data"
-        / category
+        root
         / detector_label
         / target_date.strftime("%Y")
         / target_date.strftime("%Y-%m")
@@ -262,6 +264,9 @@ def build_neutron_path(base_path: Path, target_date: date) -> Path:
     )
 
 
-def build_daily_summary_path(base_path: Path) -> Path:
-    """Build path to data/daily/summary.csv."""
-    return base_path / "data" / "daily" / "summary.csv"
+def build_daily_summary_path(base_path: Path, detector_label: Optional[str] = None) -> Path:
+    """Keep the single-detector summary path; isolate named-detector summaries."""
+    root = base_path / "data" / "daily"
+    if detector_label is not None:
+        root = root / "detectors" / detector_label
+    return root / "summary.csv"

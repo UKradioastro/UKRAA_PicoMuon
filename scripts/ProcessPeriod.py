@@ -25,13 +25,12 @@ from typing import Dict, List, Optional, Tuple
 from picomuon_metadata import SETTINGS_KEYS, csv_line
 from picomuon_products import DAY_COLUMNS, BinMetadata, HistoricalSettings, product_rows
 from picomuon_neutrons import DEFAULT_STATION
+from picomuon_processing import processing_label, processing_lock
 
 from picomuon_common import (
-    build_daily_summary_path,
     build_processed_day_path,
     get_base_path,
     get_target_date,
-    get_usb_options,
     log_error,
     log_message,
 )
@@ -49,6 +48,7 @@ PERIOD_CONFIGS = {
 
 def parse_arguments() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="PicoMuon multi-day period aggregator.")
+    parser.add_argument("--detector", help="Registered detector label (required in named mode)")
     parser.add_argument(
         "--target-date",
         "--date",
@@ -75,13 +75,15 @@ def parse_arguments() -> argparse.Namespace:
 DayRow = Tuple[datetime, float, float, float, float, float, float, Tuple[str, ...], str]
 
 
-def load_day_file(day_file: Path, base_path: Optional[Path] = None) -> List[DayRow]:
+def load_day_file(
+    day_file: Path, base_path: Optional[Path] = None, detector: Optional[str] = None,
+) -> List[DayRow]:
     """Read new or historical day rows, retaining detector fields and NMDB station."""
     rows: List[DayRow] = []
     if not day_file.exists():
         return rows
 
-    legacy = HistoricalSettings(base_path or get_base_path())
+    legacy = HistoricalSettings(base_path or get_base_path(), detector)
     assumed_station = False
     for row in product_rows(day_file):
         dt_val = datetime.strptime(row["DateTime"], "%Y-%m-%d %H:%M:%S")
@@ -98,9 +100,10 @@ def load_day_file(day_file: Path, base_path: Optional[Path] = None) -> List[DayR
         station = row.get("station", DEFAULT_STATION)
         assumed_station = assumed_station or "station" not in row
         rows.append((dt_val, *counts, temp, pres, neutrons, metadata, station))
-    legacy.report(SCRIPT_NAME)
+    source = f"{SCRIPT_NAME}[{detector}]" if detector else SCRIPT_NAME
+    legacy.report(source)
     if assumed_station:
-        log_message(SCRIPT_NAME, f"ASSUMPTION - station OULU for historical day file without station column: {day_file}")
+        log_message(source, f"ASSUMPTION - station OULU for historical day file without station column: {day_file}")
     return rows
 
 
@@ -109,9 +112,19 @@ def process_period_data(
     target_date: date,
     base_path: Optional[Path] = None,
     min_percent: float = 90.0,
+    detector: Optional[str] = None,
 ) -> int:
     base = base_path or get_base_path()
-    get_usb_options(base)
+    label = processing_label(base, detector)
+    with processing_lock(base, label):
+        return _process_period_data(period_name, target_date, base, min_percent, label)
+
+
+def _process_period_data(
+    period_name: str, target_date: date, base: Path, min_percent: float, label: Optional[str],
+) -> int:
+    product_label = label or "ACM0"
+    source = f"{SCRIPT_NAME}[{label}]" if label else SCRIPT_NAME
     cfg = PERIOD_CONFIGS[period_name]
     num_days = cfg["days"]
     step_mins = cfg["step_minutes"]
@@ -122,8 +135,8 @@ def process_period_data(
     start_str = start_date.strftime("%Y-%m-%d")
 
     log_message(
-        SCRIPT_NAME,
-        f"Started ACM0 {period_name} data processing from {start_str} to {date_str}",
+        source,
+        f"Started {product_label} {period_name} data processing from {start_str} to {date_str}",
     )
 
     # Check available days in date range
@@ -131,7 +144,7 @@ def process_period_data(
     day_files: Dict[date, Path] = {}
     for d_offset in range(num_days):
         cur_date = start_date + timedelta(days=d_offset)
-        df = build_processed_day_path(base, "day", cur_date, "ACM0", "txt")
+        df = build_processed_day_path(base, "day", cur_date, product_label, named_detector=label is not None)
         if df.exists():
             available_days += 1
             day_files[cur_date] = df
@@ -139,8 +152,8 @@ def process_period_data(
     min_required_days = math.ceil(num_days * (min_percent / 100.0) - 1e-9)
     if available_days < min_required_days:
         log_message(
-            SCRIPT_NAME,
-            f"Insufficient history; skipping ACM0 {period_name} data "
+            source,
+            f"Insufficient history; skipping {product_label} {period_name} data "
             f"({available_days}/{num_days} days, {min_required_days} needed "
             f"at {min_percent:.0f}%)",
         )
@@ -151,14 +164,14 @@ def process_period_data(
     for d_offset in range(num_days):
         cur_date = start_date + timedelta(days=d_offset)
         if cur_date in day_files:
-            all_5min_rows.extend(load_day_file(day_files[cur_date], base))
+            all_5min_rows.extend(load_day_file(day_files[cur_date], base, label))
     all_metadata = BinMetadata()
     for row in all_5min_rows:
         if sum(row[1:4]) > 0:
             all_metadata.add(row[7])
 
     # Set up output path
-    period_out = build_processed_day_path(base, period_name, target_date, "ACM0", "txt")
+    period_out = build_processed_day_path(base, period_name, target_date, product_label, named_detector=label is not None)
     period_out.parent.mkdir(parents=True, exist_ok=True)
     temp_out = period_out.with_suffix(".tmp")
 
@@ -241,8 +254,8 @@ def process_period_data(
     temp_out.replace(period_out)
 
     log_message(
-        SCRIPT_NAME,
-        f"Completed ACM0 {period_name} data processing from {start_str} to {date_str}",
+        source,
+        f"Completed {product_label} {period_name} data processing from {start_str} to {date_str}",
     )
     return 0
 
@@ -258,7 +271,11 @@ def main() -> None:
 
     failures = 0
     for p in periods_to_run:
-        res = process_period_data(p, target, min_percent=args.min_percent)
+        try:
+            res = process_period_data(p, target, min_percent=args.min_percent, detector=args.detector)
+        except (OSError, ValueError, RuntimeError) as error:
+            log_error(SCRIPT_NAME, f"FAILED [{args.detector or 'single'}] - {error}")
+            sys.exit(1)
         if res != 0:
             failures += 1
 

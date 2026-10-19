@@ -172,15 +172,16 @@ Blank values mean unspecified, not zero. Latitude and longitude must be finite n
 
 The collector records the detector name and four settings on every raw event. Legacy settings are reread whenever an event needs them, so edits apply to subsequent events without a restart. Existing recorded settings are never overwritten during processing. At the user's explicit request, processing historical rows without settings now uses current `config/legacy.ini` values and logs an `ASSUMPTION` message; this is not proof of historical configuration. Missing/invalid required legacy settings cause an explicit failure rather than invented defaults.
 
-### Phase 2a development: named-detector collection pilot
+### Phase 2a development: named-detector collection and processing pilot
 
-**This is the first Phase 2a milestone, not a production multi-detector release.**
-Leave the working RPi's `[usb]` configuration unchanged. Multi-detector
-daily/period processing, plotting, web publishing, service migration and
-historical-data mapping are still pending. See the
+**This is a development pilot, not a production multi-detector release.**
+Leave the working RPi's `[usb]` configuration unchanged. Explicitly selected
+daily/period processing and reprocessing are implemented; scheduled orchestration,
+plotting, web publishing, service migration and historical-data mapping remain pending. See the
 [implementation status and deferred work](docs/implementation-plan.md#phase-2a--concurrent-multi-detector-support-before-phase-3).
-The installer and processing/plot entry points refuse named mode rather than
-mixing detector output. Do not run the installer against a pilot configuration.
+The installer, legacy processors and scheduled processing/plot entry points
+still refuse named mode rather than mixing detector output. Do not run the
+installer against a pilot configuration.
 
 For development, prepare a separate, empty pilot copy from the updated code,
 without copying or moving the production archive:
@@ -267,6 +268,11 @@ before restarting the production service. Expected pilot outputs:
 - The correct unit's fallback settings on every event. The folder identifies
   the stable label; a detector-name change does not change that folder.
 
+For a third detector, repeat registration and legacy setup with a third stable
+label and its current device node (for example `Third` and `/dev/ttyACM2`), then
+run its collector in a third terminal. ACM numbers are only used to register
+the devices; subsequent collection uses their stable by-id identities.
+
 An identity mismatch is logged and retried with backoff **without opening the
 serial port**. A name registered to another unit stops collection with an
 explicit cable-swap error. Serial access is exclusive; disconnecting one unit
@@ -277,8 +283,53 @@ the same stable aliases and folders. Two units may require a powered USB hub.
 separate log paths and conflicts with the old single-collector services, but is
 deliberately **not installed or enabled automatically** in this milestone.
 Do not rename labels, move raw files or adopt pilot data into production yet:
-safe mapping, same-day transitions and processing isolation are the next work.
+safe mapping and same-day transitions remain pending.
 Raw data is never migrated by registration.
+
+#### Explicit offline processing in the pilot
+
+After collecting a completed UTC day in the pilot, process each label explicitly:
+
+```bash
+PICOMUON_BASE_PATH="$PILOT" python3 "$PILOT/scripts/ProcessDaily.py" \
+    --detector East --date 2026-10-18
+PICOMUON_BASE_PATH="$PILOT" python3 "$PILOT/scripts/ProcessPeriod.py" \
+    --detector East --date 2026-10-18 --period week
+PICOMUON_BASE_PATH="$PILOT" bash "$PILOT/scripts/reprocessData.sh" \
+    --detector East --from 2026-10-17 --to 2026-10-18 --dry-run
+```
+
+Use dates for which that detector has pilot data; repeat for `West` and the
+third label. Remove `--dry-run` only when ready to regenerate derived products.
+Reprocessing does not copy, move or modify raw data, and excludes today's
+partial UTC file. It discovers only the selected detector's date hierarchy,
+not rejected files or another detector's archive. This is **not** the
+historical archive adoption/mapping tool, which remains deferred.
+
+Named outputs are:
+
+- `data/{cpm,adc,day,week,month,3month,6month,year}/detectors/LABEL/YYYY/YYYY-MM/YYYY-MM-DD.txt`
+- `data/hour/detectors/LABEL/YYYY/YYYY-MM/YYYY-MM-DD.csv`
+- `data/daily/detectors/LABEL/summary.csv`
+- Reprocessing logs in `logfiles/detectors/LABEL/`.
+
+The `detectors/` product namespace prevents even a label such as `ACM0` from
+overwriting old single-detector products. Existing single-detector paths are
+unchanged. NMDB input remains shared for co-located detectors.
+
+Named processing requires `--detector LABEL` even with only one registered
+unit. Missing named raw input is an error, never a fallback to unlabelled,
+legacy ACM0 or another detector's files. Missing period history is logged as
+a skip using the existing completeness rule. Missing historical settings use
+only `[legacy:LABEL]`, with the assumption logged; recorded settings win.
+Daily and period writers share a nonblocking per-detector processing lock,
+including across different dates because they share a summary. A busy lock
+is an explicit failure; another detector can still process. Reprocessing also
+prevents overlapping batches for the same label. Temporary product files live
+beside the detector-specific destination.
+
+`--plot` is rejected for named reprocessing before products are written.
+Do not enable production cron, publishing or the installer for the pilot yet.
 
 Run `python3 -m unittest discover -s tests -p 'test_*.py'` from the updated
 repository. Named-detector tests use isolated data and simulated streams; the

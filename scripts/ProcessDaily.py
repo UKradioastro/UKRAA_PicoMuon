@@ -10,32 +10,32 @@ Reads yesterday's L0 raw file exactly once and generates:
 
 Backward compatibility:
 Writes processed products to data/cpm/ACM0, data/day/ACM0, and data/adc/ACM0.
+Named mode requires --detector LABEL and isolates all products under that label.
 """
 
 from __future__ import annotations
 
 import argparse
 import csv
-from datetime import date, datetime, timedelta, timezone
+from datetime import date, datetime
 import math
 from pathlib import Path
 import sys
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, Optional
 from picomuon_metadata import csv_line, split_payload
 from picomuon_products import (
     ADC_COLUMNS, CPM_COLUMNS, DAY_COLUMNS, HOUR_COLUMNS, BinMetadata, HistoricalSettings,
 )
 from picomuon_neutrons import load_neutrons
+from picomuon_processing import processing_label, processing_lock, raw_roots
 
 from picomuon_common import (
     build_daily_summary_path,
     build_neutron_path,
     build_processed_day_path,
-    build_raw_day_path,
     raw_data_lines,
     get_base_path,
     get_target_date,
-    get_usb_options,
     log_error,
     log_message,
 )
@@ -45,6 +45,7 @@ SCRIPT_NAME = "ProcessDaily.py"
 
 def parse_arguments() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Single-pass PicoMuon daily processor.")
+    parser.add_argument("--detector", help="Registered detector label (required in named mode)")
     parser.add_argument(
         "--target-date",
         "--date",
@@ -62,45 +63,33 @@ def load_neutron_data(neutron_file: Path) -> Dict[str, float]:
 
 
 def find_raw_file(base_path: Path, target_date: date, label: Optional[str]) -> Optional[Path]:
-    """Find raw file under single-detector path or configured label, or fallback to legacy ACM0."""
-    candidate = build_raw_day_path(base_path, datetime(target_date.year, target_date.month, target_date.day, tzinfo=timezone.utc), label)
-    if candidate.exists():
-        return candidate
-
-    # If label was not specified or not found, also check without label
-    if label:
-        candidate_nolabel = build_raw_day_path(base_path, datetime(target_date.year, target_date.month, target_date.day, tzinfo=timezone.utc), None)
-        if candidate_nolabel.exists():
-            return candidate_nolabel
-
-    # Also check legacy ACM0 location (for historical reprocessing)
-    legacy_candidate = (
-        base_path
-        / "data"
-        / "raw"
-        / "ACM0"
-        / target_date.strftime("%Y")
-        / target_date.strftime("%Y-%m")
-        / f"{target_date.strftime('%Y-%m-%d')}.txt"
-    )
-    if legacy_candidate.exists():
-        return legacy_candidate
-
+    """Named mode never falls back to unlabelled or legacy input."""
+    for root in raw_roots(base_path, label):
+        candidate = root / target_date.strftime("%Y") / target_date.strftime("%Y-%m") / f"{target_date:%Y-%m-%d}.txt"
+        if candidate.is_file():
+            return candidate
     return None
 
 
-def process_daily(target_date: date, base_path: Optional[Path] = None) -> int:
+def process_daily(
+    target_date: date, base_path: Optional[Path] = None, detector: Optional[str] = None,
+) -> int:
     base = base_path or get_base_path()
+    label = processing_label(base, detector)
+    with processing_lock(base, label):
+        return _process_daily(target_date, base, label)
+
+
+def _process_daily(target_date: date, base: Path, detector_label: Optional[str]) -> int:
     date_str = target_date.strftime("%Y-%m-%d")
+    source = f"{SCRIPT_NAME}[{detector_label}]" if detector_label else SCRIPT_NAME
+    product_label = detector_label or "ACM0"
 
-    log_message(SCRIPT_NAME, f"Started fast daily data processing for {date_str}")
-
-    usb_options = get_usb_options(base)
-    detector_label = usb_options.get("label", "").strip() or None
+    log_message(source, f"Started fast daily data processing for {date_str}")
 
     raw_file = find_raw_file(base, target_date, detector_label)
     if raw_file is None or not raw_file.exists():
-        log_error(SCRIPT_NAME, f"Raw data file missing for {date_str}")
+        log_error(source, f"Raw data file missing for {date_str}")
         return 1
 
     # Load neutron data for the day
@@ -126,7 +115,7 @@ def process_daily(target_date: date, base_path: Optional[Path] = None) -> int:
     prev_elapsed_ms: Optional[int] = None
     prev_hour_idx: Optional[int] = None
     prev_det_name: Optional[str] = None
-    legacy = HistoricalSettings(base)
+    legacy = HistoricalSettings(base, detector_label)
     all_metadata = BinMetadata()
     minute_metadata = [BinMetadata() for _ in cpm_bins]
     day_metadata = [BinMetadata() for _ in day_bins]
@@ -147,7 +136,7 @@ def process_daily(target_date: date, base_path: Optional[Path] = None) -> int:
                 try:
                     payload, settings = split_payload(line.split(",", 1)[1])
                 except (ValueError, csv.Error) as exc:
-                    log_error(SCRIPT_NAME, f"Invalid raw metadata in {raw_file}: {exc}")
+                    log_error(source, f"Invalid raw metadata in {raw_file}: {exc}")
                     continue
                 parts = [parts[0], *payload]
 
@@ -233,10 +222,10 @@ def process_daily(target_date: date, base_path: Optional[Path] = None) -> int:
             prev_hour_idx = hour_idx
             prev_det_name = det_name
 
-    legacy.report(SCRIPT_NAME)
+    legacy.report(source)
     # Output 1: Minute CPM file (1440 lines)
     # Compatible format: YYYY-MM-DD HH:MM:00,cpm_T,cpm_B,cpm_M
-    cpm_out = build_processed_day_path(base, "cpm", target_date, "ACM0", "txt")
+    cpm_out = build_processed_day_path(base, "cpm", target_date, product_label, named_detector=detector_label is not None)
     cpm_out.parent.mkdir(parents=True, exist_ok=True)
     temp_cpm = cpm_out.with_suffix(".tmp")
 
@@ -253,7 +242,7 @@ def process_daily(target_date: date, base_path: Optional[Path] = None) -> int:
 
     # Output 2: 5-minute Day file (288 lines)
     # Compatible format: YYYY-MM-DD HH:MM:00,cpm_T,cpm_B,cpm_M,avg_temp,avg_pres,neutrons
-    day_out = build_processed_day_path(base, "day", target_date, "ACM0", "txt")
+    day_out = build_processed_day_path(base, "day", target_date, product_label, named_detector=detector_label is not None)
     day_out.parent.mkdir(parents=True, exist_ok=True)
     temp_day = day_out.with_suffix(".tmp")
 
@@ -294,7 +283,7 @@ def process_daily(target_date: date, base_path: Optional[Path] = None) -> int:
 
     # Output 3: ADC distribution (1024 lines)
     # Compatible format: adc_val,count_T,count_B,count_M
-    adc_out = build_processed_day_path(base, "adc", target_date, "ACM0", "txt")
+    adc_out = build_processed_day_path(base, "adc", target_date, product_label, named_detector=detector_label is not None)
     adc_out.parent.mkdir(parents=True, exist_ok=True)
     temp_adc = adc_out.with_suffix(".tmp")
 
@@ -309,9 +298,9 @@ def process_daily(target_date: date, base_path: Optional[Path] = None) -> int:
     # Output 4: Hourly L2 file (24 lines)
     # Path: data/hour/YYYY/YYYY-MM/YYYY-MM-DD.csv
     # Fields: DateTime,T,B,C,live_seconds,missing_events,temp,pres,neutrons
-    hour_dir = base / "data" / "hour" / target_date.strftime("%Y") / target_date.strftime("%Y-%m")
+    hour_out = build_processed_day_path(base, "hour", target_date, detector_label or "", "csv", named_detector=detector_label is not None)
+    hour_dir = hour_out.parent
     hour_dir.mkdir(parents=True, exist_ok=True)
-    hour_out = hour_dir / f"{date_str}.csv"
     temp_hour = hour_out.with_suffix(".tmp")
 
     total_live_ms = 0
@@ -349,7 +338,7 @@ def process_daily(target_date: date, base_path: Optional[Path] = None) -> int:
     temp_hour.replace(hour_out)
 
     # Output 5: Update/Append data/daily/summary.csv
-    summary_path = build_daily_summary_path(base)
+    summary_path = build_daily_summary_path(base, detector_label)
     summary_path.parent.mkdir(parents=True, exist_ok=True)
 
     day_cnt_T = sum(b[0] for b in hour_bins)
@@ -387,7 +376,7 @@ def process_daily(target_date: date, base_path: Optional[Path] = None) -> int:
     temp_summary.replace(summary_path)
 
     log_message(
-        SCRIPT_NAME,
+        source,
         f"Completed daily data processing for {date_str} ({total_events} events, "
         f"{valid_hours}/24 hours, missing_events={total_missing})",
     )
@@ -397,7 +386,12 @@ def process_daily(target_date: date, base_path: Optional[Path] = None) -> int:
 def main() -> None:
     args = parse_arguments()
     target = args.target_date or get_target_date()
-    sys.exit(process_daily(target))
+    try:
+        result = process_daily(target, detector=args.detector)
+    except (OSError, ValueError, RuntimeError) as error:
+        log_error(SCRIPT_NAME, f"FAILED [{args.detector or 'single'}] - {error}")
+        result = 1
+    sys.exit(result)
 
 
 if __name__ == "__main__":

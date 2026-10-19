@@ -8,6 +8,7 @@ This project uses calendar versioning in the format `YYYY.MM.patch`.
 ## [Unreleased]
 
 ### Added
+- Phase 2a explicit offline processing pilot: `--detector LABEL` on daily, period and historical reprocessing; isolated named products/summaries/temporary files and processing locks; detector-specific historical settings; selected-archive dry runs and three-detector isolation tests. Named plotting, scheduling, installation and historical adoption remain guarded/deferred.
 - Readable NMDB attribution, station and request comments plus a CSV column header in new neutron downloads; readers retain headerless-file compatibility.
 - Optional `AddRawHeaders.py --remove-metadata` preview/apply cleanup of obsolete raw JSON comments, preserving event bytes and byte-exact backups while collectors are stopped.
 - Optional Open-Meteo hourly modelled 2 m outdoor temperature overlays on all three CPM plots, using the existing observatory coordinates and an opt-in `[weather]` section in `config/user.ini`, UTC daily downloads and historical-forecast retrieval for older dates. Weather/source attribution is retained in data, images and the web page; day/week/month images also carry a short NMDB/Oulu credit alongside the existing full web acknowledgements.
@@ -39,7 +40,7 @@ This project uses calendar versioning in the format `YYYY.MM.patch`.
 - Per-bin differing metadata fields are `mixed`, without splitting or changing counts. At the user's explicit request, missing historical settings are filled from current legacy configuration with an assumption logged. Recorded settings take precedence.
 - Daily summaries no longer write JSON comments; legacy processing entry points use the shared writers. Day/week/month plots select the neutron column for either historical or new layouts.
 - USB identity failures now prevent opening the serial port, including in single-detector mode; collectors and detector probing use exclusive serial access.
-- Until the next Phase 2a milestone, installer/processing/plot orchestration refuse named multi-detector mode instead of producing misleading shared output. The implementation plan records deferred Phase 2 exposure/L2/long-period work and pending RPi acceptance.
+- Installer, legacy processors and scheduled processing/plot orchestration continue to refuse named multi-detector mode; modern offline processors and reprocessing now require explicit detector selection. The implementation plan records deferred Phase 2 exposure/L2/long-period work and pending RPi acceptance.
 - Standardise runtime logs as UTC timestamp, aligned process name and message. Shared command logging formats external diagnostics without double-prefixing existing entries, preserves exit codes and prefixes multiline Python messages and tracebacks.
 - Daily processing, reprocessing and standalone plotting share gnuplot logging and input checks. Missing period products are skipped, real plot failures count towards the final failure status, and plots use the requested UTC target date.
 - Raw collectors write one column-header line to new or empty event files; current and legacy raw readers support both headered and headerless files without changing event counts or column order.

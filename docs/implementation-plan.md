@@ -372,7 +372,7 @@ them.
 
 ### Phase 2a – Concurrent multi-detector support (before Phase 3)
 
-**Development status at 2026-10-17: first collection milestone implemented;
+**Development status at 2026-10-19: collection and explicit offline processing implemented;
 Phase 2a is not complete or ready to replace the production installation.**
 
 - Implemented: validated case-preserving label/by-id mappings and USB identities;
@@ -390,25 +390,47 @@ Phase 2a is not complete or ready to replace the production installation.**
   by ordinary CSV detector/settings columns. Historical missing settings use
   current legacy configuration as an explicitly logged user-authorised assumption.
   Bin counts remain combined; differing metadata fields are `mixed`.
-- Implemented safeguards: installer, modern and legacy processors, reprocessing
-  and plot orchestration reject named mode until detector-specific processing
-  is wired. The template `PicoMuon@.service` is not automatically installed or
+- Implemented 2026-10-19: `ProcessDaily.py`, `ProcessPeriod.py` and
+  `reprocessData.sh` accept explicit `--detector LABEL`. Named raw input never
+  falls back to unlabelled/ACM0/another unit; historical settings use only
+  `[legacy:LABEL]`. Named daily and period products (including temporary files)
+  use `data/CATEGORY/detectors/LABEL/...`, with hourly CSVs in
+  `data/hour/detectors/LABEL/...` and summaries in
+  `data/daily/detectors/LABEL/summary.csv`. The namespace avoids collisions with
+  legacy products even for a label of `ACM0`. Existing single-detector paths
+  are retained. Daily/period writers share per-unit nonblocking locks.
+  Reprocessing selects only that unit's archive dates, supports read-only
+  `--dry-run`, isolates logs and batch locks, and refuses named `--plot`.
+- Implemented safeguards: installer, legacy processors, scheduled processing
+  and plot orchestration still reject named mode. Modern processors and
+  reprocessing require explicit detector selection. The template
+  `PicoMuon@.service` is not automatically installed or
   enabled by this milestone. Existing `[usb]` mode and its paths are retained.
 - Automated checks cover concurrent simulated streams, disconnection of one
   while the other continues, UTC rollover, swapped ACM enumeration, metadata
   and fallback isolation, malformed rows, duplicate/invalid configuration,
   identity/name mismatch and single-detector regressions. A POSIX-only
   pseudo-terminal test checks exclusive serial access on the RPi.
-- Remaining: detector-selected daily/period/reprocessing and locks; isolated
-  processed/summary/plot/temp/web output; safe installer and service-instance
+- Automated offline checks cover three detectors' counts/exposure/settings,
+  daily summaries and all period shapes, missing-input and legacy-settings
+  isolation, archive discovery, lock contention/release, CLI errors and
+  single-detector compatibility. Linux/RPi shell integration remains a
+  platform-specific acceptance check.
+  Local validation on Windows: 110 Python tests ran, 107 passed and 3
+  platform-dependent checks were skipped; reprocessing Bash syntax and
+  diff whitespace checks passed. No live RPi acceptance is claimed.
+- Remaining: scheduling all configured units; isolated plot/temp/web output;
+  safe installer and service-instance
   migration; explicit dry-run historical mapping and same-day label-change
-  handling; live two-detector RPi acceptance. Do not rename labels or move raw
+  handling; live RPi acceptance (three connected detectors are available).
+  Do not rename labels or move raw
   archives as part of this collection pilot.
 
 Phases 0-2 have implementation entries in the changelog; Phase 3 was the next
-planned feature. Insert this phase first: two physical detectors have now been
-recognised together on a powered USB hub, but simultaneous collection and
-processing are not yet wired end to end. The hub resolved USB enumeration;
+planned feature. Insert this phase first: three serial devices are now reported
+on the RPi4; stable identities and physical detector assignments still need
+verification. Simultaneous collection, scheduled processing and publishing
+are not yet wired end to end. Earlier powered-hub testing resolved USB enumeration;
 software configuration alone could not resolve that hardware issue.
 
 1. Extend `ConfigureUSB.py` and `USB.ini` to register and edit multiple

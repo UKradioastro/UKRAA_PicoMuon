@@ -17,10 +17,6 @@ ERROR_LOG="$LOG_DIR/log-error.txt"
 PYTHON=/usr/bin/python3
 GNUPLOT=/usr/bin/gnuplot
 
-mkdir -p "$LOG_DIR"
-PYTHONPATH="$BASE_PATH/scripts" "$PYTHON" -c \
-    'from picomuon_common import get_usb_options; get_usb_options()'
-
 log_msg() {
     write_log_entry "reprocessData.sh" "$1" >> "$MAIN_LOG"
 }
@@ -37,6 +33,7 @@ Rebuilds minute CPM, ADC, 5-minute Day and hourly products from raw files,
 then refreshes week, month, and multi-day period products.
 
 Options:
+  --detector LABEL    Registered detector to reprocess (required in named mode)
   --from YYYY-MM-DD    First day to reprocess (default: oldest raw file)
   --to YYYY-MM-DD      Last day to reprocess (default: yesterday)
   --skip-period        Do not regenerate multi-day period products after reprocessing
@@ -54,13 +51,21 @@ valid_date() {
 }
 
 FROM_DATE=""
-TO_DATE=$(date -d yesterday +%Y-%m-%d)
+TO_DATE=$(date -u -d yesterday +%Y-%m-%d)
+DETECTOR=""
+DETECTOR_ARGS=()
 RUN_PERIOD=true
 RUN_PLOTS=false
 DRY_RUN=false
 
 while [ "$#" -gt 0 ]; do
     case "$1" in
+        --detector)
+            DETECTOR=${2:-}
+            if [ -z "$DETECTOR" ]; then usage; exit 2; fi
+            DETECTOR_ARGS=(--detector "$DETECTOR")
+            shift 2
+            ;;
         --from)
             FROM_DATE=${2:-}
             shift 2 || { usage; exit 2; }
@@ -93,7 +98,7 @@ fi
 
 TODAY=$(date -u +%Y-%m-%d)
 if [[ ! "$TO_DATE" < "$TODAY" ]]; then
-    TO_DATE=$(date -d yesterday +%Y-%m-%d)
+    TO_DATE=$(date -u -d yesterday +%Y-%m-%d)
     echo "Limiting --to to $TO_DATE (today's raw file is still being written)"
 fi
 
@@ -102,35 +107,42 @@ if [ -n "$FROM_DATE" ] && [[ "$FROM_DATE" > "$TO_DATE" ]]; then
     exit 2
 fi
 
-RAW_ROOT="$BASE_PATH/data/raw"
-TARGET_DATES=()
+DATE_ARGS=(--to "$TO_DATE")
+if [ -n "$FROM_DATE" ]; then
+    DATE_ARGS+=(--from "$FROM_DATE")
+fi
+RAW_DATES=$(PYTHONPATH="$BASE_PATH/scripts" "$PYTHON" \
+    "$BASE_PATH/scripts/picomuon_processing.py" "${DETECTOR_ARGS[@]}" "${DATE_ARGS[@]}")
 
-if [ -d "$RAW_ROOT" ]; then
-    while IFS= read -r raw_name; do
-        day="${raw_name%.txt}"
-        if ! valid_date "$day"; then
-            continue
-        fi
-        if [ -n "$FROM_DATE" ] && [[ "$day" < "$FROM_DATE" ]]; then
-            continue
-        fi
-        if [[ "$day" > "$TO_DATE" ]]; then
-            continue
-        fi
-        TARGET_DATES+=("$day")
-    done < <(find "$RAW_ROOT" -type f -name '[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9].txt' -printf '%f\n' | sort -u)
+if [ -n "$DETECTOR" ] && [ "$RUN_PLOTS" = "true" ]; then
+    echo "Named-detector plotting is not ready; omit --plot" >&2
+    exit 2
 fi
 
-if [ "${#TARGET_DATES[@]}" -eq 0 ]; then
-    echo "No raw data files found in $RAW_ROOT for the requested range"
+if [ -z "$RAW_DATES" ]; then
+    echo "No raw data files found for ${DETECTOR:-single} in the requested range" >&2
     exit 1
 fi
+mapfile -t TARGET_DATES <<< "$RAW_DATES"
 
 echo "Days to reprocess: ${#TARGET_DATES[@]} (${TARGET_DATES[0]} to ${TARGET_DATES[-1]})"
 
 if [ "$DRY_RUN" = "true" ]; then
     printf '%s\n' "${TARGET_DATES[@]}"
     exit 0
+fi
+
+if [ -n "$DETECTOR" ]; then
+    LOG_DIR="$LOG_DIR/detectors/$DETECTOR"
+    MAIN_LOG="$LOG_DIR/log-PicoMuon.txt"
+    ERROR_LOG="$LOG_DIR/log-error.txt"
+fi
+run_as_owner mkdir -p "$LOG_DIR"
+run_as_owner touch "$MAIN_LOG" "$ERROR_LOG" "$LOG_DIR/.reprocess.lock"
+exec 8>"$LOG_DIR/.reprocess.lock"
+if ! flock -n 8; then
+    log_err "FAILED - another reprocessing job is running for ${DETECTOR:-single}"
+    exit 1
 fi
 
 log_msg "Started reprocessing ${#TARGET_DATES[@]} day(s) from ${TARGET_DATES[0]} to ${TARGET_DATES[-1]}"
@@ -142,7 +154,7 @@ TOTAL=${#TARGET_DATES[@]}
 for day in "${TARGET_DATES[@]}"; do
     COUNT=$((COUNT + 1))
     printf '[%d/%d] Reprocessing %s\n' "$COUNT" "$TOTAL" "$day"
-    if ! run_logged_command "ProcessDaily.py" run_as_owner "$PYTHON" "$BASE_PATH/scripts/ProcessDaily.py" --target-date "$day"; then
+    if ! run_logged_command "ProcessDaily.py" run_as_owner "$PYTHON" "$BASE_PATH/scripts/ProcessDaily.py" --target-date "$day" "${DETECTOR_ARGS[@]}"; then
         log_err "FAILED daily reprocessing for $day"
         FAILURES=$((FAILURES + 1))
     fi
@@ -150,7 +162,7 @@ done
 
 if [ "$RUN_PERIOD" = "true" ]; then
     log_msg "Refreshing period products for ${TO_DATE}"
-    if run_logged_command "ProcessPeriod.py" run_as_owner "$PYTHON" "$BASE_PATH/scripts/ProcessPeriod.py" --target-date "$TO_DATE"; then
+    if run_logged_command "ProcessPeriod.py" run_as_owner "$PYTHON" "$BASE_PATH/scripts/ProcessPeriod.py" --target-date "$TO_DATE" "${DETECTOR_ARGS[@]}"; then
         log_msg "Completed period products refresh"
     else
         log_err "FAILED period products refresh"

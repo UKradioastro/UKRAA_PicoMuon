@@ -361,7 +361,7 @@ class DetectorTests(unittest.TestCase):
             os.close(slave)
             os.close(master)
 
-    def test_processing_fails_closed_until_multi_pipeline_is_ready(self):
+    def test_processing_requires_explicit_selection_and_legacy_entrypoints_stay_guarded(self):
         with patch("sys.stdout", new_callable=io.StringIO):
             for operation in (
                 lambda: process_daily(date(2026, 10, 17), self.base),
