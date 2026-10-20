@@ -456,8 +456,23 @@ Phase 2a is not complete or ready to replace the production installation.**
 - Opt-in service-transition validation on Windows: 33 detector tests ran (28
   passed, 5 platform-dependent skips); Git Bash syntax checks, mocked
   single/named service transition tests, cron filtering and diff whitespace
-  checks passed. `systemd-analyze verify` and live service cutover still require
-  validation on the RPi.
+  checks passed. Subsequent RPi acceptance is recorded below.
+- RPi service acceptance supplied 2026-10-20: all 33 focused detector tests
+  passed without skips; shell transition/preflight and cron-filter tests passed.
+  The rendered pilot service template passed `systemd-analyze verify`.
+  Unit_2 and Unit_3 ran through systemd concurrently with zero restarts and
+  recorded correctly isolated names/settings and status snapshots. Production
+  was restored afterward. A second rehearsal exercised the real helper:
+  production stopped/disabled, both named instances started/enabled,
+  unauthorized reversal preflight was refused, and authorized reversal
+  stopped/disabled both instances and restored production active/enabled.
+  This does not establish full-installer or reboot acceptance.
+- Full-installer mock checks cover authorized activation/reversal, refusal
+  before host changes without authorization, rendered service paths, managed
+  cron preservation/idempotency, staged web files, raw-file preservation and
+  failures before collector activation. Host package, ownership, configuration
+  merge, systemd and cron commands are mocked; this is wiring coverage, not
+  real package installation or publication acceptance.
 - Live evidence supplied 2026-10-19/20: all 110 tests passed on the RPi;
   Unit_2 and Unit_3 recorded concurrently in the pilot, independent unplug/
   reconnect tests passed both ways, and both crossed UTC midnight correctly.
@@ -512,10 +527,14 @@ Phase 2a is not complete or ready to replace the production installation.**
   are dated October 19 and belong to the unplug tests. Visual RPi page
   acceptance and production web serving remain pending.
 - Remaining: RPi visual web acceptance, network-enabled full-chain timing,
-  live RPi acceptance of the opt-in installer/service transition (three
-  connected detectors are available); explicit dry-run historical mapping and
-  same-day label-change handling. Do not treat installer activation as proof
-  that detector assignments or historical adoption are correct.
+  full-installer and reboot acceptance; explicit dry-run historical mapping and
+  same-day label-change handling. Keep Unit_1's single-mode production
+  configuration/archive and cron unchanged during the remaining pilot checks.
+  The pilot registers all three units: a full named installation would activate
+  all three, unlike the explicitly selected Unit_2/Unit_3 rehearsals.
+  Final consolidation requires explicit historical mapping and a planned UTC-day
+  boundary cutover. Do not treat installer activation as proof that detector
+  assignments or historical adoption are correct.
   Do not rename labels or move raw
   archives as part of this collection pilot.
 
