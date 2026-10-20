@@ -1,5 +1,5 @@
 [Unit]
-Description=UKRAA PicoMuon detector %i (Phase 2a collection pilot)
+Description=UKRAA PicoMuon detector %i collector
 After=multi-user.target
 Conflicts=PicoMuon.service PicoMuonACM0.service
 

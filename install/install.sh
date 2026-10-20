@@ -2,6 +2,26 @@
 
 set -euo pipefail
 
+ACTIVATE_SERVICES=false
+while [ "$#" -gt 0 ]; do
+    case "$1" in
+        --activate-services)
+            ACTIVATE_SERVICES=true
+            ;;
+        --help|-h)
+            echo "Usage: sudo bash install/install.sh [--activate-services]"
+            echo "The flag explicitly authorizes transitions between single and named collector services."
+            exit 0
+            ;;
+        *)
+            echo "Unknown installer option: $1" >&2
+            echo "Usage: sudo bash install/install.sh [--activate-services]" >&2
+            exit 2
+            ;;
+    esac
+    shift
+done
+
 if [ "$(id -u)" -ne 0 ]; then
     echo "Run this installer with sudo, for example: sudo bash install/install.sh" >&2
     exit 1
@@ -16,6 +36,34 @@ fi
 PICOMUON_GROUP=$(id -gn "$PICOMUON_USER")
 BASE_PATH=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)
 
+CONFIG_REPORT=$(PICOMUON_BASE_PATH="$BASE_PATH" PYTHONPATH="$BASE_PATH/scripts" python3 -c '
+from picomuon_common import get_usb_options
+from picomuon_detectors import get_detectors
+
+detectors = get_detectors()
+if detectors:
+    print("named")
+    print("\n".join(detectors))
+else:
+    get_usb_options()
+    print("single")
+')
+CONFIG_MODE=${CONFIG_REPORT%%$'\n'*}
+DETECTOR_LABELS=()
+if [ "$CONFIG_MODE" = named ]; then
+    LABEL_LINES=${CONFIG_REPORT#*$'\n'}
+    mapfile -t DETECTOR_LABELS <<< "$LABEL_LINES"
+elif [ "$CONFIG_MODE" != single ]; then
+    echo "Unable to determine the collector configuration mode." >&2
+    exit 1
+fi
+
+ACTIVATION_ARGUMENTS=()
+if [ "$ACTIVATE_SERVICES" = true ]; then
+    ACTIVATION_ARGUMENTS=(--activate-services)
+fi
+bash "$BASE_PATH/install/service-transition.sh" --check "$CONFIG_MODE" "${ACTIVATION_ARGUMENTS[@]}"
+
 escape_sed_replacement() {
     printf '%s' "$1" | sed 's/[\\&|]/\\&/g'
 }
@@ -25,9 +73,6 @@ BASE_PATH_SHELL=$(printf '%q' "$BASE_PATH")
 BASE_PATH_SHELL_SED=$(escape_sed_replacement "$BASE_PATH_SHELL")
 
 echo "Installing UKRAA PicoMuon under $BASE_PATH for user $PICOMUON_USER"
-# Production named-mode installation stays disabled until service/archive migration is ready.
-PICOMUON_BASE_PATH="$BASE_PATH" PYTHONPATH="$BASE_PATH/scripts" python3 -c \
-    'from picomuon_common import get_usb_options; get_usb_options()'
 apt-get update
 DEBIAN_FRONTEND=noninteractive apt-get install -y \
     apache2 \
@@ -74,7 +119,7 @@ if [ ! -f "$BASE_PATH/config/USB.ini" ] && [ -f "$BASE_PATH/install/USB.ini.exam
         "$BASE_PATH/install/USB.ini.example" "$BASE_PATH/config/USB.ini"
 elif [ -f "$BASE_PATH/config/USB.ini" ] && [ -f "$BASE_PATH/install/USB.ini.example" ]; then
     su -s /bin/bash "$PICOMUON_USER" -c \
-        "python3 \"$BASE_PATH/scripts/MergeConfig.py\" \"$BASE_PATH/install/USB.ini.example\" \"$BASE_PATH/config/USB.ini\"" || true
+        "python3 \"$BASE_PATH/scripts/MergeConfig.py\" \"$BASE_PATH/install/USB.ini.example\" \"$BASE_PATH/config/USB.ini\""
 fi
 
 for name in legacy user; do
@@ -92,29 +137,32 @@ chown "$PICOMUON_USER:$PICOMUON_GROUP" \
     "$BASE_PATH/logfiles/log-PicoMuon.txt" "$BASE_PATH/logfiles/log-error.txt"
 chmod +x "$BASE_PATH"/scripts/*.sh
 
-# Transition from legacy PicoMuonACM0.service if active
-if systemctl is-active --quiet PicoMuonACM0.service 2>/dev/null; then
-    echo "Stopping legacy PicoMuonACM0.service..."
-    systemctl stop PicoMuonACM0.service || true
-    systemctl disable PicoMuonACM0.service || true
-    rm -f /etc/systemd/system/PicoMuonACM0.service
-fi
-
-SERVICE_TMP=$(mktemp --suffix=.service)
-trap 'rm -f "$SERVICE_TMP"' EXIT
+UNIT_TMP_DIR=$(mktemp -d)
+SERVICE_TMP="$UNIT_TMP_DIR/PicoMuon.service"
+TEMPLATE_TMP="$UNIT_TMP_DIR/PicoMuon@.service"
+trap 'rm -f "$SERVICE_TMP" "$TEMPLATE_TMP"; rmdir "$UNIT_TMP_DIR"' EXIT
 sed \
     -e "s|@PICOMUON_USER@|$(escape_sed_replacement "$PICOMUON_USER")|g" \
     -e "s|@PICOMUON_GROUP@|$(escape_sed_replacement "$PICOMUON_GROUP")|g" \
     -e "s|@PICOMUON_BASE_PATH@|$BASE_PATH_SED|g" \
     "$BASE_PATH/install/PicoMuon.service" > "$SERVICE_TMP"
-systemd-analyze verify "$SERVICE_TMP"
+sed \
+    -e "s|@PICOMUON_USER@|$(escape_sed_replacement "$PICOMUON_USER")|g" \
+    -e "s|@PICOMUON_GROUP@|$(escape_sed_replacement "$PICOMUON_GROUP")|g" \
+    -e "s|@PICOMUON_BASE_PATH@|$BASE_PATH_SED|g" \
+    "$BASE_PATH/install/PicoMuon@.service" > "$TEMPLATE_TMP"
+systemd-analyze verify "$SERVICE_TMP" "$TEMPLATE_TMP"
 install -o root -g root -m 0644 "$SERVICE_TMP" /etc/systemd/system/PicoMuon.service
-systemctl daemon-reload
-systemctl enable PicoMuon.service
-systemctl restart PicoMuon.service
+install -o root -g root -m 0644 "$TEMPLATE_TMP" /etc/systemd/system/PicoMuon@.service
+if [ "$CONFIG_MODE" = named ]; then
+    for label in "${DETECTOR_LABELS[@]}"; do
+        install -d -o "$PICOMUON_USER" -g "$PICOMUON_GROUP" -m 0755 \
+            "$BASE_PATH/logfiles/detectors/$label"
+    done
+fi
 
 CRON_TMP_DIR=$(mktemp -d)
-trap 'rm -f "$SERVICE_TMP"; rm -rf "$CRON_TMP_DIR"' EXIT
+trap 'rm -f "$SERVICE_TMP" "$TEMPLATE_TMP"; rmdir "$UNIT_TMP_DIR"; rm -rf "$CRON_TMP_DIR"' EXIT
 CURRENT_CRON="$CRON_TMP_DIR/current"
 FILTERED_CRON="$CRON_TMP_DIR/filtered"
 NEW_CRON="$CRON_TMP_DIR/new"
@@ -153,6 +201,8 @@ if [ -d "$BASE_PATH/WWW" ]; then
     cp "$BASE_PATH/VERSION" /var/www/html/picomuon-version.txt
 fi
 systemctl enable --now apache2
+
+bash "$BASE_PATH/install/service-transition.sh" --apply "$CONFIG_MODE" "${ACTIVATION_ARGUMENTS[@]}" "${DETECTOR_LABELS[@]}"
 
 echo "UKRAA PicoMuon installation completed."
 echo "Daily processing runs at 01:15 local time; logs are in $BASE_PATH/logfiles."

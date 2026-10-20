@@ -430,12 +430,16 @@ Phase 2a is not complete or ready to replace the production installation.**
   shared-input downloads, missing-output validation and stale named period/
   latest-image removal prevent success-shaped stale publication. Weekly log
   rotation now includes separate existing detector log directories.
-- Implemented safeguards: installer and legacy processors still reject named
-  mode. Modern direct processors and reprocessing require explicit detector
-  selection; shell daily/plot entry points dispatch to the named pipeline.
-  No pilot cron job has been installed. The template
-  `PicoMuon@.service` is not automatically installed or
-  enabled by this milestone. Existing `[usb]` mode and its paths are retained.
+- Implemented safeguards: modern direct processors and reprocessing require
+  explicit detector selection; shell daily/plot entry points dispatch to the
+  named pipeline. The installer validates named USB configuration and requires
+  `--activate-services` before changing collector mode. The transition stops
+  and disables all previously loaded/enabled named instances and the legacy
+  collectors before enabling the selected mode; named mode enables one
+  `PicoMuon@LABEL.service` per configured label. Returning to single mode while
+  named instances are active/enabled also requires the flag. The service template
+  is installed but instances are not enabled unless explicitly selected.
+  Existing `[usb]` mode and paths remain supported; no raw archive is moved.
 - Automated checks cover concurrent simulated streams, disconnection of one
   while the other continues, UTC rollover, swapped ACM enumeration, metadata
   and fallback isolation, malformed rows, duplicate/invalid configuration,
@@ -449,6 +453,11 @@ Phase 2a is not complete or ready to replace the production installation.**
   Local validation on Windows: 110 Python tests ran, 107 passed and 3
   platform-dependent checks were skipped; reprocessing Bash syntax and
   diff whitespace checks passed.
+- Opt-in service-transition validation on Windows: 33 detector tests ran (28
+  passed, 5 platform-dependent skips); Git Bash syntax checks, mocked
+  single/named service transition tests, cron filtering and diff whitespace
+  checks passed. `systemd-analyze verify` and live service cutover still require
+  validation on the RPi.
 - Live evidence supplied 2026-10-19/20: all 110 tests passed on the RPi;
   Unit_2 and Unit_3 recorded concurrently in the pilot, independent unplug/
   reconnect tests passed both ways, and both crossed UTC midnight correctly.
@@ -503,10 +512,10 @@ Phase 2a is not complete or ready to replace the production installation.**
   are dated October 19 and belong to the unplug tests. Visual RPi page
   acceptance and production web serving remain pending.
 - Remaining: RPi visual web acceptance, network-enabled full-chain timing,
-  production scheduler
-  activation, safe installer and service-instance
-  migration; explicit dry-run historical mapping and same-day label-change
-  handling; live RPi acceptance (three connected detectors are available).
+  live RPi acceptance of the opt-in installer/service transition (three
+  connected detectors are available); explicit dry-run historical mapping and
+  same-day label-change handling. Do not treat installer activation as proof
+  that detector assignments or historical adoption are correct.
   Do not rename labels or move raw
   archives as part of this collection pilot.
 

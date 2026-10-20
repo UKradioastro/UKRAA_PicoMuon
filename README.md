@@ -173,7 +173,7 @@ sudo bash install/install.sh
 
 ![img_04](images/RPi_imager_04.PNG)
 
-The installer installs the required packages, configures the collector service for your account, and replaces only the PicoMuon block in root's crontab. Daily processing starts at 01:15 local time; until Phase 2 replaces the legacy processing, it can take many hours to finish.
+The installer installs the required packages, configures the collector service for your account, and replaces only the PicoMuon block in root's crontab. Daily processing starts at 01:15 local time.
 
 ---
 
@@ -226,16 +226,27 @@ The collector records the detector name and four settings on every raw event. Le
 <!-- =============================================================================== -->
 ### Phase 2a development: named-detector collection and processing pilot
 
-**This is a development pilot, not a production multi-detector release.**
-Leave the working RPi's `[usb]` configuration unchanged. Explicitly selected
-daily/period processing, reprocessing, isolated plotting and static web
-publication are implemented. Named daily orchestration is available for manual
-pilot runs; production scheduler activation, service migration and historical-data
-mapping remain pending. See the
+**Named-detector service activation is an explicit migration; historical archive
+adoption and live RPi acceptance remain pending.** Explicitly selected
+daily/period processing, reprocessing, isolated plotting, static web publication
+and scheduled daily orchestration are implemented. The default installer refuses
+to activate a named configuration. After checking every detector mapping,
+identity and required `[legacy:LABEL]` settings, explicitly run:
+
+```bash
+sudo bash install/install.sh --activate-services
+```
+
+The installer stops and disables all old systemd-managed single/named collectors
+before starting the configured mode. Stop any manually launched collectors
+before using the flag as well. Without the flag, a named configuration or an
+active/enabled named service being switched back to single-detector mode is
+refused before package or configuration changes. This does not move or relabel
+historical raw data, resolve same-day label changes, or prove the physical
+detector assignments; verify those separately before a production cutover. See the
 [implementation status and deferred work](docs/implementation-plan.md#phase-2a--concurrent-multi-detector-support-before-phase-3).
-The installer and legacy processors still refuse named mode. Modern processing/
-plot entry points dispatch to the named pipeline when `[detectors]` is configured.
-Do not run the installer against a pilot configuration.
+Legacy processors still refuse implicit named selection. Modern processing/plot
+entry points dispatch to the named pipeline when `[detectors]` is configured.
 
 For development, prepare a separate, empty pilot copy from the updated code,
 without copying or moving the production archive:
@@ -333,11 +344,11 @@ explicit cable-swap error. Serial access is exclusive; disconnecting one unit
 must not stop the other. Reconnecting/swapping ACM enumeration must still use
 the same stable aliases and folders. Two units may require a powered USB hub.
 
-`install/PicoMuon@.service` supplies a future per-label service template with
-separate log paths and conflicts with the old single-collector services, but is
-deliberately **not installed or enabled automatically** in this milestone.
+`install/PicoMuon@.service` supplies a per-label service with separate log paths
+and conflicts with the old single-collector services. The installer enables
+instances only after the explicit `--activate-services` opt-in described above.
 Do not rename labels, move raw files or adopt pilot data into production yet:
-safe mapping and same-day transitions remain pending.
+historical mapping and same-day transitions remain pending.
 Raw data is never migrated by registration.
 
 #### Explicit offline processing in the pilot
