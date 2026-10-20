@@ -123,4 +123,48 @@ if [ "$(grep -n -m1 '^stop PicoMuon@East.service$' "$FAKE_SYSTEMCTL_LOG" | cut -
     exit 1
 fi
 
-echo "Service transition checks passed."
+mkdir -p "$TEMP_DIR/installer/install"
+cp "$REPO_PATH/install/service-transition.sh" "$TEMP_DIR/installer/install/"
+# Execute the real installer preflight only; never reach package or file changes.
+awk '/^escape_sed_replacement\(\)/ { exit } { print }' \
+    "$REPO_PATH/install/install.sh" > "$TEMP_DIR/installer/install/install.sh"
+cat > "$TEMP_DIR/bin/id" <<'MOCK'
+#!/bin/bash
+case "$1" in
+    -u) echo 0 ;;
+    -gn) echo pi ;;
+    *) exit 2 ;;
+esac
+MOCK
+cat > "$TEMP_DIR/bin/getent" <<'MOCK'
+#!/bin/bash
+exit 0
+MOCK
+cat > "$TEMP_DIR/bin/python3" <<'MOCK'
+#!/bin/bash
+printf '%s\n' "$FAKE_CONFIG_REPORT"
+MOCK
+chmod +x "$TEMP_DIR/bin/id" "$TEMP_DIR/bin/getent" "$TEMP_DIR/bin/python3"
+export SUDO_USER=pi
+export FAKE_ACTIVE_UNITS=
+export FAKE_ENABLED_UNITS=
+export FAKE_CONFIG_REPORT=$'named\nUnit_2\nUnit_3'
+: > "$FAKE_SYSTEMCTL_LOG"
+if bash "$TEMP_DIR/installer/install/install.sh" > "$TEMP_DIR/preflight.log" 2>&1; then
+    echo "Installer unexpectedly accepted named mode without explicit activation." >&2
+    exit 1
+fi
+if ! grep -Fq "Named detector services are opt-in" "$TEMP_DIR/preflight.log"; then
+    cat "$TEMP_DIR/preflight.log" >&2
+    echo "Installer failed before checking named-mode authorization." >&2
+    exit 1
+fi
+bash "$TEMP_DIR/installer/install/install.sh" --activate-services
+export FAKE_CONFIG_REPORT=single
+bash "$TEMP_DIR/installer/install/install.sh"
+if [ -s "$FAKE_SYSTEMCTL_LOG" ]; then
+    echo "Installer preflight unexpectedly mutated service state." >&2
+    exit 1
+fi
+
+echo "Service transition and installer preflight checks passed."

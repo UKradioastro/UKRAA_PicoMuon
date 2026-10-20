@@ -7,6 +7,9 @@ This project uses calendar versioning in the format `YYYY.MM.patch`.
 
 ## [Unreleased]
 
+### Fixed
+- Pass configured detector labels to the installer's service preflight so explicitly authorised named installations can proceed. Regression tests execute the actual installer preflight without package, file or live-service changes.
+
 ### Added
 - Opt-in named service installation: `install/install.sh --activate-services` validates named configuration and transitions collector units without overlapping old and new instances. Ordinary installation refuses named-mode activation; switching back from active/enabled named collectors also requires the flag. Historical archive adoption and live RPi acceptance remain pending.
 - Phase 2a named plot/web pilot: all six plot families use isolated named inputs, latest images and archives. `ProcessDetectors.py` processes selected/all configured units independently, downloads shared site inputs once, and publishes date-labelled per-unit pages and status snapshots locally or to an explicit web root without replacing the legacy site. Per-unit pipeline locks, stale-output checks, image/status validation and separate log rotation accompany rendering/publication regressions. Live RPi acceptance and historical adoption remain deferred.

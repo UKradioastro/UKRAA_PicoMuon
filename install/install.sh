@@ -62,7 +62,7 @@ ACTIVATION_ARGUMENTS=()
 if [ "$ACTIVATE_SERVICES" = true ]; then
     ACTIVATION_ARGUMENTS=(--activate-services)
 fi
-bash "$BASE_PATH/install/service-transition.sh" --check "$CONFIG_MODE" "${ACTIVATION_ARGUMENTS[@]}"
+bash "$BASE_PATH/install/service-transition.sh" --check "$CONFIG_MODE" "${ACTIVATION_ARGUMENTS[@]}" "${DETECTOR_LABELS[@]}"
 
 escape_sed_replacement() {
     printf '%s' "$1" | sed 's/[\\&|]/\\&/g'
