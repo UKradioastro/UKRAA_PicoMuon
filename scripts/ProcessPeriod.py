@@ -87,7 +87,7 @@ def load_day_file(
     assumed_station = False
     for row in product_rows(day_file):
         dt_val = datetime.strptime(row["DateTime"], "%Y-%m-%d %H:%M:%S")
-        counts = tuple(float(row[key]) if row[key] != "nan" else 0.0
+        counts = tuple(float(row[key])
                        for key in ("CPM_T", "CPM_B", "CPM_C"))
         temp = float(row["Mean_Temp"])
         pres = float(row["Mean_Pres"])
@@ -172,7 +172,7 @@ def _process_period_data(
             all_5min_rows.extend(load_day_file(day_files[cur_date], base, label))
     all_metadata = BinMetadata()
     for row in all_5min_rows:
-        if sum(row[1:4]) > 0:
+        if any(value > 0 for value in row[1:4]):
             all_metadata.add(row[7])
 
     # Set up output path
@@ -207,18 +207,21 @@ def _process_period_data(
             pres_count = 0
             metadata = BinMetadata()
             stations = set()
+            observed = [False, False, False]
 
             # Advance rows within [cur_bin_time, bin_end_time)
             while row_idx < num_rows and all_5min_rows[row_idx][0] < bin_end_time:
                 r_dt, r_T, r_B, r_M, r_temp, r_pres, r_neut, r_metadata, r_station = all_5min_rows[row_idx]
                 if r_dt >= cur_bin_time:
-                    if r_T + r_B + r_M > 0:
+                    if any(value > 0 for value in (r_T, r_B, r_M)):
                         metadata.add(r_metadata)
                     if r_station:
                         stations.add(r_station)
-                    cnt_T += r_T
-                    cnt_B += r_B
-                    cnt_M += r_M
+                    for index, value in enumerate((r_T, r_B, r_M)):
+                        observed[index] = observed[index] or not math.isnan(value)
+                    cnt_T += r_T if not math.isnan(r_T) else 0.0
+                    cnt_B += r_B if not math.isnan(r_B) else 0.0
+                    cnt_M += r_M if not math.isnan(r_M) else 0.0
                     neutrons_sum += r_neut
                     if not math.isnan(r_temp):
                         temp_sum += r_temp
@@ -229,9 +232,9 @@ def _process_period_data(
                 row_idx += 1
 
             # Format outputs matching legacy formatting
-            c_T = f"{cnt_T:.0f}" if cnt_T > 0.0 else "nan"
-            c_B = f"{cnt_B:.0f}" if cnt_B > 0.0 else "nan"
-            c_M = f"{cnt_M:.0f}" if cnt_M > 0.0 else "nan"
+            c_T = f"{cnt_T:.0f}" if observed[0] else "nan"
+            c_B = f"{cnt_B:.0f}" if observed[1] else "nan"
+            c_M = f"{cnt_M:.0f}" if observed[2] else "nan"
 
             # Temperature and pressure averages:
             # Legacy divides by intervals_per_step if total counts > 0

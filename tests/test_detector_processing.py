@@ -83,7 +83,7 @@ class DetectorProcessingTests(unittest.TestCase):
         for index, label in enumerate(self.labels):
             cpm = self.rows(self.product("cpm", label))
             self.assertEqual(len(cpm), 1440)
-            self.assertEqual(sum(int(row["Count_C"]) for row in cpm), index + 2)
+            self.assertEqual(sum(int(row["Count_C"]) for row in cpm if row["Count_C"] != "nan"), index + 2)
             self.assertEqual(cpm[0]["detector_name"], label)
             self.assertEqual(cpm[0]["threshold_top"], str(100 + index))
             self.assertEqual(len(self.rows(self.product("day", label))), 288)

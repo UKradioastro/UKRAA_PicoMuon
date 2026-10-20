@@ -101,6 +101,60 @@ class ProductColumnTests(unittest.TestCase):
         self.assertEqual(adc[201]["threshold_top"], "250")
         self.assertEqual(self.rows("hour")[1][0]["detector_name"], "mixed")
 
+    def test_partial_day_marks_unobserved_time_as_nan_but_keeps_observed_zero_counts(self):
+        self.write_raw([
+            "2026-10-17 10:30:01.000000,C,1,200,1000,0,22,1000,Detector,200,100,200,100",
+        ])
+        original = self.raw.read_bytes()
+        self.process()
+        cpm = self.rows("cpm")[1]
+        for index, row in enumerate(cpm):
+            expected = ("0", "0", "1") if index == 630 else ("nan",) * 3
+            self.assertEqual(tuple(row[key] for key in ("Count_T", "Count_B", "Count_C")), expected)
+        day = self.rows("day")[1]
+        for index, row in enumerate(day):
+            expected = ("0", "0", "1") if index == 126 else ("nan",) * 3
+            self.assertEqual(tuple(row[key] for key in ("CPM_T", "CPM_B", "CPM_C")), expected)
+        self.assertEqual(self.raw.read_bytes(), original)
+        self.assertEqual(self.rows("adc")[1][200]["Count_C"], "1")
+
+    def test_continuous_accounting_interval_preserves_zero_event_minutes(self):
+        self.write_raw([
+            "2026-10-17 10:00:01.000000,C,1,200,1000,0,22,1000,Detector,200,100,200,100",
+            "2026-10-17 10:03:01.000000,C,2,200,181000,0,22,1000,Detector,200,100,200,100",
+        ])
+        self.process()
+        cpm = self.rows("cpm")[1]
+        self.assertEqual(cpm[599]["Count_C"], "nan")
+        self.assertEqual([row["Count_C"] for row in cpm[600:604]], ["1", "0", "0", "1"])
+        self.assertEqual(cpm[604]["Count_C"], "nan")
+
+    def test_reset_and_long_gap_do_not_imply_observation_between_events(self):
+        self.write_raw([
+            "2026-10-17 10:00:01.000000,C,10,200,10000,0,22,1000,Detector,200,100,200,100",
+            "2026-10-17 10:10:01.000000,C,1,200,1000,0,22,1000,Detector,200,100,200,100",
+            "2026-10-17 12:10:01.000000,C,2,200,7201000,0,22,1000,Detector,200,100,200,100",
+        ])
+        self.process()
+        cpm = self.rows("cpm")[1]
+        self.assertEqual(cpm[605]["Count_C"], "nan")
+        self.assertEqual(cpm[660]["Count_C"], "nan")
+        self.assertEqual(self.rows("day")[1][121]["CPM_C"], "nan")
+
+    def test_periods_preserve_observed_zero_and_missing_bins(self):
+        self.write_raw([
+            "2026-10-17 10:00:01.000000,C,1,200,1000,0,22,1000,Detector,200,100,200,100",
+        ])
+        self.process()
+        for period in PERIOD_CONFIGS:
+            with self.subTest(period=period), patch("sys.stdout", new_callable=io.StringIO):
+                self.assertEqual(process_period_data(period, self.day, self.base, min_percent=0), 0)
+                rows = self.rows(period)[1]
+                populated = [row for row in rows if row["CPM_C"] != "nan"]
+                self.assertEqual(len(populated), 1)
+                self.assertEqual([populated[0][key] for key in ("CPM_T", "CPM_B", "CPM_C")], ["0", "0", "1"])
+                self.assertTrue(all(row["CPM_T"] == "nan" for row in rows if row["CPM_C"] == "nan"))
+
     def test_history_assumption_is_logged_and_does_not_override_reported_settings(self):
         self.write_raw([
             "# picomuon_metadata: {\"observation\": {\"private\": \"not copied\"}}",

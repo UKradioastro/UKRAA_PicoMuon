@@ -98,6 +98,7 @@ def _process_daily(target_date: date, base: Path, detector_label: Optional[str])
 
     # 1. 1440 1-minute bins: count_T, count_B, count_C
     cpm_bins = [[0, 0, 0] for _ in range(1440)]
+    observed_minutes = [False] * 1440
 
     # 2. 288 5-minute bins: count_T, count_B, count_C, sum_temp, sum_pres
     day_bins = [[0, 0, 0, 0.0, 0.0] for _ in range(288)]
@@ -177,6 +178,7 @@ def _process_daily(target_date: date, base: Path, detector_label: Optional[str])
             pos_idx = 0 if pos == "T" else (1 if pos == "B" else 2)
 
             min_idx = dt_val.hour * 60 + dt_val.minute
+            observed_minutes[min_idx] = True
             day_idx = min_idx // 5
             hour_idx = dt_val.hour
             minute_metadata[min_idx].add(metadata)
@@ -217,6 +219,9 @@ def _process_daily(target_date: date, base: Path, detector_label: Optional[str])
                     event_counts.clear()
                     log_message(source, f"Started new accounting segment at {dt_val}: {reason}")
                 else:
+                    # Infer coverage only within an accepted accounting segment.
+                    for minute in range(prev_time.hour * 60 + prev_time.minute, min_idx + 1):
+                        observed_minutes[minute] = True
                     if previous_count is not None:
                         hour_bins[hour_idx][4] += max(0, event_count - previous_count - 1)
                     # Apportion shared elapsed time over the UTC interval, not
@@ -251,7 +256,8 @@ def _process_daily(target_date: date, base: Path, detector_label: Optional[str])
             mm = m % 60
             ts_str = f"{date_str} {hh:02d}:{mm:02d}:00"
             cnt_T, cnt_B, cnt_C = cpm_bins[m]
-            out.write(csv_line([ts_str, cnt_T, cnt_B, cnt_C,
+            counts = (cnt_T, cnt_B, cnt_C) if observed_minutes[m] else ("nan",) * 3
+            out.write(csv_line([ts_str, *counts,
                                 *minute_metadata[m].columns(all_metadata)]) + "\n")
     temp_cpm.replace(cpm_out)
 
@@ -271,9 +277,10 @@ def _process_daily(target_date: date, base: Path, detector_label: Optional[str])
             cnt_T, cnt_B, cnt_C, sum_t, sum_p = day_bins[b]
             tot_counts = cnt_T + cnt_B + cnt_C
 
-            c_T = str(cnt_T) if cnt_T > 0 else "nan"
-            c_B = str(cnt_B) if cnt_B > 0 else "nan"
-            c_C = str(cnt_C) if cnt_C > 0 else "nan"
+            observed = any(observed_minutes[min_start:min_start + 5])
+            c_T = str(cnt_T) if observed else "nan"
+            c_B = str(cnt_B) if observed else "nan"
+            c_C = str(cnt_C) if observed else "nan"
             avg_t = f"{sum_t / tot_counts:.1f}" if tot_counts > 0 else "nan"
             avg_p = f"{sum_p / tot_counts:.1f}" if tot_counts > 0 else "nan"
 

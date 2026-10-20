@@ -526,7 +526,14 @@ Phase 2a is not complete or ready to replace the production installation.**
   statistics, consistent with absent NMDB input; earlier USB identity errors
   are dated October 19 and belong to the unplug tests. Visual RPi page
   acceptance and production web serving remain pending.
-- Remaining: RPi visual web acceptance, network-enabled full-chain timing,
+- Subsequent RPi network-enabled selected-unit runs on October 19 data returned
+  zero failures in 31.038 s (Unit_2) and 27.989 s (Unit_3). Supplied saved pages
+  each load ten isolated images and display correct labels/date and snapshot
+  warnings. Review found hard-coded time/location annotations and zero-filled
+  unobserved minutes. Plotters now use UTC generation timestamps and configured
+  observatory location; processing distinguishes missing (`nan`) from observed
+  zero counts. Updated products/plots still need regeneration and RPi acceptance.
+- Remaining: updated RPi visual web acceptance, all-unit scheduled timing,
   full-installer and reboot acceptance; explicit dry-run historical mapping and
   same-day label-change handling. Keep Unit_1's single-mode production
   configuration/archive and cron unchanged during the remaining pilot checks.

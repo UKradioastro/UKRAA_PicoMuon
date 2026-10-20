@@ -419,6 +419,35 @@ not once per detector. Weather still requires its configuration opt-in.
 Use `--plots-only` to render and publish existing processed products without
 reprocessing raw data.
 
+All six plot families show their actual generation date/time in UTC, rather
+than a promised daily update time. Daily/week/month muon-flux axes use
+`[Observatory] observatory_location` from `config/user.ini`; if blank or absent,
+the axis has no location suffix. Transfer `scripts/plot-annotations.gp` together
+with the plotters.
+
+Minute and five-minute count products use `nan` for unobserved time bins, so
+gnuplot omits them from curves, frequency histograms and count statistics.
+Observed bins retain genuine zero counts, including a zero-count channel when
+another channel recorded events. Observation is inferred from events and the
+existing continuous accounting intervals; resets, name/clock changes and gaps
+of at least one hour do not bridge missing bins. This is not proof of full-bin
+exposure. ADC spectra and hourly/daily accounting totals retain their numeric
+count semantics. Period aggregation preserves missing versus observed-zero
+counts without changing product columns.
+
+To correct existing zero-filled products, rerun the full selected-detector
+pipeline for the archived day (not `--plots-only`). Raw files are not changed:
+
+```bash
+(
+    set -e
+    for label in Unit_2 Unit_3; do
+        PICOMUON_BASE_PATH="$PILOT" python3 "$PILOT/scripts/ProcessDetectors.py" \
+            --detector "$label" --date 2026-10-19 --skip-downloads
+    done
+)
+```
+
 Omitting `--detector` attempts **all configured labels** independently. A failed
 or busy detector is logged and later detectors continue; the overall command
 returns nonzero if any stage fails. In the current three-unit pilot, Unit_1 has

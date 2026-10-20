@@ -8,6 +8,7 @@ This project uses calendar versioning in the format `YYYY.MM.patch`.
 ## [Unreleased]
 
 ### Fixed
+- All plot families show actual generation timestamps in UTC; day/week/month muon-flux axes use the configured observatory location instead of a hard-coded station. Missing minute/five-minute observations now remain `nan` through plotting and period aggregation, while observed zero counts are retained. Frequency histograms exclude missing minutes; entirely unobserved days render explicit empty plots. Existing products require reprocessing, not just replotting.
 - Pass configured detector labels to the installer's service preflight so explicitly authorised named installations can proceed. Regression tests execute the actual installer preflight without package, file or live-service changes.
 
 ### Added

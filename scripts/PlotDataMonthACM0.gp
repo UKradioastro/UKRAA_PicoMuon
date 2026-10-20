@@ -17,6 +17,7 @@ reset
 # Set terminal 
 set terminal pngcairo enhanced font "DejaVuSansCondensed, 10" rounded size 640,540 
 basePath = system("printf '%s' \"$PICOMUON_BASE_PATH\"")
+load basePath."/scripts/plot-annotations.gp"
 targetDate = system("date -u -d \"${PICOMUON_TARGET_DATE:-yesterday}\" +%F")
 if (!exists("detectorLabel")) { detectorLabel = "" }
 dataDetector = strlen(detectorLabel) ? "detectors/".detectorLabel : "ACM0"
@@ -71,7 +72,7 @@ EndXaxis = system("date -u -d '".targetDate." +1 day' +%F")." 00:00:00"
 pathPlot3 = basePath."/plots/month/".dataDetector."/".date."_week_plot.png"
 
 # Title for graph
-GraphTitle3 = "% change of muon and neutron count rate from mean count rate for the last month.\n Graph is updated every day at 9.30am \n"
+GraphTitle3 = "% change of muon and neutron count rate from mean count rate for the last month.".generatedLabel
 
 # Set data types
 set xdata time
@@ -119,7 +120,7 @@ set xlabel textcolor rgb "black" norotate
 set xrange [ StartXaxis : EndXaxis ] noreverse nowriteback
 
 # Y-axis labels and ranges
-set ylabel "% change in muon flux N15 London UK" 
+set ylabel muonAxisLabel noenhanced
 set ylabel textcolor rgb "dark-violet" rotate
 set yrange [ (((MUON_min/MUON_mean)*100)-100)-5 : (((MUON_max/MUON_mean)*100)-100)+5 ] noreverse nowriteback
 

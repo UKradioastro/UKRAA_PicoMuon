@@ -17,6 +17,7 @@ reset
 # Set terminal 
 set terminal pngcairo enhanced font "DejaVuSansCondensed, 10" rounded size 640,540 
 basePath = system("printf '%s' \"$PICOMUON_BASE_PATH\"")
+load basePath."/scripts/plot-annotations.gp"
 targetDate = system("date -u -d \"${PICOMUON_TARGET_DATE:-yesterday}\" +%F")
 if (!exists("detectorLabel")) { detectorLabel = "" }
 dataDetector = strlen(detectorLabel) ? "detectors/".detectorLabel : "ACM0"
@@ -63,14 +64,16 @@ pathPlot3 = basePath."/plots/cpm/".dataDetector."/".date."_CPM_M_plot.png"
 # Set separator to ","
 set datafile separator ","
 set datafile commentschars "#"
+stats FileData using 2 nooutput
+observationsAvailable = exists("STATS_records")
 
 # Title for graph
 # top detector
-GraphTitle1 = "Top SiPM counts per minute data for ".system("date -u -d '".targetDate."' +'%A %d %B %Y'")."\n Graph is updated every day at 9.30am \n"
+GraphTitle1 = "Top SiPM counts per minute data for ".system("date -u -d '".targetDate."' +'%A %d %B %Y'").generatedLabel
 # bottom detector
-GraphTitle2 = "Bottom SiPM counts per minute data for ".system("date -u -d '".targetDate."' +'%A %d %B %Y'")."\n Graph is updated every day at 9.30am \n"
+GraphTitle2 = "Bottom SiPM counts per minute data for ".system("date -u -d '".targetDate."' +'%A %d %B %Y'").generatedLabel
 # muons detected
-GraphTitle3 = "Muon counts per minute data for ".system("date -u -d '".targetDate."' +'%A %d %B %Y'")."\n Graph is updated every day at 9.30am \n"
+GraphTitle3 = "Muon counts per minute data for ".system("date -u -d '".targetDate."' +'%A %d %B %Y'").generatedLabel
 
 # Set data types
 set xdata time
@@ -122,6 +125,10 @@ set xrange [ StartXaxis : EndXaxis ] noreverse nowriteback
 set ylabel "Event counts (cpm)" 
 set ylabel textcolor rgb "dark-violet" rotate
 set yrange [ 0.00000 : * ] noreverse nowriteback
+if (!observationsAvailable) {
+    set yrange [0:1]
+    set label 101 "No detector observations in this day" at graph 0.5, 0.5 center
+}
 
 # Plot command # top detector
 GraphTitle = GraphTitle1

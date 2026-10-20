@@ -17,6 +17,7 @@ reset
 # Set terminal 
 set terminal pngcairo enhanced font "DejaVuSansCondensed, 10" rounded size 640,540 
 basePath = system("printf '%s' \"$PICOMUON_BASE_PATH\"")
+load basePath."/scripts/plot-annotations.gp"
 targetDate = system("date -u -d \"${PICOMUON_TARGET_DATE:-yesterday}\" +%F")
 if (!exists("detectorLabel")) { detectorLabel = "" }
 dataDetector = strlen(detectorLabel) ? "detectors/".detectorLabel : "ACM0"
@@ -58,11 +59,11 @@ set datafile commentschars "#"
 
 # Title for graph
 # top detector
-GraphTitle1 = "Frequency of top detector adc values for ".system("date -u -d '".targetDate."' +'%A %d %B %Y'")."\n Graph is updated every day at 9.30am \n"
+GraphTitle1 = "Frequency of top detector adc values for ".system("date -u -d '".targetDate."' +'%A %d %B %Y'").generatedLabel
 # bottom detector
-GraphTitle2 = "Frequency of top detector adc values for ".system("date -u -d '".targetDate."' +'%A %d %B %Y'")."\n Graph is updated every day at 9.30am \n"
+GraphTitle2 = "Frequency of top detector adc values for ".system("date -u -d '".targetDate."' +'%A %d %B %Y'").generatedLabel
 # muons detected
-GraphTitle3 = "Frequency of muon detected adc values for ".system("date -u -d '".targetDate."' +'%A %d %B %Y'")."\n Graph is updated every day at 9.30am \n"
+GraphTitle3 = "Frequency of muon detected adc values for ".system("date -u -d '".targetDate."' +'%A %d %B %Y'").generatedLabel
 
 # Set format types
 set format x "%.1f"

@@ -160,8 +160,8 @@ class Phase2ProcessingTests(unittest.TestCase):
         first_day = day_lines[1].split(",")
         self.assertEqual(first_day[0], "2026-10-09 00:00:00")
         if self.has_real_sample:
-            self.assertEqual(first_day[1], "nan")
-            self.assertEqual(first_day[2], "nan")
+            self.assertEqual(first_day[1], "0")
+            self.assertEqual(first_day[2], "0")
             self.assertEqual(first_day[3], "78")
             self.assertEqual(first_day[4], "22.9")
             self.assertEqual(first_day[5], "1015.5")

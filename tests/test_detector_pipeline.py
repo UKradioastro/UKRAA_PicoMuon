@@ -287,6 +287,15 @@ class DetectorPipelineTests(unittest.TestCase):
 
 def portable_plot_source(script, base, target):
     source = (REPO / "scripts" / script).read_text(encoding="utf-8")
+    annotations = (REPO / "scripts" / "plot-annotations.gp").read_text(encoding="utf-8").splitlines()
+    # Only platform-specific command results are substituted; retain the shared
+    # gnuplot annotation/missing-value logic for native rendering tests.
+    annotations = [
+        'generatedAt = system("echo 2026-10-20 12:34:56 UTC")' if line.startswith("generatedAt =")
+        else 'observatoryLocation = "Test_Observatory London UK"' if line.startswith("observatoryLocation =")
+        else line for line in annotations
+    ]
+    source = source.replace('load basePath."/scripts/plot-annotations.gp"', "\n".join(annotations))
     source = source.replace(
         'basePath = system("printf \'%s\' \\"$PICOMUON_BASE_PATH\\"")',
         f'basePath = "{base.as_posix()}"',
@@ -304,13 +313,99 @@ def portable_plot_source(script, base, target):
         )
     if os.name == "nt":
         source = source.replace("DejaVuSansCondensed", "Arial")
-    if "system(" in source:
+    if "system(" in source.replace('system("echo 2026-10-20 12:34:56 UTC")', ""):
         raise AssertionError("Unsubstituted platform shell in plot test")
     return source
 
 
+@unittest.skipUnless(shutil.which("bash"), "Bash required for plot annotation configuration lookup")
+class PlotAnnotationTests(unittest.TestCase):
+    def test_location_lookup_preserves_text_and_reports_invalid_configuration(self):
+        annotations = (REPO / "scripts" / "plot-annotations.gp").read_text().splitlines()
+        lookup = next(line for line in annotations if line.startswith("observatoryLocation ="))
+        command = json.loads(lookup.partition("system(")[2][:-1])
+        with tempfile.TemporaryDirectory() as directory:
+            base = Path(directory)
+            shutil.copytree(REPO / "scripts", base / "scripts")
+            config = base / "config"
+            config.mkdir()
+            location = 'York_Station "North" & West'
+            user = config / "user.ini"
+            user.write_text(f"[Observatory]\nobservatory_location = {location}\n")
+            environment = dict(os.environ, PICOMUON_BASE_PATH=str(base))
+            result = subprocess.run(["bash", "-c", command], env=environment, capture_output=True, text=True)
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertEqual(result.stdout.strip(), location)
+            user.unlink()
+            result = subprocess.run(["bash", "-c", command], env=environment, capture_output=True, text=True)
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertEqual(result.stdout.strip(), "")
+            user.write_text("invalid INI")
+            result = subprocess.run(["bash", "-c", command], env=environment, capture_output=True, text=True)
+            self.assertNotEqual(result.returncode, 0)
+            self.assertIn("MissingSectionHeaderError", result.stderr)
+
+
 @unittest.skipUnless(GNUPLOT, "gnuplot is required for rendering tests")
 class NamedRenderingTests(unittest.TestCase):
+    def test_plot_annotation_lookup_failure_stops_gnuplot(self):
+        annotations = (REPO / "scripts" / "plot-annotations.gp").read_text().splitlines()
+        annotations = [
+            'generatedAt = system("echo test")' if line.startswith("generatedAt =")
+            else 'observatoryLocation = system("exit 1")' if line.startswith("observatoryLocation =")
+            else line for line in annotations
+        ]
+        with tempfile.TemporaryDirectory() as directory:
+            script = Path(directory) / "annotations.gp"
+            script.write_text("\n".join(annotations))
+            result = subprocess.run([GNUPLOT, str(script)], capture_output=True, text=True)
+            self.assertNotEqual(result.returncode, 0)
+            self.assertIn("Unable to read observatory configuration", result.stderr)
+
+    def test_unobserved_day_renders_explicitly_empty_cpm_and_frequency_plots(self):
+        with tempfile.TemporaryDirectory() as directory:
+            base = Path(directory)
+            path = build_processed_day_path(base, "cpm", TARGET)
+            path.parent.mkdir(parents=True)
+            path.write_text(f"DateTime,Count_T,Count_B,Count_C\n{TARGET} 10:00:00,nan,nan,nan\n")
+            for path in ("plots/freq/ACM0", "plots/cpm/ACM0", "temp/yesterday"):
+                (base / path).mkdir(parents=True)
+            for name, suffix in (("PlotDataCpmACM0.gp", "Cpm"), ("PlotDataFreqACM0.gp", "Freq")):
+                source = portable_plot_source(name, base, TARGET)
+                source = source.replace("pngcairo enhanced", "svg enhanced").replace(" rounded size", " size")
+                script = base / name
+                script.write_text(source)
+                result = subprocess.run([GNUPLOT, str(script)], capture_output=True, text=True)
+                self.assertEqual(result.returncode, 0, result.stderr)
+                svg = (base / "temp" / "yesterday" / f"ACM0_C-{suffix}.png").read_text()
+                self.assertIn("No detector observations in this day", svg)
+
+    def test_frequency_excludes_nan_but_retains_observed_zero_minutes(self):
+        with tempfile.TemporaryDirectory() as directory:
+            base = Path(directory)
+            raw = base / "data" / "raw" / "2026" / "2026-10" / f"{TARGET}.txt"
+            raw.parent.mkdir(parents=True)
+            raw.write_text(
+                f"{TARGET} 10:00:01,C,1,200,1000,0,22,1000,Detector,200,100,200,100\n"
+                f"{TARGET} 10:02:01,C,2,200,121000,0,22,1000,Detector,200,100,200,100\n"
+            )
+            with redirect_stdout(io.StringIO()):
+                self.assertEqual(process_daily(TARGET, base), 0)
+            for path in ("plots/freq/ACM0", "temp/yesterday"):
+                (base / path).mkdir(parents=True)
+            table = base / "frequency.txt"
+            script = base / "frequency.gp"
+            script.write_text(
+                portable_plot_source("PlotDataFreqACM0.gp", base, TARGET)
+                + f'\nset table "{table.as_posix()}"\n'
+                + 'plot FileData using (rounded($4)):(1) smooth frequency\nunset table\n'
+            )
+            result = subprocess.run([GNUPLOT, str(script)], capture_output=True, text=True)
+            self.assertEqual(result.returncode, 0, result.stderr)
+            bins = [tuple(map(float, line.split()[:2])) for line in table.read_text().splitlines()
+                    if line.strip() and not line.startswith("#")]
+            self.assertEqual(bins, [(0.0, 1.0), (1.0, 2.0)])
+
     def test_no_muon_or_neutron_data_is_labelled_without_fabricated_counts(self):
         with tempfile.TemporaryDirectory() as directory:
             base = Path(directory)
@@ -333,6 +428,10 @@ class NamedRenderingTests(unittest.TestCase):
                 self.assertEqual(result.returncode, 0, result.stderr)
                 output = base / "temp" / "detectors" / "Unit_2" / "periods" / f"Unit_2_{category}_plot.png"
                 svg = output.read_text()
+                self.assertIn("Generated 2026-10-20 12:34:56 UTC", svg)
+                self.assertIn("Test_Observatory London UK", svg)
+                self.assertNotIn("N15 London", svg)
+                self.assertNotIn("9.30am", svg)
                 self.assertIn("No muon events in this period", svg)
                 self.assertIn("Neutron data unavailable", svg)
                 self.assertNotIn("Mean neutron counts", svg)

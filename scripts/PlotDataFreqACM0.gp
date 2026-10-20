@@ -17,6 +17,7 @@ reset
 # Set terminal 
 set terminal pngcairo enhanced font "DejaVuSansCondensed, 10" rounded size 640,540 
 basePath = system("printf '%s' \"$PICOMUON_BASE_PATH\"")
+load basePath."/scripts/plot-annotations.gp"
 targetDate = system("date -u -d \"${PICOMUON_TARGET_DATE:-yesterday}\" +%F")
 if (!exists("detectorLabel")) { detectorLabel = "" }
 dataDetector = strlen(detectorLabel) ? "detectors/".detectorLabel : "ACM0"
@@ -56,14 +57,16 @@ pathPlot3 = basePath."/plots/freq/".dataDetector."/".date."_Freq_M_plot.png"
 # Set separator to ","
 set datafile separator ","
 set datafile commentschars "#"
+stats FileData using 2 nooutput
+observationsAvailable = exists("STATS_records")
 
 # Title for graph
 # top detector
-GraphTitle1 = "Frequency of top SiPM counts per minute data for ".system("date -u -d '".targetDate."' +'%A %d %B %Y'")."\n Graph is updated every day at 9.30am \n"
+GraphTitle1 = "Frequency of top SiPM counts per minute data for ".system("date -u -d '".targetDate."' +'%A %d %B %Y'").generatedLabel
 # bottom detector
-GraphTitle2 = "Frequency of bottom SiPM counts per minute data for ".system("date -u -d '".targetDate."' +'%A %d %B %Y'")."\n Graph is updated every day at 9.30am \n"
+GraphTitle2 = "Frequency of bottom SiPM counts per minute data for ".system("date -u -d '".targetDate."' +'%A %d %B %Y'").generatedLabel
 # muons detected
-GraphTitle3 = "Frequency of muon counts per minute data for ".system("date -u -d '".targetDate."' +'%A %d %B %Y'")."\n Graph is updated every day at 9.30am \n"
+GraphTitle3 = "Frequency of muon counts per minute data for ".system("date -u -d '".targetDate."' +'%A %d %B %Y'").generatedLabel
 
 # Set format types
 set format x "%.1f"
@@ -100,6 +103,11 @@ set xrange [0.0:*] noreverse nowriteback
 set ylabel "Frequency of events counts per minute" 
 set ylabel textcolor rgb "#A020F0" rotate
 set yrange [0.0:*] noreverse nowriteback
+if (!observationsAvailable) {
+    set xrange [0:1]
+    set yrange [0:1]
+    set label 101 "No detector observations in this day" at graph 0.5, 0.5 center
+}
 
 #set key off
 set border 3
