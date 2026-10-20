@@ -9,10 +9,15 @@ MAIN_LOG="$BASE_PATH/logfiles/log-PicoMuon.txt"
 ERROR_LOG="$BASE_PATH/logfiles/log-error.txt"
 PYTHON=/usr/bin/python3
 GNUPLOT=/usr/bin/gnuplot
+mkdir -p "$BASE_PATH/logfiles"
+NAMED=$(PYTHONPATH="$BASE_PATH/scripts" "$PYTHON" -c \
+    'from picomuon_detectors import get_detectors; print(int(bool(get_detectors())))')
+if [ "$NAMED" = 1 ]; then
+    run_as_owner "$PYTHON" "$BASE_PATH/scripts/ProcessDetectors.py" "$@"
+    exit $?
+fi
 TARGET_DATE="${1:-${PICOMUON_TARGET_DATE:-$(date -u -d yesterday +%F)}}"
 export PICOMUON_TARGET_DATE="$TARGET_DATE"
-
-mkdir -p "$BASE_PATH/logfiles"
 SOFTWARE_VERSION=$(PYTHONPATH="$BASE_PATH/scripts" "$PYTHON" -c \
     'from picomuon_common import get_usb_options, get_version; get_usb_options(); print(get_version())')
 

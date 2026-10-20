@@ -17,7 +17,7 @@ from __future__ import annotations
 
 import argparse
 import csv
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 import math
 from pathlib import Path
 import sys
@@ -111,9 +111,9 @@ def _process_daily(target_date: date, base: Path, detector_label: Optional[str])
     # Tracking run segments, elapsed wrap, missing events
     total_events = 0
     detector_name = ""
-    prev_event_count: Optional[int] = None
+    event_counts: Dict[str, int] = {}
     prev_elapsed_ms: Optional[int] = None
-    prev_hour_idx: Optional[int] = None
+    prev_time: Optional[datetime] = None
     prev_det_name: Optional[str] = None
     legacy = HistoricalSettings(base, detector_label)
     all_metadata = BinMetadata()
@@ -198,28 +198,43 @@ def _process_daily(target_date: date, base: Path, detector_label: Optional[str])
             hour_bins[hour_idx][5] += temp_val
             hour_bins[hour_idx][6] += pres_val
 
-            # Exposure and missing event calculation (section 2a)
-            # Only compare against previous event if same detector and same session
-            if (
-                prev_event_count is not None
-                and prev_elapsed_ms is not None
-                and (not det_name or not prev_det_name or det_name == prev_det_name)
-            ):
-                # Large jumps indicate a counter reset/wrap, not missing events.
-                if event_count > prev_event_count + 1:
-                    jump = event_count - prev_event_count - 1
-                    if jump <= 1000:
-                        hour_bins[hour_idx][4] += jump
-
-                # Elapsed unwrap: delta = (elapsed - prev_elapsed) % 2**32
+            # EventCount is per T/B/C; Elapsed_ms is shared by the whole detector.
+            previous_count = event_counts.get(pos)
+            if prev_elapsed_ms is not None and prev_time is not None:
                 delta_ms = (elapsed_ms - prev_elapsed_ms) % (2**32)
-                # Cap jump across reboots/disconnections (> 1 hour delta or counter reset)
-                if event_count >= prev_event_count and delta_ms < 3600000:
-                    hour_bins[hour_idx][3] += delta_ms
+                wall_seconds = (dt_val - prev_time).total_seconds()
+                reason = None
+                if det_name and prev_det_name and det_name != prev_det_name:
+                    reason = "detector name changed"
+                elif previous_count is not None and event_count < previous_count:
+                    reason = f"{pos} counter reset"
+                elif delta_ms >= 3600000 or wall_seconds >= 3600:
+                    reason = "elapsed clock reset or gap of at least one hour"
+                elif wall_seconds < 0:
+                    reason = "UTC timestamp moved backwards"
 
-            prev_event_count = event_count
+                if reason is not None:
+                    event_counts.clear()
+                    log_message(source, f"Started new accounting segment at {dt_val}: {reason}")
+                else:
+                    if previous_count is not None:
+                        hour_bins[hour_idx][4] += max(0, event_count - previous_count - 1)
+                    # Apportion shared elapsed time over the UTC interval, not
+                    # entirely to the hour containing its final event.
+                    if prev_time.hour == hour_idx:
+                        hour_bins[hour_idx][3] += delta_ms
+                    else:
+                        interval_start = prev_time
+                        while interval_start < dt_val:
+                            next_hour = interval_start.replace(minute=0, second=0, microsecond=0) + timedelta(hours=1)
+                            interval_end = min(next_hour, dt_val)
+                            fraction = (interval_end - interval_start).total_seconds() / wall_seconds
+                            hour_bins[interval_start.hour][3] += delta_ms * fraction
+                            interval_start = interval_end
+
+            event_counts[pos] = event_count
             prev_elapsed_ms = elapsed_ms
-            prev_hour_idx = hour_idx
+            prev_time = dt_val
             prev_det_name = det_name
 
     legacy.report(source)

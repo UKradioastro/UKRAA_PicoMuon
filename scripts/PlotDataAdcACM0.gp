@@ -18,11 +18,16 @@ reset
 set terminal pngcairo enhanced font "DejaVuSansCondensed, 10" rounded size 640,540 
 basePath = system("printf '%s' \"$PICOMUON_BASE_PATH\"")
 targetDate = system("date -u -d \"${PICOMUON_TARGET_DATE:-yesterday}\" +%F")
+if (!exists("detectorLabel")) { detectorLabel = "" }
+dataDetector = strlen(detectorLabel) ? "detectors/".detectorLabel : "ACM0"
+outputDetector = strlen(detectorLabel) ? detectorLabel : "ACM0"
+tempBase = strlen(detectorLabel) ? basePath."/temp/detectors/".detectorLabel : basePath."/temp"
+if (strlen(detectorLabel)) { set title "Detector: ".detectorLabel noenhanced }
 
 # Logging and input checks are handled by run_logged_plot in logging.sh.
 
 # Set up data paths
-pathData = basePath."/data/adc/ACM0"
+pathData = basePath."/data/adc/".dataDetector
 
 # Year folder
 YearFolder = "/".targetDate[1:4]
@@ -41,11 +46,11 @@ FileData = pathData.YearFolder.YearMonthFolder.YmdFile
 
 # setting output path to include data stamp
 # top detector
-pathPlot1 = basePath."/plots/adc/ACM0/".date."_ADC_T_plot.png"
+pathPlot1 = basePath."/plots/adc/".dataDetector."/".date."_ADC_T_plot.png"
 # bottom detector
-pathPlot2 = basePath."/plots/adc/ACM0/".date."_ADC_B_plot.png"
+pathPlot2 = basePath."/plots/adc/".dataDetector."/".date."_ADC_B_plot.png"
 # muons detected
-pathPlot3 = basePath."/plots/adc/ACM0/".date."_ADC_M_plot.png"
+pathPlot3 = basePath."/plots/adc/".dataDetector."/".date."_ADC_M_plot.png"
 
 # Set separator to ","
 set datafile separator ","
@@ -105,7 +110,7 @@ plot FileData using 1:2 linetype 1 linewidth 1 linecolor rgb "#0000FF" title "Fr
 set terminal pngcairo enhanced font "DejaVuSansCondensed, 10" rounded size 640,540 
 
 # Path to directory to store file
-pathPlot = basePath."/temp/yesterday/ACM0_T-Adc"
+pathPlot = tempBase."/yesterday/".outputDetector."_T-Adc"
 
 # set output path to Plot folder
 set output pathPlot.".png"
@@ -124,7 +129,7 @@ plot FileData using 1:3 linetype 1 linewidth 1 linecolor rgb "#FF0000" title "Fr
 set terminal pngcairo enhanced font "DejaVuSansCondensed, 10" rounded size 640,540 
 
 # Path to directory to store file
-pathPlot = basePath."/temp/yesterday/ACM0_B-Adc"
+pathPlot = tempBase."/yesterday/".outputDetector."_B-Adc"
 
 # set output path to Plot folder
 set output pathPlot.".png"
@@ -143,7 +148,7 @@ plot FileData using 1:4 linetype 1 linewidth 1 linecolor rgb "#00FF00" title "Fr
 set terminal pngcairo enhanced font "DejaVuSansCondensed, 10" rounded size 640,540 
 
 # Path to directory to store file
-pathPlot = basePath."/temp/yesterday/ACM0_C-Adc"
+pathPlot = tempBase."/yesterday/".outputDetector."_C-Adc"
 
 # set output path to Plot folder
 set output pathPlot.".png"

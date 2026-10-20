@@ -1,7 +1,7 @@
 import datetime as dt
 import pandas as pd
 import os
-from picomuon_common import get_base_path, log_message, utc_yesterday
+from picomuon_common import get_base_path, get_target_date, log_message
 from picomuon_neutrons import write_neutron_header
 
 # local library that generates the html strings to download NEST data
@@ -10,7 +10,7 @@ import nest
 PROCESS_NAME = "GetDataNeutron.py"
 
 # get yesterday variable
-yesterday = utc_yesterday()
+yesterday = get_target_date()
 base_path = get_base_path()
 
 # print message to log file to say started

@@ -112,7 +112,7 @@ def select_detector(base_path: Path, label: Optional[str]) -> Optional[DetectorC
         if detectors:
             raise ValueError(
                 "USB.ini contains [detectors]; select one explicitly with --detector LABEL. "
-                "Production installer and plot activation remain disabled in this development pilot."
+                "Use ProcessDetectors.py for explicit named daily/plot/web runs; production installation remains disabled."
             )
         return None
     validate_label(label)

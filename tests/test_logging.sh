@@ -76,10 +76,10 @@ grep -F 'Skipped:' "$MAIN_LOG"
 run_logged_plot PlotDataDayACM0.gp "$target"
 [ -d "$PICOMUON_BASE_PATH/temp/periods" ]
 for script in PlotDataDayACM0.gp PlotDataWeekACM0.gp PlotDataMonthACM0.gp; do
-    grep -q 'basePath."/temp/periods/ACM0_' "$REPO_PATH/scripts/$script"
+    grep -q 'tempBase."/periods/".outputDetector' "$REPO_PATH/scripts/$script"
 done
 for script in PlotDataCpmACM0.gp PlotDataAdcACM0.gp PlotDataFreqACM0.gp; do
-    [ "$(grep -c 'basePath."/temp/yesterday/ACM0_' "$REPO_PATH/scripts/$script")" -eq 3 ]
+    [ "$(grep -c 'tempBase."/yesterday/".outputDetector' "$REPO_PATH/scripts/$script")" -eq 3 ]
 done
 grep -F 'gnuplot target=2026-10-09' "$MAIN_LOG"
 grep -Eq 'PlotDataDayACM0.gp +: Completed plot' "$MAIN_LOG"
@@ -139,7 +139,15 @@ if [[ "$1" = *ProcessDaily.py ]]; then
     done
 fi
 if [ "$1" = -c ]; then
+    if [[ "$2" = *'print(int(bool(get_detectors())))'* ]]; then
+        printf '0\n'
+        exit 0
+    fi
     printf '2026.10.0\n'
+    exit 0
+fi
+if [[ "$1" = *picomuon_processing.py ]]; then
+    printf '2026-10-09\n'
     exit 0
 fi
 if [[ "$1" = *GetDataWeather.py ]] && [ "${FAIL_WEATHER:-0}" -eq 1 ]; then

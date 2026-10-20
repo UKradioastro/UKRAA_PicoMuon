@@ -18,11 +18,16 @@ reset
 set terminal pngcairo enhanced font "DejaVuSansCondensed, 10" rounded size 640,540 
 basePath = system("printf '%s' \"$PICOMUON_BASE_PATH\"")
 targetDate = system("date -u -d \"${PICOMUON_TARGET_DATE:-yesterday}\" +%F")
+if (!exists("detectorLabel")) { detectorLabel = "" }
+dataDetector = strlen(detectorLabel) ? "detectors/".detectorLabel : "ACM0"
+outputDetector = strlen(detectorLabel) ? detectorLabel : "ACM0"
+tempBase = strlen(detectorLabel) ? basePath."/temp/detectors/".detectorLabel : basePath."/temp"
+if (strlen(detectorLabel)) { set title "Detector: ".detectorLabel noenhanced }
 
 # Logging and input checks are handled by run_logged_plot in logging.sh.
 
 # Set up data paths
-pathData = basePath."/data/cpm/ACM0"
+pathData = basePath."/data/cpm/".dataDetector
 
 # Year folder
 YearFolder = "/".targetDate[1:4]
@@ -41,11 +46,11 @@ FileData = pathData.YearFolder.YearMonthFolder.YmdFile
 
 # setting output path to include data stamp
 # top detector
-pathPlot1 = basePath."/plots/freq/ACM0/".date."_Freq_T_plot.png"
+pathPlot1 = basePath."/plots/freq/".dataDetector."/".date."_Freq_T_plot.png"
 # bottom detector
-pathPlot2 = basePath."/plots/freq/ACM0/".date."_Freq_B_plot.png"
+pathPlot2 = basePath."/plots/freq/".dataDetector."/".date."_Freq_B_plot.png"
 # muons detected
-pathPlot3 = basePath."/plots/freq/ACM0/".date."_Freq_M_plot.png"
+pathPlot3 = basePath."/plots/freq/".dataDetector."/".date."_Freq_M_plot.png"
 
 
 # Set separator to ","
@@ -122,7 +127,7 @@ plot FileData using (rounded($2)):(1) smooth frequency with boxes linecolor "#00
 set terminal pngcairo enhanced font "DejaVuSansCondensed, 10" rounded size 640,540 
 
 # Path to directory to store file
-pathPlot = basePath."/temp/yesterday/ACM0_T-Freq"
+pathPlot = tempBase."/yesterday/".outputDetector."_T-Freq"
 
 # set output path to Plot folder
 set output pathPlot.".png"
@@ -141,7 +146,7 @@ plot FileData using (rounded($3)):(1) smooth frequency with boxes linecolor "#FF
 set terminal pngcairo enhanced font "DejaVuSansCondensed, 10" rounded size 640,540 
 
 # Path to directory to store file
-pathPlot = basePath."/temp/yesterday/ACM0_B-Freq"
+pathPlot = tempBase."/yesterday/".outputDetector."_B-Freq"
 
 # set output path to Plot folder
 set output pathPlot.".png"
@@ -160,7 +165,7 @@ plot FileData using (rounded($4)):(1) smooth frequency with boxes linecolor "#00
 set terminal pngcairo enhanced font "DejaVuSansCondensed, 10" rounded size 640,540 
 
 # Path to directory to store file
-pathPlot = basePath."/temp/yesterday/ACM0_C-Freq"
+pathPlot = tempBase."/yesterday/".outputDetector."_C-Freq"
 
 # set output path to Plot folder
 set output pathPlot.".png"

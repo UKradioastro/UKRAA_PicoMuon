@@ -188,7 +188,7 @@ def main() -> int:
         print(f"serial_port = {port}")
         print(f"id_serial = {identity.get('ID_SERIAL', '')}")
         print(f"id_serial_short = {identity.get('ID_SERIAL_SHORT', '')}")
-        print("Collection pilot only: production processing, web output and automatic service activation are pending.")
+        print("Development pilot: named daily/plot/web runs are opt-in; production service activation and archive migration remain pending.")
         return 0
     if args.device or args.serial_port or args.detector_name:
         parser.error("--device, --serial-port and --detector-name require --register")

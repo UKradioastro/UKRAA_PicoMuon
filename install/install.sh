@@ -25,7 +25,7 @@ BASE_PATH_SHELL=$(printf '%q' "$BASE_PATH")
 BASE_PATH_SHELL_SED=$(escape_sed_replacement "$BASE_PATH_SHELL")
 
 echo "Installing UKRAA PicoMuon under $BASE_PATH for user $PICOMUON_USER"
-# The first Phase 2a milestone deliberately does not activate production multi-detector mode.
+# Production named-mode installation stays disabled until service/archive migration is ready.
 PICOMUON_BASE_PATH="$BASE_PATH" PYTHONPATH="$BASE_PATH/scripts" python3 -c \
     'from picomuon_common import get_usb_options; get_usb_options()'
 apt-get update

@@ -248,7 +248,7 @@ class DetectorProcessingTests(unittest.TestCase):
         self.assertFalse((self.base / "data" / "cpm").exists())
 
     @unittest.skipUnless(os.name == "posix", "Bash reprocessing integration runs on Linux/RPi")
-    def test_shell_dry_run_selection_processing_and_plot_guard(self):
+    def test_shell_dry_run_selection_processing_and_batch_lock(self):
         shutil.copytree(SCRIPTS, self.base / "scripts")
         self.raw("East")
         self.raw("West", day=self.day - timedelta(days=1))
@@ -259,10 +259,6 @@ class DetectorProcessingTests(unittest.TestCase):
         self.assertIn(str(self.day), dry.stdout)
         self.assertNotIn(str(self.day - timedelta(days=1)), dry.stdout)
         self.assertFalse((self.base / "logfiles").exists())
-        rejected = subprocess.run([*command, "--plot"], capture_output=True, text=True)
-        self.assertEqual(rejected.returncode, 2)
-        self.assertIn("plotting is not ready", rejected.stderr)
-        self.assertFalse(self.product("cpm", "East").exists())
         run = subprocess.run([*command, "--skip-period"], capture_output=True, text=True)
         self.assertEqual(run.returncode, 0, run.stderr)
         self.assertTrue(self.product("cpm", "East").exists())

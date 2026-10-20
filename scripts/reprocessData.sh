@@ -114,11 +114,6 @@ fi
 RAW_DATES=$(PYTHONPATH="$BASE_PATH/scripts" "$PYTHON" \
     "$BASE_PATH/scripts/picomuon_processing.py" "${DETECTOR_ARGS[@]}" "${DATE_ARGS[@]}")
 
-if [ -n "$DETECTOR" ] && [ "$RUN_PLOTS" = "true" ]; then
-    echo "Named-detector plotting is not ready; omit --plot" >&2
-    exit 2
-fi
-
 if [ -z "$RAW_DATES" ]; then
     echo "No raw data files found for ${DETECTOR:-single} in the requested range" >&2
     exit 1
@@ -143,6 +138,14 @@ exec 8>"$LOG_DIR/.reprocess.lock"
 if ! flock -n 8; then
     log_err "FAILED - another reprocessing job is running for ${DETECTOR:-single}"
     exit 1
+fi
+if [ -n "$DETECTOR" ]; then
+    run_as_owner touch "$LOG_DIR/.pipeline.lock"
+    exec 7>"$LOG_DIR/.pipeline.lock"
+    if ! flock -n 7; then
+        log_err "FAILED - another pipeline or plotting job is running for $DETECTOR"
+        exit 1
+    fi
 fi
 
 log_msg "Started reprocessing ${#TARGET_DATES[@]} day(s) from ${TARGET_DATES[0]} to ${TARGET_DATES[-1]}"
@@ -171,8 +174,31 @@ if [ "$RUN_PERIOD" = "true" ]; then
 fi
 
 if [ "$RUN_PLOTS" = "true" ]; then
+    if [ -n "$DETECTOR" ] && [ "$FAILURES" -gt 0 ]; then
+        log_err "FAILED - not plotting stale named products after reprocessing failures"
+        exit 1
+    fi
+    if [ -n "$DETECTOR" ]; then
+        run_as_owner touch "$LOG_DIR/.processing.lock"
+        exec 6>"$LOG_DIR/.processing.lock"
+        if ! flock -n 6; then
+            log_err "FAILED - another processor is writing $DETECTOR products"
+            exit 1
+        fi
+    fi
+    if [ -n "$DETECTOR" ]; then
+        run_as_owner touch "$BASE_PATH/logfiles/.pipeline.lock"
+        exec 5>"$BASE_PATH/logfiles/.pipeline.lock"
+        if ! flock -n 5; then
+            log_err "FAILED - another named job is downloading shared site inputs"
+            exit 1
+        fi
+    fi
     run_logged_command "GetDataWeather.py" run_as_owner "$PYTHON" \
         "$BASE_PATH/scripts/GetDataWeather.py" --date "$TO_DATE" || FAILURES=$((FAILURES + 1))
+    if [ -n "$DETECTOR" ]; then
+        exec 5>&-
+    fi
     log_msg "Refreshing gnuplot plots"
     for plot_script in \
         PlotDataCpmACM0.gp \
@@ -182,7 +208,7 @@ if [ "$RUN_PLOTS" = "true" ]; then
         PlotDataWeekACM0.gp \
         PlotDataMonthACM0.gp
     do
-        run_logged_plot "$plot_script" "$TO_DATE" || FAILURES=$((FAILURES + 1))
+        run_logged_plot "$plot_script" "$TO_DATE" "$DETECTOR" || FAILURES=$((FAILURES + 1))
     done
 fi
 

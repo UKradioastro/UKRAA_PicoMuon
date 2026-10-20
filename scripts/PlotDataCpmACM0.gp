@@ -18,11 +18,16 @@ reset
 set terminal pngcairo enhanced font "DejaVuSansCondensed, 10" rounded size 640,540 
 basePath = system("printf '%s' \"$PICOMUON_BASE_PATH\"")
 targetDate = system("date -u -d \"${PICOMUON_TARGET_DATE:-yesterday}\" +%F")
+if (!exists("detectorLabel")) { detectorLabel = "" }
+dataDetector = strlen(detectorLabel) ? "detectors/".detectorLabel : "ACM0"
+outputDetector = strlen(detectorLabel) ? detectorLabel : "ACM0"
+tempBase = strlen(detectorLabel) ? basePath."/temp/detectors/".detectorLabel : basePath."/temp"
+if (strlen(detectorLabel)) { set title "Detector: ".detectorLabel noenhanced }
 
 # Logging and input checks are handled by run_logged_plot in logging.sh.
 
 # Set up data paths
-pathData = basePath."/data/cpm/ACM0"
+pathData = basePath."/data/cpm/".dataDetector
 
 # Year folder
 YearFolder = "/".targetDate[1:4]
@@ -49,11 +54,11 @@ EndXaxis = system("date -u -d '".targetDate." +1 day' +%F")." 00:00:00"
 
 # setting output path to include data stamp
 # top detector
-pathPlot1 = basePath."/plots/cpm/ACM0/".date."_CPM_T_plot.png"
+pathPlot1 = basePath."/plots/cpm/".dataDetector."/".date."_CPM_T_plot.png"
 # bottom detector
-pathPlot2 = basePath."/plots/cpm/ACM0/".date."_CPM_B_plot.png"
+pathPlot2 = basePath."/plots/cpm/".dataDetector."/".date."_CPM_B_plot.png"
 # muons detected
-pathPlot3 = basePath."/plots/cpm/ACM0/".date."_CPM_M_plot.png"
+pathPlot3 = basePath."/plots/cpm/".dataDetector."/".date."_CPM_M_plot.png"
 
 # Set separator to ","
 set datafile separator ","
@@ -133,7 +138,7 @@ if (plotWeather) {
 set terminal pngcairo enhanced font "DejaVuSansCondensed, 10" rounded size 640,540 
 
 # Path to directory to store file
-pathPlot = basePath."/temp/yesterday/ACM0_T-Cpm"
+pathPlot = tempBase."/yesterday/".outputDetector."_T-Cpm"
 
 # set output path to Plot folder
 set output pathPlot.".png"
@@ -157,7 +162,7 @@ if (plotWeather) {
 set terminal pngcairo enhanced font "DejaVuSansCondensed, 10" rounded size 640,540 
 
 # Path to directory to store file
-pathPlot = basePath."/temp/yesterday/ACM0_B-Cpm"
+pathPlot = tempBase."/yesterday/".outputDetector."_B-Cpm"
 
 # set output path to Plot folder
 set output pathPlot.".png"
@@ -181,7 +186,7 @@ if (plotWeather) {
 set terminal pngcairo enhanced font "DejaVuSansCondensed, 10" rounded size 640,540 
 
 # Path to directory to store file
-pathPlot = basePath."/temp/yesterday/ACM0_C-Cpm"
+pathPlot = tempBase."/yesterday/".outputDetector."_C-Cpm"
 
 # set output path to Plot folder
 set output pathPlot.".png"

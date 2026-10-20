@@ -33,7 +33,7 @@ def generate_synthetic_raw_and_neutron(base_path: Path, target_date: date):
     # Generate synthetic raw lines
     lines = []
     # 2 events per minute across all 1440 minutes = 2880 events
-    event_num = 1
+    event_counts = {"T": 0, "C": 0}
     elapsed_ms = 1000
     dead_ms = 50
     for hour in range(24):
@@ -46,8 +46,8 @@ def generate_synthetic_raw_and_neutron(base_path: Path, target_date: date):
                 temp = 22.5
                 pres = 1015.0
                 det = "56/148/627"
-                lines.append(f"{ts_str},{evt_type},{event_num},{adc},{elapsed_ms},{dead_ms},{temp},{pres},{det}")
-                event_num += 1
+                event_counts[evt_type] += 1
+                lines.append(f"{ts_str},{evt_type},{event_counts[evt_type]},{adc},{elapsed_ms},{dead_ms},{temp},{pres},{det}")
 
     raw_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
 
@@ -273,7 +273,7 @@ class Phase2ProcessingTests(unittest.TestCase):
             args = parse_period_args()
             self.assertEqual(args.target_date, date(2026, 10, 12))
 
-    def test_missing_event_counter_jump_is_capped(self):
+    def test_large_same_type_missing_event_counter_jump_is_preserved(self):
         raw_path = (
             self.base_path
             / "data"
@@ -298,7 +298,7 @@ class Phase2ProcessingTests(unittest.TestCase):
         self.assertEqual(process_daily(self.target_date, self.base_path), 0)
         summary_path = build_daily_summary_path(self.base_path)
         summary_row = read_csv_lines(summary_path)[1]
-        self.assertEqual(summary_row.split(",")[8], "1")
+        self.assertEqual(summary_row.split(",")[8], "499999")
 
     def test_period_with_insufficient_history_is_skipped(self):
         self.assertEqual(

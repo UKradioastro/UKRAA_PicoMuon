@@ -116,8 +116,21 @@ situations must be detected rather than unwrapped:
 
 | Situation | How to recognise it | Action |
 |---|---|---|
-| Detector reboot or power cut | `EventCount` goes *down* (resets), or `delta` > 1 hour | Start a new "run segment". Don't compute a delta across it. |
-| Lost lines (USB/serial drop) | `EventCount` jumps by more than 1 | Record `missing_events = jump − 1` in the minute file (QC). |
+| Detector reboot or power cut | A counter decreases compared with the previous event of the **same T/B/C type**, or unwrapped elapsed delta is at least 1 hour | Start a new "run segment". Clear all event-type baselines; do not compute deltas across it. |
+| Lost lines (USB/serial drop) | `EventCount` jumps by more than 1 for the **same event type in the same segment** | Record `missing_events = jump − 1` as QC (currently hourly; minute QC remains deferred). |
+
+**Correction verified on 2026-10-20:** T, B and C have independent event counters
+but share one elapsed clock. Compare counts only within each type, while summing
+the shared elapsed delta once per adjacent event, regardless of type. Do not
+discard genuine positive counter gaps above an arbitrary 1,000-event limit.
+Detector-name changes, backwards UTC timestamps and UTC gaps of at least one
+hour also start segments. Split elapsed intervals across UTC hours in proportion
+to receiver timestamps, preserving measured device duration. Do not extrapolate
+beyond the day's first/last observed events. Small clock/buffering differences
+can put an hourly device duration slightly above 3,600 s; do not silently clamp it.
+`ValidHours`/`CoveragePercent` remain event-containing-hour metrics, not exposure
+coverage. Missing counts before each segment's first observation, including
+events during power-off, cannot be recovered from counters.
 
 **Is dead time significant (F6)?** No, you are right. The measured dead
 fraction is 0.13 % and it varies by only about ±0.01 % from day to day. A
@@ -140,8 +153,9 @@ That is the main benefit, rather than dead-time correction.
 in `config/USB.ini`; running it twice replaces that selection, rather than
 registering two detectors. A non-empty `label` directs the collector to
 `data/raw/<label>/...`, but does not create a second collector. Existing raw
-files are left where they are. The multi-detector behaviour below is a target,
-not an available feature yet.
+files are left where they are. The layout below is the production target;
+implemented pilot portions and remaining migration work are recorded in the
+Phase 2a status.
 
 **Default (almost all users): one detector.** Use the same paths as the
 PicoMagnetometer suite, with no detector level:
@@ -149,8 +163,9 @@ PicoMagnetometer suite, with no detector level:
 
 **Optional multi-detector mode (Phase 2a).** Named mode is selected by any
 non-empty `[detectors]` mapping in `config/USB.ini`, including a pilot with one
-unit. It is currently a collection-only development milestone, not a production
-processing mode; see the Phase 2a status below.
+unit. Collection, explicit processing and named plot/web orchestration are
+available as a development pilot, not a production migration; see the Phase 2a
+status below.
 
 ```ini
 [detectors]
@@ -372,7 +387,7 @@ them.
 
 ### Phase 2a – Concurrent multi-detector support (before Phase 3)
 
-**Development status at 2026-10-19: collection and explicit offline processing implemented;
+**Development status at 2026-10-20: collection, processing and named plot/web pilot implemented;
 Phase 2a is not complete or ready to replace the production installation.**
 
 - Implemented: validated case-preserving label/by-id mappings and USB identities;
@@ -400,10 +415,25 @@ Phase 2a is not complete or ready to replace the production installation.**
   legacy products even for a label of `ACM0`. Existing single-detector paths
   are retained. Daily/period writers share per-unit nonblocking locks.
   Reprocessing selects only that unit's archive dates, supports read-only
-  `--dry-run`, isolates logs and batch locks, and refuses named `--plot`.
-- Implemented safeguards: installer, legacy processors, scheduled processing
-  and plot orchestration still reject named mode. Modern processors and
-  reprocessing require explicit detector selection. The template
+  `  --dry-run`, isolates logs and batch locks, and now supports named `--plot`
+  without publishing.
+- Implemented 2026-10-20: all six plotters accept validated named selection;
+  products, plot archives and latest images are isolated per detector, including
+  labels matching legacy names. `ProcessDetectors.py` downloads shared site
+  inputs once for the requested completed UTC day, processes day/week/month/
+  3-month products, plots, and publishes separate date-labelled static views
+  under `WWW/detectors/LABEL/`. Optional explicit external web roots receive
+  only their `detectors/` subtree. Existing root pages and legacy URLs remain
+  untouched. Status is explicitly a publication-time snapshot, not live health.
+  A failed/busy unit does not prevent attempts for later units, but causes
+  nonzero aggregate status. Per-unit pipeline/processing locks, serialized named
+  shared-input downloads, missing-output validation and stale named period/
+  latest-image removal prevent success-shaped stale publication. Weekly log
+  rotation now includes separate existing detector log directories.
+- Implemented safeguards: installer and legacy processors still reject named
+  mode. Modern direct processors and reprocessing require explicit detector
+  selection; shell daily/plot entry points dispatch to the named pipeline.
+  No pilot cron job has been installed. The template
   `PicoMuon@.service` is not automatically installed or
   enabled by this milestone. Existing `[usb]` mode and its paths are retained.
 - Automated checks cover concurrent simulated streams, disconnection of one
@@ -414,13 +444,54 @@ Phase 2a is not complete or ready to replace the production installation.**
 - Automated offline checks cover three detectors' counts/exposure/settings,
   daily summaries and all period shapes, missing-input and legacy-settings
   isolation, archive discovery, lock contention/release, CLI errors and
-  single-detector compatibility. Linux/RPi shell integration remains a
-  platform-specific acceptance check.
+  single-detector compatibility. Linux/RPi shell integration is included in
+  the successful RPi suite runs recorded below.
   Local validation on Windows: 110 Python tests ran, 107 passed and 3
   platform-dependent checks were skipped; reprocessing Bash syntax and
-  diff whitespace checks passed. No live RPi acceptance is claimed.
-- Remaining: scheduling all configured units; isolated plot/temp/web output;
-  safe installer and service-instance
+  diff whitespace checks passed.
+- Live evidence supplied 2026-10-19/20: all 110 tests passed on the RPi;
+  Unit_2 and Unit_3 recorded concurrently in the pilot, independent unplug/
+  reconnect tests passed both ways, and both crossed UTC midnight correctly.
+  Supplied raw rows retain correct dates, per-unit names and settings with
+  empty rejected files. Unit_1 remained on production collection. Live ACM
+  renumbering, three named collectors and full scheduled/web acceptance are
+  not yet established. Captured data exposed shared-counter assumptions in
+  missing-event and exposure QC; the 2026-10-20 correction is described above.
+- Counter/exposure regression validation on 2026-10-20: 129 Python tests ran
+  locally (126 passed, 3 platform-dependent skips), including 19 new accounting
+  regressions. Temporary processing copies of both units' 19/20 October raw
+  files preserve exact T/B/C totals in CPM/day/ADC/hour products and yield zero
+  inferred missing events. Every hourly exposure matches independent uptime
+  interpolation at UTC boundaries to the CSV's 0.1 s rounding precision.
+  October 19 segment-duration totals are 48,312.758 s (Unit_2) and
+  48,275.746 s (Unit_3); the truncated October 20 snapshots give 30,560.703 s
+  and 30,558.776 s respectively. Original capture files were hash-verified
+  unchanged. These are desktop validations, not RPi processing timings.
+- RPi confirmation on 2026-10-20: all 129 tests passed without skips in
+  13.121 s. Processing October 19 completed in approximately 26 s for Unit_2
+  (242,289 events) and 24 s for Unit_3 (214,183 events), from logged timestamps;
+  both report zero inferred missing events. Inspection of the supplied
+  RPi-generated CPM/day/ADC/hour products verifies exact raw T/B/C totals,
+  row counts, isolated names/settings and independent summaries. All hourly
+  exposures agree with independent uptime-boundary interpolation within
+  0.05 s rounding; summed CSV durations are 48,312.7 s and 48,275.8 s.
+  Both summaries report 14 event-containing hours (58.3%), not exposure
+  coverage. No NMDB input was supplied in the pilot, so neutron values are
+  `nan` and station fields blank. These timings cover daily processing only,
+  not the full scheduled plotting/publishing chain.
+- Desktop plot/web validation on 2026-10-20: 143 Python tests ran, 140 passed
+  and 3 POSIX checks were skipped. Real portable gnuplot rendered all six
+  plotters for legacy mode and two named labels (including `ACM0`), plus empty
+  muon/neutron cases. Both supplied October 19 products rendered and published
+  separately (10 images per unit); source capture hashes were unchanged.
+  Browser inspection confirmed the Unit_2 page loads all 10 images at 640 px
+  width. Named shell plotting/log-rotation and legacy web-publication
+  regressions passed under Git Bash; Bash syntax checks passed. Full shell
+  logging/orchestration checks passed with an explicit lock-command stub;
+  the unmodified run stops at unavailable `flock` on Windows. Actual Linux
+  pipeline/locking acceptance and timings remain to be run on the RPi.
+- Remaining: RPi plot/web and full-chain timing acceptance, production scheduler
+  activation, safe installer and service-instance
   migration; explicit dry-run historical mapping and same-day label-change
   handling; live RPi acceptance (three connected detectors are available).
   Do not rename labels or move raw
@@ -429,8 +500,9 @@ Phase 2a is not complete or ready to replace the production installation.**
 Phases 0-2 have implementation entries in the changelog; Phase 3 was the next
 planned feature. Insert this phase first: three serial devices are now reported
 on the RPi4; stable identities and physical detector assignments still need
-verification. Simultaneous collection, scheduled processing and publishing
-are not yet wired end to end. Earlier powered-hub testing resolved USB enumeration;
+verification. Simultaneous collection and manual daily/plot/web runs are wired
+for the pilot; production scheduled/service acceptance remains pending.
+Earlier powered-hub testing resolved USB enumeration;
 software configuration alone could not resolve that hardware issue.
 
 1. Extend `ConfigureUSB.py` and `USB.ini` to register and edit multiple

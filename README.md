@@ -35,6 +35,7 @@ Instructions for setting up a Raspberry Pi4/5 are included in the **docs** folde
   - [Observation and legacy detector configuration](#observation-and-legacy-detector-configuration)
   - [Phase 2a development: named-detector collection and processing pilot](#phase-2a-development-named-detector-collection-and-processing-pilot)
     - [Explicit offline processing in the pilot](#explicit-offline-processing-in-the-pilot)
+    - [Named daily plots and web pilot](#named-daily-plots-and-web-pilot)
   - [Raw event columns](#raw-event-columns)
   - [Metadata in processed and shared data](#metadata-in-processed-and-shared-data)
   - [Neutron file attribution and headers](#neutron-file-attribution-and-headers)
@@ -227,12 +228,14 @@ The collector records the detector name and four settings on every raw event. Le
 
 **This is a development pilot, not a production multi-detector release.**
 Leave the working RPi's `[usb]` configuration unchanged. Explicitly selected
-daily/period processing and reprocessing are implemented; scheduled orchestration,
-plotting, web publishing, service migration and historical-data mapping remain pending. See the
+daily/period processing, reprocessing, isolated plotting and static web
+publication are implemented. Named daily orchestration is available for manual
+pilot runs; production scheduler activation, service migration and historical-data
+mapping remain pending. See the
 [implementation status and deferred work](docs/implementation-plan.md#phase-2a--concurrent-multi-detector-support-before-phase-3).
-The installer, legacy processors and scheduled processing/plot entry points
-still refuse named mode rather than mixing detector output. Do not run the
-installer against a pilot configuration.
+The installer and legacy processors still refuse named mode. Modern processing/
+plot entry points dispatch to the named pipeline when `[detectors]` is configured.
+Do not run the installer against a pilot configuration.
 
 For development, prepare a separate, empty pilot copy from the updated code,
 without copying or moving the production archive:
@@ -368,8 +371,8 @@ The `detectors/` product namespace prevents even a label such as `ACM0` from
 overwriting old single-detector products. Existing single-detector paths are
 unchanged. NMDB input remains shared for co-located detectors.
 
-Named processing requires `--detector LABEL` even with only one registered
-unit. Missing named raw input is an error, never a fallback to unlabelled,
+Direct daily/period processing and reprocessing require `--detector LABEL`
+even with only one registered unit. Missing named raw input is an error, never a fallback to unlabelled,
 legacy ACM0 or another detector's files. Missing period history is logged as
 a skip using the existing completeness rule. Missing historical settings use
 only `[legacy:LABEL]`, with the assumption logged; recorded settings win.
@@ -379,12 +382,99 @@ is an explicit failure; another detector can still process. Reprocessing also
 prevents overlapping batches for the same label. Temporary product files live
 beside the detector-specific destination.
 
-`--plot` is rejected for named reprocessing before products are written.
-Do not enable production cron, publishing or the installer for the pilot yet.
+Named reprocessing now supports `--plot`; it renders only that label's products
+and does not publish web pages. Failed named reprocessing never plots stale
+products. A named period skipped for insufficient history removes any stale
+product for that target date.
+
+#### Named daily plots and web pilot
+
+Run as the installation's file owner, not with `sudo`. Bash, gnuplot and `flock`
+are required on the RPi, alongside the existing Python dependencies. First test
+one completed day without network downloads:
+
+```bash
+PILOT="/home/pi/UKRAA_PicoMuon-pilot.arQgce"  # use your existing pilot directory
+PICOMUON_BASE_PATH="$PILOT" python3 "$PILOT/scripts/ProcessDetectors.py" \
+    --detector Unit_2 --date 2026-10-19 --skip-downloads
+PICOMUON_BASE_PATH="$PILOT" python3 "$PILOT/scripts/ProcessDetectors.py" \
+    --detector Unit_3 --date 2026-10-19 --skip-downloads
+```
+
+Use your registered labels/dates. `--skip-downloads` uses stored site inputs;
+absent NMDB/weather values remain unavailable, not invented. Without that flag,
+shared neutron/weather inputs are downloaded once for the requested date,
+not once per detector. Weather still requires its configuration opt-in.
+Use `--plots-only` to render and publish existing processed products without
+reprocessing raw data.
+
+Omitting `--detector` attempts **all configured labels** independently. A failed
+or busy detector is logged and later detectors continue; the overall command
+returns nonzero if any stage fails. In the current three-unit pilot, Unit_1 has
+no pilot raw archive while it remains on production: an all-unit run will
+therefore report that failure while still processing Unit_2 and Unit_3.
+
+The existing shell entry points also dispatch named configurations:
+
+```bash
+PICOMUON_BASE_PATH="$PILOT" bash "$PILOT/scripts/processData.sh" \
+    --date 2026-10-19 --detector Unit_2 --skip-downloads
+PICOMUON_BASE_PATH="$PILOT" bash "$PILOT/scripts/plots.sh" \
+    --date 2026-10-19 --detector Unit_3 --skip-downloads
+```
+
+When updating an existing pilot, transfer the updated repository to the RPi
+first, run the regression suite from that checkout, and copy the scripts
+together so Python, shell and gnuplot interfaces stay aligned:
+
+```bash
+cd ~/UKRAA_PicoMuon
+python3 -m unittest discover -s tests -p 'test_*.py'
+bash tests/test_named_plots.sh
+bash tests/test_logging.sh
+bash tests/test_publish.sh
+# Continue only if the tests above pass.
+cp -a scripts/. "$PILOT/scripts/"
+```
+
+This does not replace pilot configuration or data, and no collector restart is
+needed for the plot/pipeline update. Keep the existing pilot directory rather
+than creating another one. Inspect each unit's pipeline/error logs after running.
+
+With no date, the pipeline uses yesterday UTC; today/future dates are rejected.
+The daily chain processes day/week/month/3-month products, renders the six plot
+families, and publishes the available day/week/month images. Period completeness
+rules remain unchanged. All detector-specific outputs are isolated:
+
+- Archived plots: `plots/CATEGORY/detectors/LABEL/DATE_*.png`.
+- Latest plots: `temp/detectors/LABEL/yesterday/` and `temp/detectors/LABEL/periods/`.
+- Local web index: `WWW/detectors/index.html`.
+- Per-unit page/snapshot: `WWW/detectors/LABEL/{index.html,status.json}`.
+- Date-qualified images: `WWW/detectors/LABEL/YYYY-MM-DD/`.
+- Pipeline/error logs: `logfiles/detectors/LABEL/`; weekly rotation retains
+  separate archives for each existing unit.
+
+The page states the processed UTC date and explicitly labels collector status
+as a **publication-time snapshot, not a live connection indicator**. Missing
+period history is shown as unavailable. Missing/failed plots cannot be reused
+as fresh images; publication validates the complete expected image set first.
+A failed run leaves the previous dated page rather than claiming a fresh run.
+Per-unit pipeline locks prevent overlapping processing/plot jobs; processing
+locks also protect plotting from concurrent direct writers. Named shared-input
+downloads are serialized.
+
+Local output is **not automatically served by Apache**. An optional
+`--web-root /path/to/existing/writable/webroot` also publishes its `detectors/`
+subtree, leaving the existing root `index.html` and legacy image URLs untouched.
+Do not enable production cron, service migration or the installer yet. These
+entry points are scheduler-compatible, but no pilot cron job is installed.
 
 Run `python3 -m unittest discover -s tests -p 'test_*.py'` from the updated
 repository. Named-detector tests use isolated data and simulated streams; the
 POSIX exclusive-access test uses a local pseudo-terminal, not your detector.
+With gnuplot installed, the suite also renders real plots and exercises the
+Linux shell pipeline. Run `bash tests/test_named_plots.sh`,
+`bash tests/test_logging.sh` and `bash tests/test_publish.sh` for shell regressions.
 
 [Back to Contents](#contents)
 
@@ -447,6 +537,30 @@ Counts, numerical averaging and the number of bins are unchanged. Metadata comes
 Periods read both the new day columns and older seven-column day files, including historical JSON comments. Old day files lack a detector-name column, so that field remains blank unless they are first regenerated from raw events. Their missing settings use the same explicit legacy assumption. Legacy neutron files without a station header are treated as OULU (the existing downloader's fixed station), with that assumption logged.
 
 `data/daily/summary.csv` retains its existing numerical schema and no longer writes JSON comments. Old processing script names delegate to the shared daily/period writers: daily compatibility scripts rebuild all daily products rather than appending duplicate rows. Week/month compatibility scripts use the shared completeness rule.
+
+`EventCount` is independent for T, B and C. Missing-event QC compares successive
+counts of the **same event type** within a run segment, not adjacent mixed-type
+rows. Positive gaps contribute `current - previous - 1`, including gaps larger
+than 1,000. These are inferred counter gaps, not a measurement of events lost
+while the detector was powered off; counts before a segment's first observation
+are unknown.
+
+Hourly `live_seconds` uses the detector's **shared** elapsed clock once across
+successive events of any type, with modulo-32-bit unwrapping. A same-type counter
+decrease, detector-name change, elapsed reset/step of at least one hour, UTC gap
+of at least one hour or backwards UTC timestamp starts a new accounting segment.
+That boundary contributes neither exposure nor missing events; all three
+counter baselines are cleared together. Normal segment boundaries are logged.
+Intervals crossing UTC hours are split proportionally using receiver timestamps.
+No exposure is invented before the first or after the last event in a daily file.
+Device/receiver clock differences and USB buffering can yield hourly values
+slightly above 3,600 seconds; measured device time is not silently clamped.
+No dead-time correction is applied. The existing `ValidHours`/`CoveragePercent`
+summary still means hours containing events, **not** elapsed exposure coverage.
+
+After updating the processor, regenerate affected daily products/summaries
+from unchanged raw files to correct older missing-event and exposure values.
+The collector does not need restarting for this processing-only fix.
 
 [Back to Contents](#contents)
 

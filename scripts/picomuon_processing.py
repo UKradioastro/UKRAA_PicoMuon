@@ -47,13 +47,14 @@ def raw_dates(base: Path, label: Optional[str], first: Optional[date], last: dat
 
 
 @contextmanager
-def processing_lock(base: Path, label: Optional[str]) -> Iterator[None]:
+def processing_lock(base: Path, label: Optional[str], *, pipeline: bool = False) -> Iterator[None]:
     """Serialize daily/period writers, including different dates sharing a summary."""
     directory = base / "logfiles"
     if label is not None:
         directory = directory / "detectors" / label
     directory.mkdir(parents=True, exist_ok=True)
-    with (directory / ".processing.lock").open("a+b") as lock:
+    filename = ".pipeline.lock" if pipeline else ".processing.lock"
+    with (directory / filename).open("a+b") as lock:
         if os.name == "nt":
             import msvcrt
 

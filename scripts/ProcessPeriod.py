@@ -151,6 +151,11 @@ def _process_period_data(
 
     min_required_days = math.ceil(num_days * (min_percent / 100.0) - 1e-9)
     if available_days < min_required_days:
+        if label is not None:
+            stale = build_processed_day_path(base, period_name, target_date, product_label, named_detector=True)
+            if stale.exists():
+                stale.unlink()
+                log_message(source, f"Removed stale {period_name} product for {date_str}")
         log_message(
             source,
             f"Insufficient history; skipping {product_label} {period_name} data "

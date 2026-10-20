@@ -5,7 +5,7 @@ id_serial =
 id_serial_short =
 label =
 
-# Phase 2a collection/offline-processing pilot; NOT ready for production activation.
+# Phase 2a collection/daily/plot/web pilot; NOT ready for production activation.
 # Do not enable in a production installation until the remaining Phase 2a work
 # is complete. A separate pilot copy avoids interrupting single-detector jobs.
 # One or more entries select named-detector mode; even one requires --detector.

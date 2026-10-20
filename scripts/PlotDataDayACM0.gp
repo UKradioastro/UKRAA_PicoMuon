@@ -18,11 +18,16 @@ reset
 set terminal pngcairo enhanced font "DejaVuSansCondensed, 10" rounded size 640,540 
 basePath = system("printf '%s' \"$PICOMUON_BASE_PATH\"")
 targetDate = system("date -u -d \"${PICOMUON_TARGET_DATE:-yesterday}\" +%F")
+if (!exists("detectorLabel")) { detectorLabel = "" }
+dataDetector = strlen(detectorLabel) ? "detectors/".detectorLabel : "ACM0"
+outputDetector = strlen(detectorLabel) ? detectorLabel : "ACM0"
+tempBase = strlen(detectorLabel) ? basePath."/temp/detectors/".detectorLabel : basePath."/temp"
+if (strlen(detectorLabel)) { set title "Detector: ".detectorLabel noenhanced }
 
 # Logging and input checks are handled by run_logged_plot in logging.sh.
 
 # Set up data paths
-pathData        = basePath."/data/day/ACM0"
+pathData        = basePath."/data/day/".dataDetector
 
 # Year folder
 YearFolder = "/".targetDate[1:4]
@@ -42,12 +47,15 @@ set datafile commentschars "#"
 
 # undertake stats before setting timeformat and xdata
 stats FileData using 4 output prefix "MUON" nooutput
+muonAvailable = exists("MUON_mean")
+if (muonAvailable) { muonAvailable = MUON_mean > 0 }
+if (!muonAvailable) { MUON_min = 1.0; MUON_max = 1.0; MUON_mean = 1.0 }
 if (!exists("neutronColumn")) { neutronColumn = 12 }
 stats FileData using neutronColumn output prefix "NEUTRON" nooutput
 
-# Guard against missing/nan neutron stats so gnuplot does not fail with undefined variable
-if (!exists("NEUTRON_min")) { NEUTRON_min = 1.0; NEUTRON_max = 1.0; NEUTRON_mean = 1.0 }
-if (!exists("NEUTRON_mean") || NEUTRON_mean == 0.0) { NEUTRON_mean = 1.0; NEUTRON_min = 1.0; NEUTRON_max = 1.0 }
+neutronAvailable = exists("NEUTRON_mean")
+if (neutronAvailable) { neutronAvailable = NEUTRON_mean > 0 }
+if (!neutronAvailable) { NEUTRON_min = 1.0; NEUTRON_max = 1.0; NEUTRON_mean = 1.0 }
 
 # date to be processed
 date = targetDate
@@ -59,7 +67,7 @@ StartXaxis = targetDate." 00:00:00"
 EndXaxis = system("date -u -d '".targetDate." +1 day' +%F")." 00:00:00"
 
 # setting output path to include data stamp
-pathPlot3 = basePath."/plots/day/ACM0/".date."_day_plot.png"
+pathPlot3 = basePath."/plots/day/".dataDetector."/".date."_day_plot.png"
 
 # Title for graph
 GraphTitle3 = "% change of muon and neutron count rate from mean count rate for ".system("date -u -d '".targetDate."' +'%A %d %B %Y'")."\n Graph is updated every day at 9.30am \n"
@@ -122,9 +130,9 @@ set y2label textcolor rgb "black" rotate
 set y2range [ (((NEUTRON_min/NEUTRON_mean)*100)-100)-5 : (((NEUTRON_max/NEUTRON_mean)*100)-100)+5 ] noreverse nowriteback
 
 # set STATS labels on graph
-set label 1 sprintf("Mean muon counts per 5 minutes: %0.1f", MUON_mean)
+set label 1 (muonAvailable ? sprintf("Mean muon counts per 5 minutes: %0.1f", MUON_mean) : "No muon events in this period")
 set label 1 at graph 0.02, 0.95 tc default
-set label 2 sprintf("Mean neutron counts per 5 minutes: %0.1f", NEUTRON_mean)
+set label 2 (neutronAvailable ? sprintf("Mean neutron counts per 5 minutes: %0.1f", NEUTRON_mean) : "Neutron data unavailable")
 set label 2 at graph 0.02, 0.90 tc default
 
 
@@ -132,14 +140,14 @@ set label 2 at graph 0.02, 0.90 tc default
 GraphTitle = GraphTitle3
 set key title GraphTitle
 set output pathPlot3
-plot FileData using 1:(((($4/MUON_mean)*100)-100)) linetype 1 linewidth 1 linecolor rgb "dark-violet" notitle "5-min averages of muons detected" with lines, \
-     FileData using 1:((((column(neutronColumn)/NEUTRON_mean)*100)-100)) linetype 1 linewidth 1 linecolor rgb "black" axes x1y2 notitle "NMDB neutron flux (cpm)" with lines
+plot FileData using 1:(muonAvailable ? (($4/MUON_mean)*100)-100 : 1/0) linetype 1 linewidth 1 linecolor rgb "dark-violet" notitle "5-min averages of muons detected" with lines, \
+     FileData using 1:(neutronAvailable ? ((column(neutronColumn)/NEUTRON_mean)*100)-100 : 1/0) linetype 1 linewidth 1 linecolor rgb "black" axes x1y2 notitle "NMDB neutron flux (cpm)" with lines
 
 # Replot to terminal and create .png image with data tag for future upload to web page
 set terminal pngcairo enhanced font "DejaVuSansCondensed, 10" rounded size 640,540 
 
 # Path to directory to store file
-pathPlot = basePath."/temp/periods/ACM0_day_plot"
+pathPlot = tempBase."/periods/".outputDetector."_day_plot"
 
 # set output path to Plot folder
 set output pathPlot.".png"
