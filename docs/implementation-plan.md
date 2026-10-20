@@ -532,8 +532,35 @@ Phase 2a is not complete or ready to replace the production installation.**
   warnings. Review found hard-coded time/location annotations and zero-filled
   unobserved minutes. Plotters now use UTC generation timestamps and configured
   observatory location; processing distinguishes missing (`nan`) from observed
-  zero counts. Updated products/plots still need regeneration and RPi acceptance.
-- Remaining: updated RPi visual web acceptance, all-unit scheduled timing,
+  zero counts.
+- Updated RPi selected-unit runs supplied 2026-10-20 completed with zero failures;
+  saved pages captured at 14:55:21 UTC (Unit_2) and 14:55:49 UTC (Unit_3).
+  Review of both pages and all twenty saved images confirms UTC generation
+  labels, distinct detector identities, no pre-observation zero baseline and
+  no missing-hours frequency spike at zero. Weather/neutron series retain
+  their independent coverage. Week/month remain explicitly unavailable.
+  Initial daily muon axes had no location suffix because the pilot's
+  `observatory_location` was blank. After saving `N15 London UK`, selected-unit
+  plots-only runs returned zero failures at 15:04:47/51 UTC. Revised saved
+  daily images show the configured location on the left muon-flux axis and
+  generation times of 15:04:46 UTC (Unit_2) and 15:04:50 UTC (Unit_3).
+  This location annotation is inside the image, not an HTML heading.
+  Status last-event times remain around 11:28 UTC, consistent with the earlier
+  stopped pilot rehearsal, not evidence of live pilot collection.
+- Historical mapping evidence supplied 2026-10-20: the user confirms that
+  production detector `56/148/627` has been the same physical detector/Pico
+  throughout the archive starting October 10, bound to USB serial
+  `E660D4A0A7598522`; map this history to `Unit_1`.
+  Production has four legacy `ACM0` event files (October 10-13) and eight
+  current-layout event files (October 13-20); rejected files are separate
+  diagnostics, not event archives. October 13 is split between legacy
+  (189,497 event-shaped rows, ending 10:38:10.456836 UTC) and current layout
+  (236,857 rows, starting 10:38:16.454421 UTC), both named `56/148/627`.
+  These file-order endpoints suggest consecutive segments, not duplicate
+  full-day copies; full ordering, range and overlap validation is still needed.
+  Pilot October 19 files contain 242,289 event-shaped rows for `Unit-2`
+  and 214,183 for `Unit-3`. No archive adoption has been performed.
+- Remaining: all-unit scheduled timing,
   full-installer and reboot acceptance; explicit dry-run historical mapping and
   same-day label-change handling. Keep Unit_1's single-mode production
   configuration/archive and cron unchanged during the remaining pilot checks.
