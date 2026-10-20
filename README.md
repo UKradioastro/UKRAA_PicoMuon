@@ -248,6 +248,64 @@ detector assignments; verify those separately before a production cutover. See t
 Legacy processors still refuse implicit named selection. Modern processing/plot
 entry points dispatch to the named pipeline when `[detectors]` is configured.
 
+#### Read-only production archive migration preview
+
+Run [PreviewArchiveMigration.py](scripts/PreviewArchiveMigration.py) before
+planning any historical adoption:
+
+```bash
+python3 -B scripts/PreviewArchiveMigration.py \
+    --source-base "$HOME/UKRAA_PicoMuon" \
+    --destination-base "$HOME/UKRAA_PicoMuon-pilot.arQgce"
+```
+
+Replace the destination with the intended installation root. Omit
+`--destination-base` to preview adoption into the source installation's named
+layout. The source defaults to `PICOMUON_BASE_PATH` (or the script's installation
+root). JSON is printed to stdout; redirect it to a report **outside the archive**
+if desired. Exit status is 0 for a conflict-free preview, 1 for reported
+conflicts or a source/read failure, and 2 for invalid command-line arguments.
+
+The mapping is deliberately specific: the user-confirmed production detector
+`56/148/627`, USB serial `E660D4A0A7598522`, from **2026-10-10 onwards**, maps to
+`Unit_1`. Both `data/raw/ACM0/YYYY/YYYY-MM/YYYY-MM-DD.txt` and
+`data/raw/YYYY/YYYY-MM/YYYY-MM-DD.txt` are inspected. This is not a generic
+name-based mapping tool and does not infer physical identity from event rows or
+change USB configuration. Other named archives (including Unit_2/Unit_3 pilot
+data) are not sources.
+
+Every discovered completed-day event file is read in full: CSV shape, numeric
+fields, finite temperature/pressure, recorded settings when present, expected
+name, UTC date, path layout and strictly increasing timestamps are checked.
+Signed timer wraps and event-counter resets are not treated as timestamp
+ordering failures. Invalid rows stay in their original source and are reported
+by reason/count with up to 20 line-numbered samples per file; nothing is silently
+discarded or repaired. Legacy settings are not filled from current configuration.
+Reports include byte-snapshot SHA-256 hashes, event totals and timestamp bounds.
+
+Same-day source segments are ordered by their actual timestamp bounds, not by
+directory name. Disjoint validated segments propose chronological concatenation;
+any intersecting range (including a shared endpoint or duplicate copy) blocks
+adoption. The October 13 split must pass these checks, not just an endpoint
+inspection. Destinations under `data/raw/Unit_1/` are reported without being
+created. Existing different destinations, blocked parent paths, symbolic links
+and files changing during inspection are conflicts. A single byte-identical
+destination is an `already_present` no-op; no implicit merge or overwrite is
+proposed.
+
+Today's **UTC** production file is always **provisional**, even if currently
+well-formed; future-dated files are provisional and flagged as conflicts.
+Neither is eligible for completed-day adoption. Rejected files are listed in
+`rejected_diagnostics`, never counted as events, with separate proposed
+`Unit_1/rejected/legacy_ACM0/` and `Unit_1/rejected/current/` destinations retaining
+their source-layout provenance.
+
+**There is no apply mode.** The preview does not create, rename, move, rewrite,
+deduplicate, merge, or delete archives, nor touch configuration, services, cron,
+logs or locks. It cannot certify an active file as final or authorize cutover;
+rerun against the complete production archive with collectors stopped before
+any separately approved adoption.
+
 For development, prepare a separate, empty pilot copy from the updated code,
 without copying or moving the production archive:
 

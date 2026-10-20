@@ -560,6 +560,22 @@ Phase 2a is not complete or ready to replace the production installation.**
   full-day copies; full ordering, range and overlap validation is still needed.
   Pilot October 19 files contain 242,289 event-shaped rows for `Unit-2`
   and 214,183 for `Unit-3`. No archive adoption has been performed.
+- Read-only historical preview is implemented in
+  `scripts/PreviewArchiveMigration.py`: an explicit production-to-Unit_1 mapping
+  checks every discovered completed-day event file, full timestamp ordering,
+  same-day range intersections and proposed destinations. Rejected diagnostics
+  remain separate; today's UTC file is provisional. JSON includes source hashes,
+  validation issues and conflict/no-op/concatenation proposals. There is no apply
+  mode and no archive, configuration, service or cron changes. Full production
+  preview results and a separately approved boundary cutover remain pending.
+- Supplied `examples/RPi4_data` snapshot preview: all seven completed event
+  files (October 13-19) and seven separate rejected diagnostic files were read.
+  Six event files pass. October 13 is blocked: at line 526, timestamps move
+  backwards from `11:03:58.197230` to `10:39:45.612100` UTC. This is an interior
+  ordering failure, despite the apparently consecutive legacy/current endpoints.
+  Source byte hashes and modification times were verified unchanged. This
+  snapshot does not include the complete October 10-13 legacy split or today's
+  active file, so it is not full live-production validation.
 - Remaining: all-unit scheduled timing,
   full-installer and reboot acceptance; explicit dry-run historical mapping and
   same-day label-change handling. Keep Unit_1's single-mode production
