@@ -488,9 +488,22 @@ Phase 2a is not complete or ready to replace the production installation.**
   width. Named shell plotting/log-rotation and legacy web-publication
   regressions passed under Git Bash; Bash syntax checks passed. Full shell
   logging/orchestration checks passed with an explicit lock-command stub;
-  the unmodified run stops at unavailable `flock` on Windows. Actual Linux
-  pipeline/locking acceptance and timings remain to be run on the RPi.
-- Remaining: RPi plot/web and full-chain timing acceptance, production scheduler
+  the unmodified run stops at unavailable `flock` on Windows.
+- RPi plot/web confirmation on 2026-10-20: all 143 Python tests passed without
+  skips in 36.860 s, including Linux shell/locking integration. Logging and
+  publication shell suites passed; the named plotting/log-rotation suite also
+  passed after normalizing its transferred CRLF line endings to LF. Explicit
+  Unit_2 and Unit_3 October 19 pipelines with `--skip-downloads` both returned
+  zero and published 10 plots per detector. Week/month/3-month products correctly
+  skipped insufficient history. Unit_3's complete offline pipeline finished
+  within the 26 s interval between the two logged completion timestamps;
+  Unit_2's start time is not shown. This does not establish network-download or
+  all-unit scheduled timings. The sole current plot warning is empty neutron
+  statistics, consistent with absent NMDB input; earlier USB identity errors
+  are dated October 19 and belong to the unplug tests. Visual RPi page
+  acceptance and production web serving remain pending.
+- Remaining: RPi visual web acceptance, network-enabled full-chain timing,
+  production scheduler
   activation, safe installer and service-instance
   migration; explicit dry-run historical mapping and same-day label-change
   handling; live RPi acceptance (three connected detectors are available).
