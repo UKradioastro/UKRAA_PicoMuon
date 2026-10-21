@@ -576,6 +576,14 @@ Phase 2a is not complete or ready to replace the production installation.**
   Source byte hashes and modification times were verified unchanged. This
   snapshot does not include the complete October 10-13 legacy split or today's
   active file, so it is not full live-production validation.
+- Fixed-batch adoption tooling is separate from the read-only preview:
+  `scripts/AdoptUnit1Archive.py` prints an October 10-20 manifest by default.
+  Linux-only apply/quarantine rollback require approval of exact manifest bytes,
+  verified backup/restore and stopped-writer confirmations. Candidate hashes and
+  the October 13 source/output exception are pinned; staging, no-clobber linking,
+  journaling and guarded recovery never modify originals. Native Linux
+  durability/locking acceptance, backup/restore verification and production
+  execution approval remain pending. Archive adoption must not activate services.
 - Remaining: all-unit scheduled timing,
   full-installer and reboot acceptance; explicit dry-run historical mapping and
   same-day label-change handling. Keep Unit_1's single-mode production

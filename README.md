@@ -306,6 +306,90 @@ logs or locks. It cannot certify an active file as final or authorize cutover;
 rerun against the complete production archive with collectors stopped before
 any separately approved adoption.
 
+#### Fixed-batch source-preserving adoption tool (not production acceptance)
+
+[AdoptUnit1Archive.py](scripts/AdoptUnit1Archive.py) is a **separate tool**; the
+preview above still has no apply mode. Its default operation only reads files
+and prints a manifest for the reviewed **October 10-20, 2026** Unit_1 batch:
+
+```bash
+python3 -B scripts/AdoptUnit1Archive.py \
+    --source-base "$HOME/UKRAA_PicoMuon" \
+    --destination-base "$HOME/UKRAA_PicoMuon"
+```
+
+To save that manifest, redirect stdout to a new report outside both installation
+trees; do not overwrite an existing approval file. Review its **actual paths**
+and compute its SHA-256 with `sha256sum`. Paths are installation-specific:
+a desktop manifest is not an approval to apply on the Pi.
+
+The eleven candidate hashes are pinned to the reviewed rehearsal. October 13
+alone permits timestamp ordering of the exact reviewed pair of sources,
+retaining one identical header and every event-line byte/occurrence; the output
+hash is pinned too. All other days are byte-exact copies, including October 17's
+mixed-format file. Eight rejected diagnostic files stay separate. Sources
+outside this fixed batch, active files and other detectors are not adopted.
+A changed event source or an unexpected extra segment is a hard stop, not a
+reason to edit the pinned hashes. Diagnostic bytes are bound by manifest approval.
+
+**Do not apply until backup/restore verification, a reviewed manifest, stopped
+writers and a separately approved execution window are established.** Service
+activation, cron, USB configuration and web publication are not part of adoption.
+Production Linux durability/locking acceptance remains required before live use.
+In a separate Linux/RPi code/test copy, run
+`python3 -B -m unittest discover -s tests -p test_archive_adoption.py -v`.
+The suite uses synthetic temporary archives, never production services or data.
+Its native locking/directory-flush test must run without skipping. Windows tests
+substitute Linux-only hooks and cannot certify Linux ownership or crash durability.
+
+For a separately approved operation, `--apply` requires all of:
+
+- `--manifest PATH`: the exact reviewed JSON file.
+- `--approve-manifest SHA256`: approval of those exact bytes, not just equivalent JSON.
+- `--run-dir PATH`: a new/private run directory outside both installation trees,
+  whose parent already exists on the destination filesystem.
+- `--backup-verified`: operator confirmation that an independent backup **and**
+  isolated restore have been verified.
+- `--writers-stopped`: operator confirmation that relevant source/destination
+  writers remain stopped throughout. These flags attest prerequisites; they
+  do not automatically back up data, stop services or detect all writers.
+
+Apply/rollback refuse non-Linux platforms. The Linux implementation uses a
+private run lock, flushes staged files and directories, verifies the entire batch
+before promotion and uses hard links for atomic **no-clobber** promotion. This
+requires a filesystem supporting hard links and directory `fsync`; no copying
+or rename fallback is used. Run as the account owning the sources and destination.
+New candidate files use mode 0644; existing identical files keep their metadata.
+
+Existing byte-identical destinations are verified no-ops. Any different file,
+symbolic link, blocked parent, unapproved manifest, changed source or conflicting
+run evidence stops the operation. Exit status is 0 for successful manifest/apply/
+rollback, 1 for a reported failure and 2 for invalid command-line arguments.
+
+The run directory holds the approved manifest, staged files and flushed journal.
+**Retain it after success:** stages are hard-linked to newly promoted files and
+provide identity evidence for recovery. Do not edit stage contents or recursively
+clean up that directory as an operational step.
+
+A failed/partial batch is not success. Keep the evidence. A normal resume uses
+the same exact manifest, approval hash and run directory and repeats all source,
+stage and destination checks. An interrupted partial stage/journal or changed
+destination identity requires manual recovery; the tool does not silently repair it.
+A crash after a successful link but before its journal completion is recoverable
+from the flushed intent and the shared stage/destination inode.
+
+`--rollback` requires the same approval and safety flags. It quarantines only
+unchanged files provably created by that run, leaving originals, unrelated files
+and pre-existing no-ops alone. Changed hashes/identities stop rollback. It does
+not remove whole directories, revert configuration or reconcile newly collected
+named data. Once a run has quarantined files, do not resume apply from that run.
+
+The accounting qualifications remain: 2,943 confirmed skipped sequence numbers
+are not reconstructed; missing raw settings remain missing; historical processing
+assumptions stay explicit; detector elapsed span includes short capture gaps and
+is neither calibrated nor dead-time corrected. Adoption is not proof of complete
+acquisition or production service readiness.
+
 For development, prepare a separate, empty pilot copy from the updated code,
 without copying or moving the production archive:
 
