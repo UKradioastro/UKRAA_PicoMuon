@@ -8,6 +8,7 @@ This project uses calendar versioning in the format `YYYY.MM.patch`.
 ## [Unreleased]
 
 ### Fixed
+- Wait within the existing 30-second startup deadline for both new raw events and a post-start status update during Unit_1 recovery; do not reject the preserved pre-trial status file as a steady-state failure immediately after restarting single-mode.
 - Open the existing Unit_1 cron-wrapper lock read-only for Linux exclusive flock, avoiding unnecessary write permission while preserving the lock inode, contents and busy-lock protection.
 - Pin Unit_1 configuration permissions to the reviewed production backup (`USB.ini` 0644, `legacy.ini` 0664) during readiness, publication and recovery, rather than rejecting the existing legacy configuration's group-write permission.
 - Accept fuser's resolved serial-device label as well as the requested by-id alias during Unit_1 ownership checks, while rejecting diagnostics, unknown labels and invalid PID output.

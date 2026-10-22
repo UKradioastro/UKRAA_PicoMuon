@@ -552,12 +552,19 @@ class Trial:
     def healthy(self, named: bool, duration: int) -> None:
         unit = NAMED if named else OLD
         deadline = self.host.ticks() + 30
+        start = datetime.fromisoformat(self.state["start_utc"])
         while True:
             props = self.properties(unit)
             raw, status_path, _ = self.files(named)
             if props["ActiveState"] == "active" and raw.exists() and status_path.exists():
-                self.sample(named)
-                if last_event(raw) >= datetime.fromisoformat(self.state["start_utc"]):
+                status_value = json.loads(data(status_path))
+                status_event = datetime.strptime(
+                    status_value["last_event_utc"], "%Y-%m-%d %H:%M:%S UTC",
+                ).replace(tzinfo=timezone.utc)
+                # The original status file survives the named trial. Wait for a
+                # post-start update before applying steady-state freshness checks.
+                if last_event(raw) >= start and status_event >= start.replace(microsecond=0):
+                    self.sample(named)
                     break
             require(self.host.ticks() < deadline, "No new valid collection within 30 seconds.")
             require(props["ActiveState"] in ("activating", "active"), "Collector failed on startup.")

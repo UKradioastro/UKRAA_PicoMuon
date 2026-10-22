@@ -577,6 +577,9 @@ plotting scripts, alter the pilot template, change boot enablement or reboot.
 Normal recovery verifies two minutes of single-mode advancement before
 restoring cron. Named trial data remain separate and partial; neither layout
 is claimed gap-free. Trial failure is distinct from successful restoration.
+Startup waits up to 30 seconds for post-start raw and status updates before
+applying steady-state freshness checks: a preserved single-mode status file
+may legitimately still contain its pre-trial timestamp immediately after restart.
 
 Every mutation is preceded by a durable state intent and commands retain
 stdout/stderr/exit evidence. Catchable interruptions attempt guarded recovery.

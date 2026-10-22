@@ -525,6 +525,28 @@ class CollectionTrialTests(unittest.TestCase):
             self.trial.healthy(True, 600)
         self.assertEqual(self.trial.host.elapsed, 30)
 
+    def test_recovery_waits_for_new_raw_and_status_instead_of_rejecting_old_status(self):
+        t = self.trial
+        t.host.current += timedelta(minutes=11)
+        t.state["start_utc"] = t.host.now().isoformat()
+        t.state["named_frozen"] = t.signatures(t.files(True))
+        slept = t.host.sleep
+
+        def delayed_status(seconds):
+            slept(seconds)
+            if t.host.elapsed < 5:
+                # Simulate the collector's status-write cadence after fresh raw arrives.
+                path = t.files(False)[1]
+                value = json.loads(path.read_text())
+                value["last_event_utc"] = "2026-10-22 10:00:00 UTC"
+                path.write_text(json.dumps(value))
+        with patch.object(t.host, "sleep", side_effect=delayed_status):
+            t.healthy(False, 120)
+        self.assertGreaterEqual(t.host.elapsed, 125)
+        self.assertEqual(t.host.running, runner.OLD)
+        self.assertFalse(any(command[:4] == ("sudo", "-n", "systemctl", "start")
+                             for command in t.host.calls))
+
     @unittest.skipUnless(sys.platform == "linux", "Native flock requires Linux")
     def test_native_wrapper_lock_is_exclusive_and_does_not_replace_inode(self):
         path = self.trial.base / "logfiles/.picomuon-cron.lock"
