@@ -527,6 +527,12 @@ and approved. No cron or publication change is part of staging.
 
 #### Unit_1 collection trial runner: readiness check only
 
+The original Unit_1 trial and return to single-mode have now been accepted.
+The following trial workflow is retained for reference, **not** as the next
+production step. Its absence checks deliberately reject the preserved trial
+targets. Use the separate permanent readiness workflow below; do not rerun a
+trial or delete its data/status/logs.
+
 [`scripts/TrialUnit1Collection.py`](scripts/TrialUnit1Collection.py) prepares
 readiness evidence for the fixed, reviewed `unit1-cutover-stage._u8vl_xk`
 candidate. It requires the reviewed preflight, staging and rehearsal folders,
@@ -595,6 +601,88 @@ Local tests cover disposable-host trial/recovery and injected failures;
 they are not native Pi service/port acceptance. Passing `--check` is also not
 execution approval. Do not use trial/recovery flags until the exact package,
 effects, interruption limits and recovery have been explicitly approved.
+
+#### Unit_1 permanent collection-only runner: readiness only
+
+[`scripts/PermanentUnit1Collection.py`](scripts/PermanentUnit1Collection.py)
+is a **separate** runner; it does not turn the temporary trial into a permanent
+deployment. Implementation and disposable-host tests are not authorization
+to change the Pi. Use a later attended UTC day than **2026-10-22**, in the
+08:00-18:59 UTC window. Reconfirm Unit_1's OLED settings remain 200/100 top
+and 200/100 bottom, and agree no concurrent edits, jobs or reboot.
+
+Upload these three helpers together, in WinSCP **Binary** mode, beside one
+another in `/home/pi/`, not into production:
+
+- [`scripts/PermanentUnit1Collection.py`](scripts/PermanentUnit1Collection.py)
+- [`scripts/TrialUnit1Collection.py`](scripts/TrialUnit1Collection.py)
+- [`scripts/StageUnit1Cutover.py`](scripts/StageUnit1Cutover.py)
+
+Keep the accepted preflight, stage and processing-rehearsal directories in
+pi's home under their original names. Keep the accepted trial evidence too.
+The only next step is the check, as pi:
+
+```bash
+sudo -v
+python3 -B "$HOME/PermanentUnit1Collection.py" --check
+```
+
+Default invocation is also check-only. Expect
+`PERMANENT_READY_NOT_AUTHORIZED`; privately download the **entire** printed
+`unit1-permanent-collection.*` evidence directory for review. No permanent
+apply command is authorized here. A failed check means stop and review its
+evidence, not change permissions, remove existing data or bypass a pin.
+
+Readiness reuses the pinned reconstruction, code/config/archive, physical
+identity, process ownership, scheduling and advancing-collection checks.
+It additionally inspects actual boot links and enabled states, validates
+original restoration configuration, and preserves existing named status/log
+bytes, hashes, permissions, ownership and error-log baseline in private
+evidence. The October 22 trial raw/rejected hashes must remain unchanged;
+cutover-day named raw/rejected must not exist. Preserved trial status cannot
+count as new startup evidence. Checks write only private evidence and the
+shared home singleton lock, briefly taking the existing cron-wrapper lock;
+they do not alter production, boot state, cron or services, open serial,
+process/publish data, or change the archive.
+
+The separately gated apply mode uses a new permanent approval, never the old
+trial approval. It holds exactly the daily processing job, disables old boot
+enablement before stopping single-mode, publishes only the two configs and a
+no-clobber concrete production Unit_1 unit, enables that instance without
+starting it, then starts and observes it for ten minutes. Acceptance requires
+new raw/status within 30 seconds, the old-last/new-first interval at most
+120 seconds, advancing valid named rows/status, no new errors/rejected rows,
+stable PID/no restarts, sole device ownership, correct boot links and unchanged
+old/trial/historical data.
+
+Successful commit **leaves named collection running and enabled**, single-mode
+inactive/disabled with its definition retained, and daily processing held.
+Weekly rotation and unrelated cron lines remain scheduled; the wrapper lock
+is released after the attended operation. Production scripts, VERSION, user
+configuration, pilot template and website are not deployed or changed.
+Both cutover-day layouts are partial and remain separate. Existing website
+products and old single-mode status will stop refreshing.
+
+Before commit, catchable failures attempt guarded restoration of config,
+owned unit publication, old boot state, single-mode health and then cron.
+An interrupted operation must use its existing journal, not another apply.
+Helper hashes, recovery copies and phase/boot state are checked on resume.
+Unknown edits, unit inodes, device ownership, failed stops or restoration
+checks halt recovery and keep processing held. Partial named data are retained,
+with explicit validation errors and recovery event-spacing evidence.
+`--recover` is only for uncommitted, same-UTC-day operations and requires the
+separate permanent approval. A committed/commit-ready journal refuses recovery:
+`--verify` observes retained collection without redeploying, restarting,
+changing boot state or restoring cron. Verification failures do not roll back.
+Error-log rotation or unexpected errors require review rather than silently
+resetting the preserved baseline.
+
+There is no automatic recovery guarantee for power loss, SIGKILL or reboot
+mid-deployment, and no supported post-commit rollback flag. Such rollback
+needs a separately reviewed procedure. Native Pi readiness, live acceptance,
+next-day rollover and a separately approved reboot test remain required.
+Do not resume daily processing/publication until its named-mode effects and
+partial-day handling have been separately accepted.
 
 For development, prepare a separate, empty pilot copy from the updated code,
 without copying or moving the production archive:

@@ -403,9 +403,7 @@ class Trial:
         target = self.units / NAMED
         safe_target(target)
         require(not target.exists() and not target.is_symlink(), "Concrete Unit_1 unit already exists.")
-        for path in (*self.files(True), self.base / "logfiles/detectors/Unit_1"):
-            safe_target(path)
-            require(not path.exists() and not path.is_symlink(), f"Prior named trial target exists: {path}")
+        self.check_named_targets()
         # Reject runtime/transient or type-wide overrides before a concrete unit is installed.
         for root in (Path("/run/systemd/system"), Path("/run/systemd/transient"), self.units):
             for name in (NAMED, f"{NAMED}.d", "PicoMuon@.service.d", "service.d"):
@@ -447,6 +445,14 @@ class Trial:
             name: staging.digest(data(self.stage / "candidate/config" / name)) for name in CONFIGS}
         self.state["candidate_unit_hash"] = staging.digest(data(self.stage / "units" / NAMED))
         self.journal("READY_FOR_REVIEW_NOT_AUTHORIZED")
+
+    def check_named_targets(self) -> None:
+        for path in (*self.files(True), self.base / "logfiles/detectors/Unit_1"):
+            safe_target(path)
+            require(not path.exists(), f"Prior named trial target exists: {path}")
+
+    def error_baseline(self, named: bool) -> int:
+        return 0 if named else self.state["old_error_size"]
 
     def host_unit_backup(self, name: str) -> bytes:
         import tarfile
@@ -563,8 +569,9 @@ class Trial:
                 ).replace(tzinfo=timezone.utc)
                 # The original status file survives the named trial. Wait for a
                 # post-start update before applying steady-state freshness checks.
-                if last_event(raw) >= start and status_event >= start.replace(microsecond=0):
+                if status_event >= start.replace(microsecond=0) and last_event(raw) >= start:
                     self.sample(named)
+                    require(self.host.ticks() <= deadline, "No new valid collection within 30 seconds.")
                     break
             require(self.host.ticks() < deadline, "No new valid collection within 30 seconds.")
             require(props["ActiveState"] in ("activating", "active"), "Collector failed on startup.")
@@ -600,7 +607,7 @@ class Trial:
             else:
                 self.frozen("named_frozen")
                 error = self.base / "logfiles/log-error.txt"
-            require(error.stat().st_size == (0 if named else self.state["old_error_size"]),
+            require(error.stat().st_size == self.error_baseline(named),
                     "New collector error log content.")
             self.no_other_jobs()
             samples.append(current)
@@ -625,9 +632,7 @@ class Trial:
         self.device()
         self.no_other_jobs()
         staging.check_production(self.base, self.hashes)
-        for path in (*self.files(True), self.base / "logfiles/detectors/Unit_1"):
-            safe_target(path)
-            require(not path.exists(), f"Named target appeared after precheck: {path}")
+        self.check_named_targets()
         self.stop(OLD)
         self.state["last_old_event"] = last_event(self.files(False)[0]).isoformat()
         self.state["old_frozen"] = self.signatures(self.files(False))
@@ -640,6 +645,13 @@ class Trial:
         self.done("create-named-logs")
         for name in CONFIGS:
             self.publish_config(name)
+        self.install_named_unit()
+        self.start(NAMED)
+        self.healthy(True, 600)
+        self.state["trial_passed"] = True
+        self.journal("named-trial-passed-recovery-required")
+
+    def install_named_unit(self) -> None:
         target = self.units / NAMED
         require(not target.exists() and not target.is_symlink(), "Instance appeared concurrently.")
         self.intent("install-unit")
@@ -648,6 +660,7 @@ class Trial:
         self.host.run("sudo", "-n", "test", "!", "-e", str(temporary))
         self.host.run("sudo", "-n", "install", "-o", "root", "-g", "root", "-m", "0644",
                       str(self.stage / "units" / NAMED), str(temporary))
+        self.record_unit_temporary(temporary)
         self.host.run("sudo", "-n", "ln", "-T", str(temporary), str(target))
         self.host.run("sudo", "-n", "rm", "--", str(temporary))
         self.done("install-unit")
@@ -656,10 +669,9 @@ class Trial:
         self.host.run("systemd-analyze", "verify", "--man=no", str(target))
         self.check_unit(NAMED, running=False)
         self.probe(True)
-        self.start(NAMED)
-        self.healthy(True, 600)
-        self.state["trial_passed"] = True
-        self.journal("named-trial-passed-recovery-required")
+
+    def record_unit_temporary(self, temporary: Path) -> None:
+        pass
 
     def recover(self) -> None:
         self.journal("recovering")
