@@ -428,6 +428,103 @@ the exact retained scratch path. This mode rechecks raw inputs, products, plots,
 logs and source hashes without rerunning processing; it writes a separate
 `validation-recheck.json` and preserves the original failure report.
 
+#### Unit_1 production cutover read-only preflight
+
+Before preparing a separate production collection cutover, use
+[`scripts/CollectUnit1CutoverPreflight.sh`](scripts/CollectUnit1CutoverPreflight.sh)
+as `pi` to collect a fresh, private evidence bundle:
+
+```bash
+bash "$HOME/CollectUnit1CutoverPreflight.sh"
+```
+
+Upload the script to `/home/pi/CollectUnit1CutoverPreflight.sh` first. The
+repository enforces LF endings for shell scripts (`.gitattributes`), but a
+Windows file-transfer client can convert them to CRLF. In WinSCP, set the
+default transfer mode to **Binary** and check that the transfer dialog also
+says Binary. Do not use Text or Automatic/text conversion for shell scripts.
+If a Bash script reports `$'\r': command not found` or `set: pipefail`, it has
+CRLF endings; normalize the uploaded copy before running it:
+
+```bash
+python3 -c 'from pathlib import Path; p=Path.home()/"CollectUnit1CutoverPreflight.sh"; b=p.read_bytes(); assert b"\0" not in b; b=b.replace(b"\r\n",b"\n"); assert b"\r" not in b; p.write_bytes(b)'
+python3 -c 'from pathlib import Path; p=Path.home()/"CollectUnit1CutoverPreflight.sh"; b=p.read_bytes(); assert b"\r" not in b; print("LF-only script confirmed")'
+bash "$HOME/CollectUnit1CutoverPreflight.sh"
+```
+
+The collector verifies the expected Unit_1 udev identity, captures current
+service, process, cron, timer and active-file/status evidence, checks the
+approved historical manifest against a fresh read-only rebuild, and creates a
+private backup of current production config/code/install files and relevant
+systemd unit/cron definitions. It does not stop services, edit production
+files, install units, or change cron. The evidence contains private
+configuration and system scheduling information; keep it private and review
+all command statuses before using it to plan a cutover.
+
+The installed `PicoMuon@.service` is a template: the preflight captures its
+definition but records runtime properties as not applicable. Concrete services
+such as `PicoMuon.service` and `PicoMuon@Unit_1.service` also have their runtime
+properties captured. If an older helper stopped with a template-unit error,
+retain that incomplete evidence folder, upload the corrected helper in Binary
+mode, and rerun it; the new run creates a separate evidence folder.
+
+This preflight does not authorize or perform a cutover. In particular, do not
+run the full installer as a service-switch shortcut: it also changes packages,
+configuration, root cron, Apache and website content. The named service must
+reference the production path, not the existing pilot. A single collector must
+own the Pico at any time; stop and verify the old collector before starting the
+named one. Preserve the old and new current-day files separately and report any
+capture gap. Production processing, publication, cron changes and reboot
+acceptance require separate review and approval.
+
+#### Unit_1 staging only (no production cutover)
+
+After accepting the `unit1-cutover-preflight.YtqHwx` evidence and the
+`unit1-processing-rehearsal.yo2to17p/validation-recheck.json` processing recheck,
+upload [`scripts/StageUnit1Cutover.py`](scripts/StageUnit1Cutover.py) in Binary
+mode to `/home/pi/StageUnit1Cutover.py`. Run as `pi`, without sudo:
+
+```bash
+python3 -B "$HOME/StageUnit1Cutover.py"
+```
+
+The helper is deliberately pinned to those two reviewed evidence packages.
+Keep the original Pi preflight and rehearsal directories in place. It checks
+the full preflight hash index, accepted report and all 40 rehearsal scripts,
+verifies backup contents, and requires all captured production config/code
+files still to match the preflight. A mismatch is a stop for fresh review, not
+permission to update pins or overwrite live files.
+
+It creates a new private `/home/pi/unit1-cutover-stage.*` directory containing:
+
+- `candidate/scripts/`: the complete accepted 40-file code baseline, including
+  the shared plot-annotation helper; no production scripts are overwritten.
+- `candidate/config/`: proposed Unit_1-only named USB configuration, a proposed
+  `[legacy:Unit_1]` section copied from the current configured 200/100/200/100
+  fallback, and the preserved private site configuration. The fallback is
+  **provisional pending hardware-settings confirmation**, not an assertion of
+  the actual hardware values. The existing `[usb]` and `[legacy]` sections are
+  retained, but explicit Unit_1 selection is required in named mode.
+- `units/PicoMuon@Unit_1.service`: a production-path-rendered candidate unit,
+  checked using `systemd-analyze verify`, never installed or started. Its paths
+  intentionally refer to production for later review, not to the staging area.
+- Configuration-probe, shell-syntax and systemd validation logs with exit
+  statuses, `SHA256SUMS` for candidate files, and `staging-report.json` recording
+  proposed script changes and unresolved approval gates.
+
+The helper validates Python syntax and configuration without starting the
+collector, processing data, opening the serial device, downloading inputs,
+publishing pages, running the installer, or calling `systemctl`. It checks
+captured production-file hashes again afterwards. It does not copy raw data
+or claim to validate collection continuity or device ownership.
+
+Expect `STAGING COMPLETE (NOT CUTOVER APPROVAL)`. Preserve the staging folder
+even on failure and privately download it for independent review. It contains
+private configuration. Do not copy its candidate into production or enable its
+unit. Hardware settings, exact deployment/recovery steps and the existing daily
+cron's change to named processing/publication must still be separately resolved
+and approved. No cron or publication change is part of staging.
+
 For development, prepare a separate, empty pilot copy from the updated code,
 without copying or moving the production archive:
 
