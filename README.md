@@ -390,6 +390,44 @@ assumptions stay explicit; detector elapsed span includes short capture gaps and
 is neither calibrated nor dead-time corrected. Adoption is not proof of complete
 acquisition or production service readiness.
 
+#### Isolated native-Linux Unit_1 processing rehearsal
+
+After archive acceptance, the optional
+[`examples/RehearseUnit1Processing.py`](examples/RehearseUnit1Processing.py)
+checks named daily/period processing and plotting on Linux without changing the
+production installation or the existing pilot. Upload the current repository's
+complete `scripts/` folder to `$HOME/unit1-processing-code/scripts/` and this
+runner to `$HOME/RehearseUnit1Processing.py`. The runner pins every script hash
+and the approved archive manifest; it refuses a partial or stale code copy.
+
+Run as the normal installation owner, with Bash, `flock`, and gnuplot installed:
+
+```bash
+python3 -B "$HOME/RehearseUnit1Processing.py" \
+    --source-base "$HOME/UKRAA_PicoMuon" \
+    --code-dir "$HOME/unit1-processing-code" \
+    --manifest "$HOME/unit1-adoption-manifest.RpgaZH.json"
+```
+
+It copies the approved 19 raw files into a new private home-directory scratch
+installation, uses only the verified Unit_1 mapping and historical settings
+assumption, then runs the named pipeline for October 10–20 with
+`--skip-downloads`. Any stored neutron/weather inputs for those dates are copied
+read-only. Plots and generated pages are written only below the scratch
+installation's `WWW/`; no live publication, collector, service, cron or
+production processing command is invoked. The report validates all daily
+product row counts and CPM/hourly totals, expected weekly completeness, plot
+images, source hashes and production raw-file hashes before/after.
+
+Keep the printed rehearsal directory even on failure and review
+`verification.json` and `rehearsal-logs/`. The script deliberately does not
+delete failed evidence or alter/clean the production installation.
+If processing completed but a later validation check failed, upload the corrected
+runner and use `--validate-existing "$HOME/unit1-processing-rehearsal.ID"` with
+the exact retained scratch path. This mode rechecks raw inputs, products, plots,
+logs and source hashes without rerunning processing; it writes a separate
+`validation-recheck.json` and preserves the original failure report.
+
 For development, prepare a separate, empty pilot copy from the updated code,
 without copying or moving the production archive:
 
