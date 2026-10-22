@@ -525,6 +525,74 @@ unit. Hardware settings, exact deployment/recovery steps and the existing daily
 cron's change to named processing/publication must still be separately resolved
 and approved. No cron or publication change is part of staging.
 
+#### Unit_1 collection trial runner: readiness check only
+
+[`scripts/TrialUnit1Collection.py`](scripts/TrialUnit1Collection.py) prepares
+readiness evidence for the fixed, reviewed `unit1-cutover-stage._u8vl_xk`
+candidate. It requires the reviewed preflight, staging and rehearsal folders,
+plus [`scripts/StageUnit1Cutover.py`](scripts/StageUnit1Cutover.py) beside the
+runner. Upload both Python helpers in Binary mode to `/home/pi/`, **not** into
+the production scripts directory.
+
+The next authorized step is only the read-only check, as pi:
+
+```bash
+sudo -v
+python3 -B "$HOME/TrialUnit1Collection.py" --check
+```
+
+`sudo -v` refreshes credentials for privileged evidence reads; do not run the
+Python runner itself with sudo. Default invocation is also check-only. It
+creates private evidence and a singleton lock in pi's home, and briefly takes
+the existing PicoMuon cron-wrapper lock while checking that no wrapper job
+is running.
+The existing lock is opened read-only and exclusively locked using Linux
+`flock`; no write access, ownership change, truncation or replacement is needed.
+It does not edit production files/crontabs or stop/start units,
+open the serial stream, run processing/downloads, or publish anything. It
+verifies udev identity, device ownership using fuser, unit/scheduling inventory,
+stage hashes/reconstruction, original code/config hashes, archive manifest,
+candidate configuration using installed helpers, and advancing live raw/status.
+Device-owner parsing accepts fuser's exact requested by-id label or its resolved
+device label (for example `/dev/ttyACM0`); diagnostics or unknown labels remain
+blocking failures.
+Configuration modes must match the reviewed backup exactly: `USB.ini` is
+`0644`, and `legacy.ini` is `0664`, both owned by pi's user/group. Publication
+and recovery preserve those modes; unexpected permission changes still block
+the run. Do not chmod production files merely to satisfy readiness checks.
+Use an attended 08:00-18:59 UTC window, away from scheduled tasks or reboot
+activity. Missing tools, a busy wrapper lock, stale data or evidence drift are
+explicit failures for review, not permission to bypass the check.
+
+On success expect `READY_FOR_REVIEW_NOT_AUTHORIZED`. Privately download the
+whole printed evidence directory before any execution approval. Evidence
+contains private configuration, recovery copies and scheduling details.
+
+The runner also contains **separately gated, not yet authorized** trial and
+interrupted-run recovery modes. A trial holds exactly the daily processing
+cron line, stops single-mode, atomically deploys only the two configs and a
+no-clobber concrete Unit_1 service, observes for ten minutes, then stops named
+collection and restores single-mode. It does not deploy staged processing/
+plotting scripts, alter the pilot template, change boot enablement or reboot.
+Normal recovery verifies two minutes of single-mode advancement before
+restoring cron. Named trial data remain separate and partial; neither layout
+is claimed gap-free. Trial failure is distinct from successful restoration.
+
+Every mutation is preceded by a durable state intent and commands retain
+stdout/stderr/exit evidence. Catchable interruptions attempt guarded recovery.
+A failed stop, unknown port owner, third-party edit or unverified restoration
+halts progression; it must not start a second collector or blindly restore cron.
+Power loss, SIGKILL and reboot cannot guarantee automatic recovery. An
+interrupted run must be reviewed and recovered using its existing journal,
+never by rerunning a trial; recovery across UTC rollover needs manual review.
+This runner has no watchdog that survives power loss. The temporary named
+configuration is **not** a supported unattended/reboot state.
+
+Local tests cover disposable-host trial/recovery and injected failures;
+they are not native Pi service/port acceptance. Passing `--check` is also not
+execution approval. Do not use trial/recovery flags until the exact package,
+effects, interruption limits and recovery have been explicitly approved.
+
 For development, prepare a separate, empty pilot copy from the updated code,
 without copying or moving the production archive:
 
