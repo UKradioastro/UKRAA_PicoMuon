@@ -8,6 +8,9 @@ This project uses calendar versioning in the format `YYYY.MM.patch`.
 ## [Unreleased]
 
 ### Fixed
+- Accept only the `PicoMuonACM0.service not-found inactive dead` runtime placeholder created by the named collector's pinned `Conflicts=` entry during permanent retention checks, rather than rolling back healthy collection. Installed legacy units, other unexpected units and non-inactive placeholders remain rejected; existing data-preservation and retry gates are unchanged.
+- Allow a permanent Unit_1 retry on a later UTC day after the recovered October 23 attempt (`unit1-permanent-collection.34qvz5jc`): its exact post-recovery named status is accepted as the pre-cutover baseline, and its partial October 23 named raw (pinned hash) and empty rejected file are then protected through readiness, deployment, recovery and verification.
+- Accept the root-owned (`root:root`, not group/other-writable) Unit_1 named logs that systemd's `StandardOutput/StandardError=append:` created during the trial, as well as `pi`-owned logs, in permanent readiness checks; the failure message now reports the observed uid, gid and mode.
 - Enforce the Unit_1 30-second startup observation deadline even when a service query is slow, and wait for post-start status before parsing a header-only new raw file beside preserved trial status.
 - Wait within the existing 30-second startup deadline for both new raw events and a post-start status update during Unit_1 recovery; do not reject the preserved pre-trial status file as a steady-state failure immediately after restarting single-mode.
 - Open the existing Unit_1 cron-wrapper lock read-only for Linux exclusive flock, avoiding unnecessary write permission while preserving the lock inode, contents and busy-lock protection.

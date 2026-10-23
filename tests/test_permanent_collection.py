@@ -3,6 +3,7 @@ import io
 import json
 import os
 from pathlib import Path
+import stat
 import sys
 import unittest
 from unittest.mock import patch
@@ -188,6 +189,47 @@ class PermanentCollectionTests(unittest.TestCase):
         self.assertFalse(any(command[-2:] == ("start", runner.OLD)
                              for command in self.operation.host.calls))
 
+    def test_missing_legacy_conflict_reference_allows_commit_and_verification(self):
+        host = self.operation.host
+        run = host.run
+
+        def with_conflict_reference(*args, **kwargs):
+            if args[:2] == ("systemctl", "list-units") and host.running == runner.NAMED:
+                host.calls.append(args)
+                return (
+                    b"PicoMuon.service loaded inactive dead UKRAA PicoMuon raw data collector\n"
+                    b"PicoMuon@Unit_1.service loaded active running UKRAA PicoMuon detector Unit_1 collector\n"
+                    b"PicoMuonACM0.service not-found inactive dead PicoMuonACM0.service\n"
+                )
+            return run(*args, **kwargs)
+
+        with patch.object(host, "run", side_effect=with_conflict_reference):
+            self.operation.execute()
+            self.assert_retained()
+            self.operation.verify_retained(observe=True)
+        self.assertFalse(any(command[-2:] == ("stop", runner.NAMED) for command in host.calls))
+        self.assertFalse(any(command[-2:] == ("start", runner.OLD) for command in host.calls))
+
+    def test_inventory_rejects_real_legacy_service_and_other_missing_units(self):
+        old = b"PicoMuon.service loaded inactive dead Original collector\n"
+        cases = (
+            ("list-units", b"PicoMuonACM0.service loaded inactive dead Legacy collector\n"),
+            ("list-units", b"PicoMuonACM0.service loaded active running Legacy collector\n"),
+            ("list-units", b"PicoMuonACM0.service not-found active running Legacy collector\n"),
+            ("list-units", b"PicoMuonACM0.service not-found failed failed Legacy collector\n"),
+            ("list-units", b"PicoMuon@Unit_2.service not-found inactive dead Other detector\n"),
+            ("list-unit-files", b"PicoMuonACM0.service disabled enabled\n"),
+            ("list-unit-files", b"PicoMuonACM0.service masked enabled\n"),
+        )
+        for action, row in cases:
+            with self.subTest(action=action, row=row):
+                def inventory(*args, **kwargs):
+                    return old + (row if args[1] == action else b"")
+
+                with patch.object(self.operation.host, "run", side_effect=inventory), \
+                        self.assertRaisesRegex(RuntimeError, "Unexpected permanent PicoMuon service inventory"):
+                    self.operation.service_inventory()
+
     def test_disable_old_failure_recovers_boot_and_cron_without_stop(self):
         self.operation.host.fail = ("disable", runner.OLD)
         self.operation.execute()
@@ -315,6 +357,62 @@ class PermanentCollectionTests(unittest.TestCase):
         with self.assertRaisesRegex(RuntimeError, "already exists"):
             self.operation.check_named_targets()
         self.assertEqual(raw.read_bytes(), b"existing scientific data\n")
+
+    def test_root_owned_systemd_logs_are_accepted_but_writable_logs_are_not(self):
+        logs = self.operation.base / "logfiles/detectors/Unit_1"
+        targets = {logs / "log-PicoMuon.txt", logs / "log-error.txt"}
+        real_stat = Path.stat
+
+        def fake(uid, mode):
+            def stat_(path, *args, **kwargs):
+                info = real_stat(path, *args, **kwargs)
+                if not stat.S_ISREG(info.st_mode):
+                    return info
+                values = list(info)
+                values[0] = stat.S_IFREG | 0o644
+                if path in targets:
+                    values[0], values[4], values[5] = stat.S_IFREG | mode, uid, uid
+                return os.stat_result(values)
+            return stat_
+
+        with patch.object(runner.stat, "S_IMODE",
+                          side_effect=lambda m: m & 0o7777 if stat.S_ISREG(m) else 0o755):
+            with patch.object(Path, "stat", fake(0, 0o644)):
+                self.operation.check_named_targets()
+            with patch.object(Path, "stat", fake(0, 0o664)), \
+                    self.assertRaisesRegex(RuntimeError, "mode=0664"):
+                self.operation.check_named_targets()
+            with patch.object(Path, "stat", fake(4242, 0o644)), \
+                    self.assertRaisesRegex(RuntimeError, "uid=4242"):
+                self.operation.check_named_targets()
+
+    def test_partial_attempt_status_requires_later_day_and_pins_partial_data(self):
+        import shutil
+        op = self.operation
+        root = op.base / "data/raw/Unit_1"
+        partial_raw = root / "2026/2026-10/2026-10-23.txt"
+        partial_raw.write_bytes(b"partial named collection preserved\n")
+        (root / "rejected/2026-10-23.txt").write_bytes(b"")
+        status = op.files(True)[1]
+        trial_status = status.read_bytes()
+        status.write_text('{"last_event_utc": "2026-10-23 15:25:17 UTC"}')
+        patch.object(runner, "PARTIAL_RAW_SHA256", trial.staging.digest(partial_raw.read_bytes())).start()
+        patch.object(runner, "PARTIAL_STATUS_SHA256", trial.staging.digest(status.read_bytes())).start()
+        shutil.rmtree(self.evidence / "prior-named")
+        with self.assertRaisesRegex(RuntimeError, "already exists"):
+            op.check_named_targets()
+        op.state["day"] = "2026-10-24"
+        op.check_named_targets()
+        self.assertTrue(op.state["partial_attempt_protected"])
+        op.protect_trial()
+        partial_raw.write_bytes(b"tampered\n")
+        with self.assertRaisesRegex(RuntimeError, "October 23 partial named raw"):
+            op.protect_trial()
+        partial_raw.write_bytes(b"partial named collection preserved\n")
+        status.write_bytes(trial_status)
+        shutil.rmtree(self.evidence / "prior-named")
+        with self.assertRaisesRegex(RuntimeError, "trial status changed"):
+            op.check_named_targets()
 
     def test_trial_and_status_drift_refuse_apply(self):
         self.operation.files(True)[1].write_bytes(b"unexpected status")

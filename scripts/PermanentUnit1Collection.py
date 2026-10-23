@@ -26,6 +26,9 @@ TRIAL_DAY = "2026-10-22"
 TRIAL_RAW_SHA256 = "03d4ac6915bc8a6215394a6f5839f79cf47dac8af0c8c2b4b7850b0e95a91a6b"
 EMPTY_SHA256 = "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
 TRIAL_STATUS_SHA256 = "afd95017061e7f632986fa71cffda426304c36dd907b4114feb5ceb700fa6b05"
+PARTIAL_DAY = "2026-10-23"
+PARTIAL_RAW_SHA256 = "ee96c12b50163f010749f8ab54fc990fba3509f56708af97706d4b35f9a49e5a"
+PARTIAL_STATUS_SHA256 = "9ba35520c71daa055d8f0510511d1989761985bb6d7f87d5d7eadd07326c9a4e"
 TERMINAL_RECOVERY = "SINGLE_RESTORED_CRON_RESTORED"
 COMMITTED = "PERMANENT_NAMED_COMMITTED_PROCESSING_HELD"
 HELPERS = ("PermanentUnit1Collection.py", "TrialUnit1Collection.py", "StageUnit1Cutover.py")
@@ -48,6 +51,11 @@ class Permanent(trial.Trial):
                 "October 22 trial raw changed or missing.")
         require(fingerprint(root / "rejected/2026-10-22.txt") == EMPTY_SHA256,
                 "October 22 trial rejected data changed or missing.")
+        if self.state.get("partial_attempt_protected"):
+            require(fingerprint(root / f"2026/2026-10/{PARTIAL_DAY}.txt") == PARTIAL_RAW_SHA256,
+                    "October 23 partial named raw changed or missing.")
+            require(fingerprint(root / f"rejected/{PARTIAL_DAY}.txt") == EMPTY_SHA256,
+                    "October 23 partial named rejected data changed or missing.")
 
     def check_named_targets(self) -> None:
         require(self.state["day"] > TRIAL_DAY, "Permanent cutover requires a later UTC day than October 22.")
@@ -65,13 +73,27 @@ class Permanent(trial.Trial):
         require(info.st_uid == os.getuid() and info.st_gid == os.getgid()
                 and not stat.S_IMODE(info.st_mode) & 0o022, "Unexpected named log directory permissions.")
         paths += [logs / "log-PicoMuon.txt", logs / "log-error.txt"]
+        # systemd's StandardOutput/StandardError=append: creates the trial logs as root.
+        owners = {(os.getuid(), os.getgid()), (0, 0)}
         for path in paths:
             data(path)
             info = path.stat()
-            require(info.st_uid == os.getuid() and info.st_gid == os.getgid()
-                    and not stat.S_IMODE(info.st_mode) & 0o022,
-                    f"Unexpected named status/log permissions: {path}")
-        require(fingerprint(paths[0]) == TRIAL_STATUS_SHA256, "Pre-cutover trial status changed.")
+            mode = stat.S_IMODE(info.st_mode)
+            require((info.st_uid, info.st_gid) in owners and not mode & 0o022,
+                    f"Unexpected named status/log permissions: {path} "
+                    f"(uid={info.st_uid} gid={info.st_gid} mode={mode:04o})")
+        status_hash = fingerprint(paths[0])
+        if status_hash == PARTIAL_STATUS_SHA256:
+            # Only the recovered October 23 attempt (unit1-permanent-collection.34qvz5jc) may supersede
+            # the trial status, and its partial named data then stays pinned for this operation.
+            require(self.state["day"] > PARTIAL_DAY,
+                    "Retry after the October 23 partial attempt requires a later UTC day.")
+            self.state["partial_attempt_protected"] = True
+            self.protect_trial()
+        else:
+            require(status_hash == TRIAL_STATUS_SHA256
+                    and not self.state.get("partial_attempt_protected"),
+                    "Pre-cutover trial status changed.")
         snapshot = self.evidence / "prior-named"
         if not snapshot.exists():
             snapshot.mkdir()
@@ -191,8 +213,16 @@ class Permanent(trial.Trial):
         for action in ("list-units", "list-unit-files"):
             output = self.host.run("systemctl", action, "--all", "--type=service", "--no-pager",
                                    "--no-legend", "--plain").decode()
-            names = {line.split()[0] for line in output.splitlines() if line.strip()
-                     and line.split()[0].startswith("PicoMuon")}
+            names = set()
+            for line in output.splitlines():
+                fields = line.split()
+                if not fields or not fields[0].startswith("PicoMuon"):
+                    continue
+                # The pinned Conflicts= entry loads a placeholder for this absent legacy unit.
+                if action == "list-units" and fields[:4] == [
+                        "PicoMuonACM0.service", "not-found", "inactive", "dead"]:
+                    continue
+                names.add(fields[0])
             require(OLD in names and names <= {OLD, NAMED, "PicoMuon@.service"},
                     f"Unexpected permanent PicoMuon service inventory: {names}")
 
