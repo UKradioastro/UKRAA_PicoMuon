@@ -1,6 +1,8 @@
 #!/bin/bash
 
 set -euo pipefail
+# Published web files must stay world-readable even if the caller's umask is private.
+umask 022
 
 source "$(dirname "${BASH_SOURCE[0]}")/picomuon-env.sh"
 source "$(dirname "${BASH_SOURCE[0]}")/logging.sh"
@@ -27,7 +29,8 @@ publish_named_web() {
     if [ -d "$BASE_PATH/WWW/detectors" ]; then
         if run_logged_command "processData.sh" install -d -m 0755 "$web_root/detectors" &&
             run_logged_command "processData.sh" cp -R --no-preserve=mode,ownership \
-                "$BASE_PATH/WWW/detectors/." "$web_root/detectors/"; then
+                "$BASE_PATH/WWW/detectors/." "$web_root/detectors/" &&
+            run_logged_command "processData.sh" chmod -R u+rwX,go+rX,go-w "$web_root/detectors"; then
             log_message "Published named detector pages from $BASE_PATH/WWW/detectors to $web_root/detectors"
         else
             log_failure "FAILED - could not publish named detector pages to $web_root/detectors"

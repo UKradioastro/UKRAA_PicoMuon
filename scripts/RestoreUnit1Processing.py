@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+from contextlib import contextmanager
 import csv
 from datetime import date, datetime, timedelta
 import json
@@ -39,11 +40,23 @@ REHEARSED = (
     "PlotDataMonthACM0.gp",
 )
 NEW_FILES = ("scripts/plot-annotations.gp",)
-PROCESS_DATA_SHA256 = "a5873eb98117513a07d1e4d85c68a1b98da3ebc6ed4ad26e6e497333e9fc8bc4"
+PROCESS_DATA_SHA256 = "dd50bdfcbdf5570fd7521b2bc2c1912926122087e16edfe1a02f44ffddffb609"
+# Four PlotDataDay warnings reviewed after the 25 October rolled-back restore.
+REVIEWED_PROCESSING_ERRORS_SHA256 = "cbfd4f0534702884f6f67c4d9d0069f86dfab9c04111aadef49b3562bce2cb2d"
 # Python rewrites these after the reviewed sources change; they are restored on rollback.
 STALE_BYTECODE = ("scripts/__pycache__/ProcessDaily.cpython-313.pyc",
                   "scripts/__pycache__/ProcessPeriod.cpython-313.pyc")
 HELPERS = ("RestoreUnit1Processing.py", *permanent.HELPERS, "processData.sh")
+
+
+@contextmanager
+def production_umask():
+    # Evidence stays private (umask 077), but products and public pages need cron's 022.
+    previous = os.umask(0o022)
+    try:
+        yield
+    finally:
+        os.umask(previous)
 PUBLIC = Path("/var/www/html")
 LOGS = ("logfiles/log-PicoMuon.txt", "logfiles/log-error.txt",
         "logfiles/detectors/Unit_1/log-PicoMuon.txt", "logfiles/detectors/Unit_1/log-error.txt",
@@ -285,6 +298,40 @@ class Restore:
         self.state["unwritable"] = blocked
         require(not blocked, f"Not writable by {self.home.name} ({len(blocked)}): {', '.join(blocked[:8])}")
 
+    def retained_state(self) -> dict[str, str]:
+        collection = self.collection
+        live = self.base / "logfiles/detectors/Unit_1/log-error.txt"
+        baseline = data(collection.evidence / "prior-named/log-error.txt")
+        if fingerprint(live) != REVIEWED_PROCESSING_ERRORS_SHA256:
+            return collection.retained_state()
+        require(baseline == b"", "Reviewed processing warnings require the original empty baseline.")
+        # Mirrors Permanent.retained_state (whose code is pinned by the committed journal), except
+        # the error log may be the exact reviewed warnings. Committed evidence is never edited.
+        collection.protect_trial()
+        collection.installed_hashes()
+        collection.service_inventory()
+        collection.boot_state(True)
+        require(collection.cron() == data(collection.evidence / "root-crontab.held"),
+                "Permanent processing hold lost.")
+        old = collection.properties(OLD)
+        require(old["MainPID"] == "0" and old["ActiveState"] == "inactive", "Old service is not stopped.")
+        named = collection.check_unit(NAMED, running=True)
+        require(named["NRestarts"] == "0", "Named collector has restarted; review required.")
+        collection.state["live_pid"] = int(named["MainPID"])
+        collection.device()
+        require(self.host.holders(staging.DEVICE) == {collection.state["live_pid"]}, "Unexpected device owner.")
+        collection.no_other_jobs()
+        collection.frozen("old_frozen")
+        require(fingerprint(live) == REVIEWED_PROCESSING_ERRORS_SHA256,
+                "Named error log changed or rotated; inspect before accepting retained collection.")
+        self.state["reviewed_processing_errors_sha256"] = REVIEWED_PROCESSING_ERRORS_SHA256
+        save_json(self.evidence / "reviewed-processing-errors.json", {
+            "committed_baseline_sha256": staging.digest(baseline),
+            "accepted_live_sha256": REVIEWED_PROCESSING_ERRORS_SHA256,
+            "reason": "Four PlotDataDayACM0.gp warnings from the rolled-back 25 October restore.",
+        })
+        return named
+
     def check(self) -> None:
         now = self.host.now()
         require(WINDOW_HOURS[0] <= now.hour < WINDOW_HOURS[1],
@@ -297,7 +344,7 @@ class Restore:
                 require(not earlier.get("mutations") or earlier.get("status") == ROLLED_BACK,
                         f"Earlier restore needs recovery or is already committed: {path}")
         with collection.lock():
-            named = collection.retained_state()
+            named = self.retained_state()
         self.state["collector_pid"] = int(named["MainPID"])
         collection.manifest()
         self.payload = self.deployment()
@@ -395,11 +442,13 @@ class Restore:
         for day in self.state["backfill_days"][:-1]:
             self.host.run("sudo", "-n", "-v")
             weather = self.base / "data/weather" / day[:4] / day[:7] / f"{day}.txt"
-            if not weather.exists():
-                self.host.run(*self.python("GetDataWeather.py", "--date", day), allowed=(0, 1), timeout=600)
             mark = self.unit_log().stat().st_size
-            self.host.run(*self.python("ProcessDetectors.py", "--detector", "Unit_1", "--date", day,
-                                       "--skip-downloads"), timeout=1800)
+            with production_umask():
+                if not weather.exists():
+                    self.host.run(*self.python("GetDataWeather.py", "--date", day), allowed=(0, 1),
+                                  timeout=600)
+                self.host.run(*self.python("ProcessDetectors.py", "--detector", "Unit_1", "--date", day,
+                                           "--skip-downloads"), timeout=1800)
             self.require_processed(day, mark)
             self.state["processed"].append(day)
             self.journal(f"processed:{day}")
@@ -409,8 +458,9 @@ class Restore:
         day = self.state["backfill_days"][-1]
         self.host.run("sudo", "-n", "-v")
         mark = self.unit_log().stat().st_size
-        self.host.run("sudo", "-n", "/bin/bash", str(self.base / "scripts/processData.sh"),
-                      allowed=(0, 1), timeout=3600)
+        with production_umask():
+            self.host.run("sudo", "-n", "/bin/bash", str(self.base / "scripts/processData.sh"),
+                          allowed=(0, 1), timeout=3600)
         self.require_processed(day, mark)
         self.require_published(day)
         self.state["processed"].append(day)

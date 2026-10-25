@@ -6,7 +6,7 @@ from pathlib import Path
 import sys
 import tempfile
 import unittest
-from unittest.mock import patch
+from unittest.mock import MagicMock, patch
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
@@ -16,6 +16,14 @@ staging = runner.staging
 NOW = datetime(2026, 10, 26, 10, 0, tzinfo=timezone.utc)
 HELD = b"# UNIT1 COLLECTION-ONLY HOLD: 15 1 * * * daily\n"
 ORIGINAL = b"15 1 * * * daily\n"
+
+def reviewed_errors() -> bytes:
+    return "".join(
+        f'2026-10-25 {stamp} UTC : PlotDataDayACM0.gp         : '
+        '"/home/pi/UKRAA_PicoMuon/scripts/PlotDataDayACM0.gp" line 55: '
+        'warning: No valid data points found in file\n'
+        for stamp in ("11:36:38", "11:37:29", "11:38:21", "11:41:29")
+    ).encode()
 
 
 def row(stamp: str, count: int = 1, settings: str = "200,100,200,100") -> str:
@@ -169,6 +177,13 @@ class MergeTests(unittest.TestCase):
 
 
 class PinTests(unittest.TestCase):
+    def test_reviewed_processing_errors_match_exact_warnings(self):
+        content = reviewed_errors()
+        self.assertEqual(staging.digest(content), runner.REVIEWED_PROCESSING_ERRORS_SHA256)
+        self.assertEqual(len(content.splitlines()), 4)
+        self.assertTrue(all(b"PlotDataDayACM0.gp" in line and b"warning: No valid data points" in line
+                            for line in content.splitlines()))
+
     def test_process_data_pin_matches_repository(self):
         content = (ROOT / "scripts/processData.sh").read_bytes()
         self.assertNotIn(b"\r", content)
@@ -210,6 +225,78 @@ class RestoreTests(unittest.TestCase):
         operation = self.fixture.restore("apply")
         self.fixture.ready(operation)
         return reviewed, operation
+
+    def test_check_uses_restore_retained_state(self):
+        operation = self.fixture.restore("check")
+        with patch.object(operation, "open_collection", return_value=operation.collection), \
+                patch.object(operation, "retained_state",
+                             side_effect=RuntimeError("retained check reached")) as retained:
+            with self.assertRaisesRegex(RuntimeError, "retained check reached"):
+                operation.check()
+        retained.assert_called_once_with()
+        self.assertEqual(operation.state["mutations"], [])
+
+    def retained_fixture(self, name: str, baseline: bytes, live: bytes):
+        operation = self.fixture.restore(name)
+        path = operation.collection.evidence / "prior-named/log-error.txt"
+        path.parent.mkdir()
+        path.write_bytes(baseline)
+        self.fixture.write("logfiles/detectors/Unit_1/log-error.txt", live)
+        collection = operation.collection
+        collection.retained_state = MagicMock(return_value={"MainPID": "1716198"})
+        for method in ("protect_trial", "installed_hashes", "service_inventory", "boot_state",
+                       "device", "no_other_jobs", "frozen"):
+            setattr(collection, method, MagicMock())
+        collection.properties = MagicMock(return_value={"MainPID": "0", "ActiveState": "inactive"})
+        collection.check_unit = MagicMock(return_value={"MainPID": "1716198", "NRestarts": "0"})
+        operation.host.holders = MagicMock(return_value={1716198})
+        return operation, path
+
+    def test_reviewed_warnings_accepted_without_editing_committed_evidence(self):
+        operation, baseline = self.retained_fixture("review-errors", b"", reviewed_errors())
+        named = operation.retained_state()
+        self.assertEqual(named["MainPID"], "1716198")
+        operation.collection.retained_state.assert_not_called()
+        operation.collection.frozen.assert_called_once_with("old_frozen")
+        operation.collection.boot_state.assert_called_once_with(True)
+        self.assertEqual(baseline.read_bytes(), b"")
+        self.assertEqual((operation.base / "logfiles/detectors/Unit_1/log-error.txt").read_bytes(),
+                         reviewed_errors())
+        record = json.loads((operation.evidence / "reviewed-processing-errors.json").read_bytes())
+        self.assertEqual(record["accepted_live_sha256"], runner.REVIEWED_PROCESSING_ERRORS_SHA256)
+        self.assertEqual(record["committed_baseline_sha256"], staging.digest(b""))
+
+    def test_other_error_logs_use_unchanged_committed_check(self):
+        for content in (b"", b"collector error\n", reviewed_errors() + b"new error\n",
+                        reviewed_errors().splitlines(keepends=True)[0]):
+            with self.subTest(content=content):
+                operation, baseline = self.retained_fixture(f"other-{len(content)}", b"", content)
+                operation.retained_state()
+                operation.collection.retained_state.assert_called_once_with()
+                operation.collection.check_unit.assert_not_called()
+                self.assertEqual(baseline.read_bytes(), b"")
+                self.assertFalse((operation.evidence / "reviewed-processing-errors.json").exists())
+
+    def test_reviewed_warnings_require_original_empty_baseline(self):
+        operation, baseline = self.retained_fixture("unexpected-baseline", b"original collector error\n",
+                                                    reviewed_errors())
+        with self.assertRaisesRegex(RuntimeError, "original empty baseline"):
+            operation.retained_state()
+        operation.collection.check_unit.assert_not_called()
+        self.assertEqual(baseline.read_bytes(), b"original collector error\n")
+
+    def test_reviewed_retained_state_mirrors_permanent_checks(self):
+        import inspect
+        permanent_source = inspect.getsource(runner.permanent.Permanent.retained_state)
+        restore_source = inspect.getsource(runner.Restore.retained_state)
+        calls = ("protect_trial()", "installed_hashes()", "service_inventory()", "boot_state(True)",
+                 "root-crontab.held", "properties(OLD)", 'old["MainPID"] == "0"',
+                 "check_unit(NAMED, running=True)", 'named["NRestarts"] == "0"', "device()",
+                 "holders(staging.DEVICE)", "no_other_jobs()", 'frozen("old_frozen")')
+        for call in calls:
+            self.assertIn(call, permanent_source)
+            self.assertIn(call, restore_source)
+        self.assertEqual(permanent_source.count("require("), restore_source.count("require(") - 1)
 
     def test_writability_allows_preserved_rotated_logs(self):
         operation = self.fixture.restore("rotated-logs")
@@ -344,9 +431,11 @@ class RestoreTests(unittest.TestCase):
         log = base / "logfiles/detectors/Unit_1/log-PicoMuon.txt"
         self.fixture.write("logfiles/detectors/Unit_1/log-PicoMuon.txt", b"")
         png = b"\x89PNG\r\n\x1a\n" + b"0" * 32
+        masks = []
 
         def pipeline(command):
             if "ProcessDetectors.py" in " ".join(command) or command[-1].endswith("processData.sh"):
+                masks.append(current[0])
                 day = command[command.index("--date") + 1] if "--date" in command else "2026-10-25"
                 self.fixture.write(f"data/day/detectors/Unit_1/{day[:4]}/{day[:7]}/{day}.txt", b"x")
                 plots = [f"yesterday/Unit_1_{event}-{kind}.png" for kind in ("Cpm", "Freq", "Adc")
@@ -374,8 +463,18 @@ class RestoreTests(unittest.TestCase):
                     handle.write(f"Completed run for {day}\n")
 
         operation.host.on_run = pipeline
-        operation.backfill()
-        operation.final_run()
+        current = [0o077]
+
+        def umask(value):
+            previous, current[0] = current[0], value
+            return previous
+
+        with patch.object(runner.os, "umask", side_effect=umask):
+            operation.backfill()
+            operation.final_run()
+        self.assertEqual(current[0], 0o077)
+        # Children must not inherit the private evidence umask (0600 root pages broke publishing).
+        self.assertEqual(set(masks), {0o022})
         runs = [command for command in operation.host.commands if "ProcessDetectors.py" in " ".join(command)]
         self.assertEqual(len(runs), 15)
         self.assertTrue(all("--skip-downloads" in command and "TZ=UTC" in command for command in runs))

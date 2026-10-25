@@ -712,6 +712,17 @@ regular-file archives need not be writable: weekly rotation preserves their
 ownership, and processing leaves them untouched. Do not change their ownership
 or permissions to satisfy readiness.
 
+The restore check also accepts the exact SHA-256-pinned named error log reviewed
+after the rolled-back 25 October attempt: four `PlotDataDayACM0.gp` warnings.
+Any other changed log still blocks readiness; do not clear it or replace the
+committed collection evidence. Standalone collection verification retains its
+original strict error-log baseline. The restore records this acceptance in
+`reviewed-processing-errors.json` in its own evidence directory; it never edits
+the live log, the committed collection evidence, or its copy of that evidence.
+Processing children run with `umask 022`
+while restore evidence remains private; named publishing also repairs public
+page permissions so the web server and acceptance checks can read them.
+
 The separately approved apply (`--apply --approval UNIT1-RESTORE-PROCESSING
 --reviewed <check directory>`) must run on the reviewed check's UTC day with an
 identical manifest and plan. Holding the cron-wrapper lock, it backs up and

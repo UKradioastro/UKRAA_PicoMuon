@@ -82,9 +82,16 @@ printf 'not named\n' > "$UNIT/periods/Other_day_plot.png"
 printf 'page\n' > "$BASE_PATH/WWW/detectors/Unit_1/index.html"
 printf 'dated\n' > "$BASE_PATH/WWW/detectors/Unit_1/2026-10-24/Unit_1_T-Cpm.png"
 printf 'public page\n' > "$WEB_ROOT/index.html"
+mkdir -p "$WEB_ROOT/detectors/Unit_1"
+printf 'stale private\n' > "$WEB_ROOT/detectors/Unit_1/index.html"
+chmod 600 "$WEB_ROOT/detectors/Unit_1/index.html"
 : > "$MAIN_LOG"
 DETECTORS=Unit_1
-publish_named_web
+# A private caller umask (the restore runner's 077) must not leave unreadable public pages.
+(umask 077; publish_named_web)
+[ "$(stat -c %a "$WEB_ROOT/detectors/Unit_1/index.html")" = 644 ]
+[ "$(stat -c %a "$WEB_ROOT/detectors/Unit_1/2026-10-24/Unit_1_T-Cpm.png")" = 644 ]
+[ "$(stat -c %a "$WEB_ROOT/detectors/Unit_1/2026-10-24")" = 755 ]
 cmp "$UNIT/yesterday/Unit_1_T-Cpm.png" "$WEB_ROOT/temp/ACM0_T-Cpm.png"
 cmp "$UNIT/periods/Unit_1_day_plot.png" "$WEB_ROOT/temp/ACM0_day_plot.png"
 [ ! -e "$WEB_ROOT/temp/ACM0_Other_day_plot.png" ]
