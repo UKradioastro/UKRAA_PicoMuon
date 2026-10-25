@@ -684,6 +684,48 @@ next-day rollover and a separately approved reboot test remain required.
 Do not resume daily processing/publication until its named-mode effects and
 partial-day handling have been separately accepted.
 
+#### Unit_1 processing restore and backfill: readiness only
+
+[`scripts/RestoreUnit1Processing.py`](scripts/RestoreUnit1Processing.py) is a
+separate runner for the committed `unit1-permanent-collection.k_xuwdb1`
+cutover. It is not authorization to change the Pi. Upload it with the reviewed
+[`scripts/processData.sh`](scripts/processData.sh) in WinSCP **Binary** mode
+to `/home/pi/`, beside the three collection helpers, not into production.
+Run as `pi`, without `sudo`, between 03:00 and 21:00 UTC:
+
+```bash
+sudo -v
+python3 -B "$HOME/RestoreUnit1Processing.py" --check
+```
+
+Expect `RESTORE_READY_NOT_AUTHORIZED` and privately download the whole printed
+`unit1-restore-processing.*` directory for review. The check repeats retained
+collection and archive validation, then pins the deployment payload (the
+rehearsal-validated `ProcessDaily.py`, `ProcessPeriod.py`, six day/week/month
+plot scripts, new `plot-annotations.gp` and named-publishing `processData.sh`),
+confirms every named output tree and log is writable by `pi`, and writes
+`merge-manifest.json`. The manifest merges October 21-24 single-mode and named
+raw into `data/raw/Unit_1` in time order, refusing overlapping segments,
+unexpected settings or columns, incomplete rows and unpinned named inputs.
+
+The separately approved apply (`--apply --approval UNIT1-RESTORE-PROCESSING
+--reviewed <check directory>`) must run on the reviewed check's UTC day with an
+identical manifest and plan. Holding the cron-wrapper lock, it backs up and
+atomically replaces the merged raw and deployed scripts, reprocesses Unit_1
+offline from 2026-10-10 to the day before yesterday, then runs the restored
+daily `processData.sh` once for yesterday. That run publishes
+`/var/www/html/detectors/` and refreshes the existing `temp/ACM0_*` plots from
+Unit_1; `/var/www/html/index.html` must not change. Neutron values remain
+empty while NMDB is unavailable; that download failure is tolerated. After
+collector, pin and publication checks it restores the original crontab.
+
+Failures before `COMMIT_READY` restore raw, scripts, bytecode and mtimes from
+the evidence backup and keep processing held. Regenerated products and public
+web files are not rolled back. Use `--recover <directory>` with the same
+approval to finish or roll back an interrupted run; `--verify <directory>`
+re-checks a committed restore, advancing collection and the latest published
+day without changes.
+
 For development, prepare a separate, empty pilot copy from the updated code,
 without copying or moving the production archive:
 

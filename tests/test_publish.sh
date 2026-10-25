@@ -70,4 +70,40 @@ grep -F "FAILED - could not publish plot assets from $BASE_PATH/temp to $WEB_ROO
 ! grep -q "Published .* plot assets" "$MAIN_LOG"
 unset -f install
 
-echo "Publishing passed: grouped PNGs, ignored stale flat files, single group, missing/empty source, and command failure diagnostics."
+# Named mode: root publishes named pages and the sole detector's plots under legacy names.
+NAMED_BLOCK=$(sed -n '/^publish_named_web() {/,/^}/p' "$REPO_PATH/scripts/processData.sh" |
+    sed "s|/var/www/html|$WEB_ROOT|g")
+eval "$NAMED_BLOCK"
+UNIT="$BASE_PATH/temp/detectors/Unit_1"
+mkdir -p "$UNIT/yesterday" "$UNIT/periods" "$BASE_PATH/WWW/detectors/Unit_1/2026-10-24"
+printf 'named cpm\n' > "$UNIT/yesterday/Unit_1_T-Cpm.png"
+printf 'named day\n' > "$UNIT/periods/Unit_1_day_plot.png"
+printf 'not named\n' > "$UNIT/periods/Other_day_plot.png"
+printf 'page\n' > "$BASE_PATH/WWW/detectors/Unit_1/index.html"
+printf 'dated\n' > "$BASE_PATH/WWW/detectors/Unit_1/2026-10-24/Unit_1_T-Cpm.png"
+printf 'public page\n' > "$WEB_ROOT/index.html"
+: > "$MAIN_LOG"
+DETECTORS=Unit_1
+publish_named_web
+cmp "$UNIT/yesterday/Unit_1_T-Cpm.png" "$WEB_ROOT/temp/ACM0_T-Cpm.png"
+cmp "$UNIT/periods/Unit_1_day_plot.png" "$WEB_ROOT/temp/ACM0_day_plot.png"
+[ ! -e "$WEB_ROOT/temp/ACM0_Other_day_plot.png" ]
+cmp "$BASE_PATH/WWW/detectors/Unit_1/index.html" "$WEB_ROOT/detectors/Unit_1/index.html"
+cmp "$BASE_PATH/WWW/detectors/Unit_1/2026-10-24/Unit_1_T-Cpm.png" "$WEB_ROOT/detectors/Unit_1/2026-10-24/Unit_1_T-Cpm.png"
+[ "$(cat "$WEB_ROOT/index.html")" = "public page" ]
+grep -F "Published 2 Unit_1 plot assets to $WEB_ROOT/temp as legacy ACM0 plots" "$MAIN_LOG"
+
+printf 'untouched\n' > "$WEB_ROOT/temp/ACM0_day_plot.png"
+DETECTORS=$'Unit_1\nUnit_2'
+publish_named_web
+[ "$(cat "$WEB_ROOT/temp/ACM0_day_plot.png")" = "untouched" ]
+grep -F "Skipped legacy public plots: 2 named detectors configured" "$MAIN_LOG"
+
+rm "$UNIT/yesterday/"*.png "$UNIT/periods/Unit_1_day_plot.png"
+DETECTORS=Unit_1
+status=0
+publish_named_web || status=$?
+[ "$status" -ne 0 ]
+grep -F "FAILED - no Unit_1 PNG plot assets found for legacy publishing to $WEB_ROOT/temp" "$ERROR_LOG"
+
+echo "Publishing passed: grouped PNGs, ignored stale flat files, single group, missing/empty source, command failure diagnostics, and named legacy publishing."
