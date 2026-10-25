@@ -211,6 +211,41 @@ class RestoreTests(unittest.TestCase):
         self.fixture.ready(operation)
         return reviewed, operation
 
+    def test_writability_allows_preserved_rotated_logs(self):
+        operation = self.fixture.restore("rotated-logs")
+        for relative in runner.LOGS[:4]:
+            self.fixture.write(relative, b"current log\n")
+        archives = {
+            self.fixture.base / f"{relative}-{generation}"
+            for relative in runner.LOGS[2:4] for generation in range(4)
+        }
+        for path in archives:
+            path.write_bytes(b"preserved archive\n")
+        with patch.object(runner.os, "access", side_effect=lambda path, mode: Path(path) not in archives):
+            operation.require_writable()
+        self.assertEqual(operation.state["unwritable"], [])
+        for path in archives:
+            self.assertEqual(path.read_bytes(), b"preserved archive\n")
+
+    def test_writability_still_rejects_live_logs_locks_directories_and_other_files(self):
+        operation = self.fixture.restore("blocked-output")
+        for relative in runner.LOGS:
+            self.fixture.write(relative, b"log or lock\n")
+        others = ("logfiles/detectors/Unit_1/unexpected.txt",
+                  "logfiles/detectors/Unit_1/log-PicoMuon.txt-4",
+                  "temp/detectors/Unit_1/log-PicoMuon.txt-0")
+        for relative in others:
+            self.fixture.write(relative, b"other\n")
+        for relative in (*runner.LOGS, "logfiles/detectors/Unit_1", *others,
+                         "data/raw/Unit_1/2026/2026-10/2026-10-23.txt"):
+            with self.subTest(relative=relative):
+                blocked = self.fixture.base / relative
+                with patch.object(runner.os, "access",
+                                  side_effect=lambda path, mode: Path(path) != blocked), \
+                        self.assertRaisesRegex(RuntimeError, "Not writable"):
+                    operation.require_writable()
+                self.assertIn(relative, operation.state["unwritable"])
+
     def test_manifest_and_backfill_plan(self):
         operation = self.fixture.restore("plan")
         manifest = operation.merge_manifest()

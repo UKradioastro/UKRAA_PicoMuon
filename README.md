@@ -703,10 +703,14 @@ Expect `RESTORE_READY_NOT_AUTHORIZED` and privately download the whole printed
 collection and archive validation, then pins the deployment payload (the
 rehearsal-validated `ProcessDaily.py`, `ProcessPeriod.py`, six day/week/month
 plot scripts, new `plot-annotations.gp` and named-publishing `processData.sh`),
-confirms every named output tree and log is writable by `pi`, and writes
+confirms named output trees, current logs and locks are writable by `pi`, and writes
 `merge-manifest.json`. The manifest merges October 21-24 single-mode and named
 raw into `data/raw/Unit_1` in time order, refusing overlapping segments,
 unexpected settings or columns, incomplete rows and unpinned named inputs.
+The named `log-PicoMuon.txt-0` through `-3` and `log-error.txt-0` through `-3`
+regular-file archives need not be writable: weekly rotation preserves their
+ownership, and processing leaves them untouched. Do not change their ownership
+or permissions to satisfy readiness.
 
 The separately approved apply (`--apply --approval UNIT1-RESTORE-PROCESSING
 --reviewed <check directory>`) must run on the reviewed check's UTC day with an

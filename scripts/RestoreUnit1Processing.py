@@ -49,6 +49,8 @@ LOGS = ("logfiles/log-PicoMuon.txt", "logfiles/log-error.txt",
         "logfiles/detectors/Unit_1/log-PicoMuon.txt", "logfiles/detectors/Unit_1/log-error.txt",
         "logfiles/.pipeline.lock", "logfiles/detectors/Unit_1/.pipeline.lock",
         "logfiles/detectors/Unit_1/.processing.lock")
+ROTATED_LOGS = frozenset(f"{relative}-{generation}"
+                         for relative in LOGS[2:4] for generation in range(4))
 # Everything the pipeline (run as pi) writes; systemd-created files are the known risk.
 OUTPUT_ROOTS = (
     "logfiles/detectors/Unit_1", "data/raw/Unit_1", "temp/detectors/Unit_1", "WWW",
@@ -272,8 +274,14 @@ class Restore:
             for directory, names, files in os.walk(root):
                 if not os.access(directory, os.W_OK | os.X_OK):
                     blocked.append(self.relative(Path(directory)))
-                blocked.extend(self.relative(Path(directory) / name) for name in files
-                               if not os.access(Path(directory) / name, os.W_OK))
+                for name in files:
+                    path = Path(directory) / name
+                    # Rotation preserves ownership; processing never writes these archives.
+                    if (self.relative(path) in ROTATED_LOGS
+                            and stat.S_ISREG(path.lstat().st_mode)):
+                        continue
+                    if not os.access(path, os.W_OK):
+                        blocked.append(self.relative(path))
         self.state["unwritable"] = blocked
         require(not blocked, f"Not writable by {self.home.name} ({len(blocked)}): {', '.join(blocked[:8])}")
 
