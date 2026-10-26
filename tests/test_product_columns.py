@@ -3,11 +3,13 @@ from datetime import date
 import io
 from pathlib import Path
 import runpy
+import socket
 import sys
 import tempfile
 from types import SimpleNamespace
 import unittest
 from unittest.mock import patch
+from urllib.error import URLError
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
 
@@ -227,6 +229,7 @@ class ProductColumnTests(unittest.TestCase):
 
     def test_neutron_scraper_writes_header_and_preserves_dataframe_rows(self):
         scripts = Path(__file__).resolve().parents[1] / "scripts"
+        self.addCleanup(socket.setdefaulttimeout, socket.getdefaulttimeout())
         def to_csv(output, **kwargs):
             csv.writer(output, lineterminator="\n").writerow(
                 ["2026-10-17 00:00:00", 1010.59, 90.8, 98.202, 98.388]
@@ -240,6 +243,40 @@ class ProductColumnTests(unittest.TestCase):
         path = build_neutron_path(self.base, self.day)
         self.assertIn("# Request: https://www.nmdb.eu/nest/", path.read_text())
         self.assertEqual(load_neutrons(path), ({"00:00": 98.388}, "OULU"))
+
+    def run_failed_neutron_download(self, error):
+        scripts = Path(__file__).resolve().parents[1] / "scripts"
+        self.addCleanup(socket.setdefaulttimeout, socket.getdefaulttimeout())
+        observed = {}
+
+        def read_table(*args, **kwargs):
+            observed["timeout"] = socket.getdefaulttimeout()
+            raise error
+
+        pandas = SimpleNamespace(read_table=read_table)
+        stderr = io.StringIO()
+        with patch("picomuon_common.get_base_path", return_value=self.base), \
+                patch("picomuon_common.utc_yesterday", return_value=self.day), \
+                patch.dict(sys.modules, {"pandas": pandas}), \
+                patch("sys.stdout", new_callable=io.StringIO), patch("sys.stderr", stderr), \
+                self.assertRaises(SystemExit) as stopped:
+            runpy.run_path(str(scripts / "GetDataNeutron.py"), run_name="__main__")
+        self.assertEqual(stopped.exception.code, 1)
+        self.assertEqual(observed["timeout"], 30)
+        written = [path for path in (self.base / "data").rglob("*") if path.is_file()]
+        self.assertEqual([path for path in written if "neutron" in str(path).lower()], [])
+        return stderr.getvalue().splitlines()
+
+    def test_unreachable_nmdb_times_out_with_one_line_error(self):
+        lines = self.run_failed_neutron_download(URLError(TimeoutError(110, "Connection timed out")))
+        self.assertEqual(len(lines), 1)
+        self.assertIn("GetDataNeutron.py", lines[0])
+        self.assertIn(f"FAILED - NMDB download for {self.day}: [Errno 110] Connection timed out", lines[0])
+
+    def test_unparseable_nmdb_response_is_one_line_error(self):
+        lines = self.run_failed_neutron_download(ValueError("No columns to parse from file"))
+        self.assertEqual(len(lines), 1)
+        self.assertIn(f"FAILED - NMDB download for {self.day}: No columns to parse from file", lines[0])
 
 
 if __name__ == "__main__":

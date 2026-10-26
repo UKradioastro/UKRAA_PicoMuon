@@ -6,6 +6,7 @@ import os
 from pathlib import Path
 import runpy
 import shutil
+import socket
 import struct
 import subprocess
 import sys
@@ -237,6 +238,7 @@ class DetectorPipelineTests(unittest.TestCase):
         self.assertEqual(other.read_text(), "other detector")
 
     def test_neutron_download_uses_pipeline_target_not_current_yesterday(self):
+        self.addCleanup(socket.setdefaulttimeout, socket.getdefaulttimeout())
         pandas = MagicMock()
         nest = MagicMock()
         nest.single.return_value = "https://example.invalid/test"

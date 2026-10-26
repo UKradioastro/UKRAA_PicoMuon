@@ -1,13 +1,20 @@
 import datetime as dt
 import pandas as pd
 import os
-from picomuon_common import get_base_path, get_target_date, log_message
+import socket
+import sys
+from urllib.error import URLError
+from picomuon_common import get_base_path, get_target_date, log_error, log_message
 from picomuon_neutrons import write_neutron_header
 
 # local library that generates the html strings to download NEST data
 import nest
 
 PROCESS_NAME = "GetDataNeutron.py"
+# Applies to each connect/read made by pandas' urlopen; without it an unreachable
+# NMDB blocks the nightly run for over two minutes before the OS gives up.
+DOWNLOAD_TIMEOUT_SECONDS = 30
+socket.setdefaulttimeout(DOWNLOAD_TIMEOUT_SECONDS)
 
 # get yesterday variable
 yesterday = get_target_date()
@@ -66,8 +73,13 @@ names = data.copy()  # keep the original columns, work only with a copy
 
 names.insert(0, "start_date_time") # add header for first column
 
-# create panda dataframe
-df = pd.read_table(download, sep=";", comment="#", header=0, names=names)
+# create panda dataframe; nothing is written unless the download succeeds
+try:
+    df = pd.read_table(download, sep=";", comment="#", header=0, names=names)
+except (URLError, OSError, ValueError) as exc:
+    reason = exc.reason if isinstance(exc, URLError) else exc
+    log_error(PROCESS_NAME, f"FAILED - NMDB download for {yesterday.strftime('%Y-%m-%d')}: {reason}")
+    sys.exit(1)
 
 # Save panda dataframe to csv file
 temporary = outfile + ".tmp"
