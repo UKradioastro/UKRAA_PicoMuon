@@ -741,6 +741,38 @@ approval to finish or roll back an interrupted run; `--verify <directory>`
 re-checks a committed restore, advancing collection and the latest published
 day without changes.
 
+#### Unit_1 Pi reboot acceptance (read-only)
+
+[`scripts/VerifyUnit1Reboot.py`](scripts/VerifyUnit1Reboot.py) checks that
+named Unit_1 collection survives a Pi reboot. It never changes services,
+configuration, cron or data. Upload it in WinSCP **Binary** mode to
+`/home/pi/`, beside `TrialUnit1Collection.py` and `StageUnit1Cutover.py`, and
+run it as `pi`, without `sudo`, between 04:00 and 22:59 local time:
+
+```bash
+sudo -v
+python3 -B "$HOME/VerifyUnit1Reboot.py" --baseline
+sudo reboot
+# after about 3 minutes, log in again:
+python3 -B "$HOME/VerifyUnit1Reboot.py" --verify "$HOME/unit1-reboot-check.XXXXXX"
+```
+
+Use the directory printed by `--baseline`, and verify on the same UTC day.
+Both modes require `PicoMuon@Unit_1.service` enabled and running as the sole
+owner of Unit_1's by-id port, `PicoMuon.service` disabled and stopped, the
+correct USB identity, the unheld daily cron entry, an NTP-synchronised clock
+and advancing raw/status data. `--verify` additionally requires a new boot ID
+and collector PID with no service restarts, an unchanged crontab, a raw file
+that was only appended to (no rewritten bytes or repeated header), the first
+post-boot event within 180 seconds of boot, no new rejected rows or fatal
+collector errors, and a collector start logged no earlier than the boot time.
+An earlier start means the collector ran before the clock was set, so its first
+rows may carry wrong timestamps. Expect `REBOOT_ACCEPTED` with the measured
+collection gap; transient identity/serial retries during boot are listed but
+accepted. Evidence remains in the `unit1-reboot-check.*` directory.
+
+#### Named-detector development pilot copy
+
 For development, prepare a separate, empty pilot copy from the updated code,
 without copying or moving the production archive:
 
