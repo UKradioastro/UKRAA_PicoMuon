@@ -26,13 +26,19 @@ HOUR_COLUMNS = (
 @dataclass
 class BinMetadata:
     values: list[set[str]] = field(default_factory=lambda: [set() for _ in DETECTOR_COLUMNS])
+    _last_columns: Optional[Tuple[str, ...]] = field(default=None, init=False, repr=False, compare=False)
 
     def add(self, values: Iterable[object]) -> None:
-        items = tuple(str(value) for value in values)
+        self.add_columns(tuple(str(value) for value in values))
+
+    def add_columns(self, items: Tuple[str, ...]) -> None:
         if len(items) != len(DETECTOR_COLUMNS):
             raise ValueError("Expected detector name and four settings")
+        if items == self._last_columns:
+            return
         for seen, value in zip(self.values, items):
             seen.add(value)
+        self._last_columns = items
 
     def columns(self, fallback: Optional[BinMetadata] = None) -> Tuple[str, ...]:
         if not any(self.values) and fallback is not None:

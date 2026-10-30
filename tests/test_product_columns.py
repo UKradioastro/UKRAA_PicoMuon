@@ -16,9 +16,40 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
 from picomuon_common import RAW_HEADER, build_neutron_path, build_processed_day_path
 from picomuon_metadata import RawEventWriter
 from picomuon_neutrons import NEUTRON_COLUMNS, load_neutrons, write_neutron_header
-from picomuon_products import ADC_COLUMNS, CPM_COLUMNS, DAY_COLUMNS, HOUR_COLUMNS
+from picomuon_products import ADC_COLUMNS, CPM_COLUMNS, DAY_COLUMNS, HOUR_COLUMNS, BinMetadata
 from ProcessDaily import process_daily
 from ProcessPeriod import PERIOD_CONFIGS, process_period_data
+
+
+class BinMetadataTests(unittest.TestCase):
+    def test_prepared_columns_match_generic_values_across_repeats_and_changes(self):
+        generic = BinMetadata()
+        prepared = BinMetadata()
+        observations = (
+            ("Detector", 200, 100, 200, 100),
+            ("Detector", 200, 100, 200, 100),
+            ("Detector", 250, 100, 200, 100),
+            ("Other", 250, 100, 200, 200),
+            ("Detector", 200, 100, 200, 100),
+        )
+        for observation in observations:
+            generic.add(observation)
+            prepared.add_columns(tuple(str(value) for value in observation))
+            self.assertEqual(prepared.values, generic.values)
+            self.assertEqual(prepared.columns(), generic.columns())
+        self.assertEqual(prepared.columns(), ("mixed", "mixed", "100", "200", "mixed"))
+
+    def test_prepared_columns_preserve_empty_fallback_and_validate_width(self):
+        fallback = BinMetadata()
+        fallback.add(("Detector", 200, 100, 200, 100))
+        empty = BinMetadata()
+        self.assertEqual(empty.columns(fallback), fallback.columns())
+        for values in ((), ("Detector",), ("Detector", "200", "100", "200", "100", "extra")):
+            with self.assertRaises(ValueError):
+                empty.add_columns(values)
+        self.assertEqual(empty.columns(fallback), fallback.columns())
+        empty.add_columns(("Other", "250", "120", "250", "120"))
+        self.assertEqual(fallback.columns(), ("Detector", "200", "100", "200", "100"))
 
 
 class ProductColumnTests(unittest.TestCase):

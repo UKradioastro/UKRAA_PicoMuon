@@ -350,6 +350,39 @@ class PlotAnnotationTests(unittest.TestCase):
 
 @unittest.skipUnless(GNUPLOT, "gnuplot is required for rendering tests")
 class NamedRenderingTests(unittest.TestCase):
+    def test_adc_titles_match_top_bottom_and_coincidence_outputs(self):
+        with tempfile.TemporaryDirectory() as directory:
+            base = Path(directory)
+            for label in ("", "Unit_2"):
+                with self.subTest(label=label):
+                    path = build_processed_day_path(
+                        base, "adc", TARGET, label or "ACM0", named_detector=bool(label),
+                    )
+                    path.parent.mkdir(parents=True)
+                    path.write_text("ADC_Value,Count_T,Count_B,Count_C\n0,1,2,3\n1,2,3,4\n")
+                    plots = base / "plots" / "adc"
+                    (plots / "detectors" / label if label else plots / "ACM0").mkdir(parents=True)
+                    temp = base / "temp" / "detectors" / label if label else base / "temp"
+                    (temp / "yesterday").mkdir(parents=True)
+                    source = portable_plot_source("PlotDataAdcACM0.gp", base, TARGET)
+                    source = source.replace("pngcairo enhanced", "svg enhanced").replace(" rounded size", " size")
+                    script = base / "adc-titles.gp"
+                    script.write_text(source)
+                    result = subprocess.run(
+                        [GNUPLOT, "-e", f"detectorLabel='{label}'", str(script)],
+                        capture_output=True, text=True,
+                    )
+                    self.assertEqual(result.returncode, 0, result.stderr)
+                    for event, title in (
+                        ("T", "Frequency of top detector adc values"),
+                        ("B", "Frequency of bottom detector adc values"),
+                        ("C", "Frequency of muon detected adc values"),
+                    ):
+                        svg = (temp / "yesterday" / f"{label or 'ACM0'}_{event}-Adc.png").read_text()
+                        self.assertIn(title, svg)
+                        if event == "B":
+                            self.assertNotIn("Frequency of top detector adc values", svg)
+
     def test_plot_annotation_lookup_failure_stops_gnuplot(self):
         annotations = (REPO / "scripts" / "plot-annotations.gp").read_text().splitlines()
         annotations = [

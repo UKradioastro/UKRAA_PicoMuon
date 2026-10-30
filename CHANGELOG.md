@@ -8,6 +8,8 @@ This project uses calendar versioning in the format `YYYY.MM.patch`.
 ## [Unreleased]
 
 ### Fixed
+- Reduce repeated metadata conversion and set updates during daily processing by reusing prepared detector/settings columns and skipping unchanged per-bin metadata. Mixed settings/names, historical-setting assumptions and product schemas are preserved; Raspberry Pi timing acceptance remains separate.
+- Correct the bottom-detector ADC plot title, which incorrectly said "top detector", for both single and named detector outputs. Existing images need replotting to show the corrected title.
 - Stop an unreachable NMDB server from stalling the nightly run. `GetDataNeutron.py` now gives each connection and read 30 seconds. On failure it logs a single `FAILED - NMDB download for DAY: reason` line instead of a traceback, writes no neutron file and exits 1, so the run still reports the failure. On 26 October the NMDB request hung for 2 min 14 s, which took the daily chain to 3 min 06 s.
 - Do not require write access to the named Unit_1 rotated log archives (`-0` through `-3`) during processing-restore readiness. Rotation preserves their original ownership; processing does not modify them. Current logs, locks, directories and other output files still require write access.
 - Keep published named detector pages world-readable. `processData.sh` now sets `umask 022` and normalises modes under `/var/www/html/detectors` after copying, repairing any `0600` pages. The processing-restore runner keeps its private evidence umask but runs backfill and the final daily run under `022`. A restore apply had rolled back because root inherited the runner's `077` umask and created unreadable public pages.

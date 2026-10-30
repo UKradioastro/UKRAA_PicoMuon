@@ -61,7 +61,7 @@ set datafile commentschars "#"
 # top detector
 GraphTitle1 = "Frequency of top detector adc values for ".system("date -u -d '".targetDate."' +'%A %d %B %Y'").generatedLabel
 # bottom detector
-GraphTitle2 = "Frequency of top detector adc values for ".system("date -u -d '".targetDate."' +'%A %d %B %Y'").generatedLabel
+GraphTitle2 = "Frequency of bottom detector adc values for ".system("date -u -d '".targetDate."' +'%A %d %B %Y'").generatedLabel
 # muons detected
 GraphTitle3 = "Frequency of muon detected adc values for ".system("date -u -d '".targetDate."' +'%A %d %B %Y'").generatedLabel
 

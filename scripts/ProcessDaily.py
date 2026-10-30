@@ -21,8 +21,8 @@ from datetime import date, datetime, timedelta
 import math
 from pathlib import Path
 import sys
-from typing import Dict, Optional
-from picomuon_metadata import csv_line, split_payload
+from typing import Dict, Optional, Tuple
+from picomuon_metadata import Settings, csv_line, split_payload
 from picomuon_products import (
     ADC_COLUMNS, CPM_COLUMNS, DAY_COLUMNS, HOUR_COLUMNS, BinMetadata, HistoricalSettings,
 )
@@ -122,6 +122,8 @@ def _process_daily(target_date: date, base: Path, detector_label: Optional[str])
     day_metadata = [BinMetadata() for _ in day_bins]
     adc_metadata = [BinMetadata() for _ in adc_bins]
     hour_metadata = [BinMetadata() for _ in hour_bins]
+    previous_metadata: Optional[Tuple[str, Settings]] = None
+    metadata_columns: Tuple[str, ...] = ()
 
     with raw_file.open(mode="r", encoding="utf-8", errors="replace") as rf:
         for line in raw_data_lines(rf):
@@ -171,8 +173,11 @@ def _process_daily(target_date: date, base: Path, detector_label: Optional[str])
             det_name = parts[8] if len(parts) >= 9 else ""
             if det_name and not detector_name:
                 detector_name = det_name
-            metadata = (det_name, *legacy.resolve(settings))
-            all_metadata.add(metadata)
+            metadata = (det_name, legacy.resolve(settings))
+            if metadata != previous_metadata:
+                metadata_columns = (det_name, *(str(value) for value in metadata[1]))
+                previous_metadata = metadata
+            all_metadata.add_columns(metadata_columns)
 
             total_events += 1
             pos_idx = 0 if pos == "T" else (1 if pos == "B" else 2)
@@ -181,9 +186,9 @@ def _process_daily(target_date: date, base: Path, detector_label: Optional[str])
             observed_minutes[min_idx] = True
             day_idx = min_idx // 5
             hour_idx = dt_val.hour
-            minute_metadata[min_idx].add(metadata)
-            day_metadata[day_idx].add(metadata)
-            hour_metadata[hour_idx].add(metadata)
+            minute_metadata[min_idx].add_columns(metadata_columns)
+            day_metadata[day_idx].add_columns(metadata_columns)
+            hour_metadata[hour_idx].add_columns(metadata_columns)
 
             # Bins accumulation
             cpm_bins[min_idx][pos_idx] += 1
@@ -194,7 +199,7 @@ def _process_daily(target_date: date, base: Path, detector_label: Optional[str])
 
             if 0 <= adc_val < 1024:
                 adc_bins[adc_val][pos_idx] += 1
-                adc_metadata[adc_val].add(metadata)
+                adc_metadata[adc_val].add_columns(metadata_columns)
 
             hour_bins[hour_idx][pos_idx] += 1
             hour_bins[hour_idx][5] += temp_val
