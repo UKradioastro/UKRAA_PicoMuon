@@ -1,9 +1,9 @@
 # Two-plus detectors on one Raspberry Pi: implementation and test report
 
 **Project:** UKRAA PicoMuon  
-**Report date:** 30 October 2026  
-**Evidence cut-off:** 30 October 2026, 12:11 UTC  
-**Status:** Two collectors running; separate processing arrangements installed; final multi-detector deployment acceptance remains open.
+**Report date:** 30 October 2026; addendum added 1 November 2026  
+**Evidence cut-off:** 30 October 2026, 12:11 UTC; addendum evidence to 1 November 2026, about 11:12 UTC  
+**Status:** Two collectors running; separate scheduled daily processing verified on 31 October and 1 November (section 16); final multi-detector deployment acceptance remains open.
 
 ## 1. Executive summary
 
@@ -22,7 +22,7 @@ The principal results are:
 - The verified two-file optimization was deployed to both live installations after backup, fault-injection tests, native Linux rehearsal and separate approval. Neither collector was restarted.
 - Unit_2's 29 October daily products were seeded and checked. Its incorrect pilot weather coordinates were corrected with approval. A separate **01:30 host-local** daily job now explicitly selects Unit_2, leaving Unit_1's existing **01:15** job unchanged.
 
-**Still pending:** the first actual Unit_2 scheduled run, a successful fresh download-inclusive two-unit timing test, sufficient genuine period history, live ACM-renumbering acceptance, three-unit acceptance and any final consolidation/full-installer acceptance. Passing software and continuity tests does not establish detector efficiency, calibration or scientific accuracy.
+**Still pending:** a successful fresh download-inclusive two-unit timing test (NMDB remained unreachable through 1 November), sufficient genuine period history, live ACM-renumbering acceptance, three-unit acceptance and any final consolidation/full-installer acceptance. The first actual Unit_2 scheduled runs succeeded on 31 October and 1 November (section 16). Passing software and continuity tests does not establish detector efficiency, calibration or scientific accuracy.
 
 ## 2. Scope, evidence and acceptance rules
 
@@ -402,9 +402,9 @@ The old status file was dated **October 20**, with old raw files for October 19/
 | Separate plot/page validation | Passed for exercised outputs; separate live ADC-title deployment outstanding |
 | Optimization output equivalence and offline timing | Passed for stated workload |
 | Guarded live optimization installation | Applied and verified in both roots |
-| Unit_2 seed and separate schedule installation | Verified; actual scheduled execution pending |
-| Successful downloads plus combined runtime under 120 seconds | Not passed; NMDB outage and earlier 130.895-second result |
-| Unit_2 full-week / month / 90-day acceptance | Pending genuine eligible history |
+| Unit_2 seed and separate schedule installation | Verified; scheduled execution passed on 31 October and 1 November (section 16) |
+| Successful downloads plus combined runtime under 120 seconds | Not passed; NMDB outage (persisting through 1 November) and earlier 130.895-second result |
+| Unit_2 full-week / month / 90-day acceptance | Pending genuine eligible history; week gate at 3/7 days after the 1 November run (section 16) |
 | Live swapped ACM enumeration / three active named collectors | Not established by the current two-unit tests |
 | Consolidated all-unit production rollout/full installer | Not accepted; requires a separate plan and approval |
 
@@ -421,6 +421,8 @@ After both jobs have finished, inspect scheduler evidence and logs, not just fil
 5. Verify Unit_1 mapping/schedule and Unit_3 inactive status remain unchanged.
 
 Do not treat cron's active state, a quiet journal or an old published status snapshot as proof of this gate.
+
+**Result, 1 November:** this review was completed against operator-supplied evidence for both the 31 October and 1 November runs and passed; the only failure each night was the external NMDB download. See section 16.
 
 ### 14.2 Complete the network-inclusive performance gate
 
@@ -522,4 +524,29 @@ picomuon_products.py
 - [Web publisher](../scripts/picomuon_web.py), [cron wrapper](../scripts/runCronJob.sh), [weather downloader](../scripts/GetDataWeather.py) and [repository neutron downloader](../scripts/GetDataNeutron.py). Repository contents do not prove which version is live in each root.
 - [Metadata/product regression tests](../tests/test_product_columns.py) and [pipeline/rendering tests](../tests/test_detector_pipeline.py).
 
-The companion PDF is generated from this Markdown report. This report records the evidence position at its stated cut-off; later scheduled execution, new history and external-service recovery require additional results.
+The companion PDF is generated from this Markdown report and predates the addendum below. This report records the evidence position at its stated cut-offs; section 16 records the 31 October-1 November scheduled-run results. New history and external-service recovery require additional results.
+
+## 16. Addendum: first scheduled runs and Sunday rotation, 31 October-1 November
+
+Added 1 November 2026. Evidence: operator-pasted terminal output collected about 11:04-11:13 UTC on 1 November, comprising the cron journal from 31 October 01:00 to 1 November 02:30, the root crontab and `/etc/cron.d/picomuon-unit2` listing, rotated and live shared/per-detector logs from both roots, daily summaries, dated published-image listings, systemd service properties, raw-file listings, status snapshots and error-log extracts. No repository code changed, and no Pi action was performed to prepare this addendum.
+
+### 16.1 Scheduled execution, both nights
+
+- Unit_1's root-crontab job started at **01:15:01** on both 31 October and 1 November and its cron session closed at **01:16:13** each night. It selected the correct previous UTC day both times: 30 October completed with **417,560 events, 24/24 hours, missing_events=0**, and the 31 October summary row was recorded at 01:16 (its per-detector entries went to the freshly rotated live log).
+- Unit_2's `/etc/cron.d/picomuon-unit2` job started at **01:30:01** both nights with the explicit `--detector Unit_2`, pilot root and UTC environment, closing at **01:32:57** and **01:32:56**. It processed 30 October (**427,849 events**) and 31 October (**429,106 events**), both 24/24 hours with missing_events=0, and published ten plots each night into the correctly dated `WWW/detectors/Unit_2` directories.
+- The only failure recorded in either root on either night was the shared NMDB neutron download timing out; the nonzero exit was preserved and detector processing continued. Weather downloads completed 24/24 hours every night in both roots. This closes the section 14.1 gate. It does not pass the download-inclusive timing gate in section 14.2, which remains blocked on NMDB availability.
+- Unit_2's run took about 2 minutes 56 seconds wall-clock, of which roughly 2 minutes 15 seconds was the pilot downloader's NMDB timeout; local daily processing took about 35 seconds for Unit_2 and about 33 seconds for Unit_1.
+
+### 16.2 Collector continuity and isolation
+
+Unit_1 kept PID **1614** (active since 26 October) and Unit_2 PID **216305** (since 28 October), both with **NRestarts=0**, through both processing runs and the log rotation. Both collectors rolled their raw files at exactly **00:00:00 UTC** into November; the completed 30 and 31 October raw files were last written at 23:59, and both status snapshots were current at about 11:06 UTC with the correct detector identities. Unit_3 remained inactive and disabled.
+
+### 16.3 Sunday log rotation
+
+The production root's weekly rotation ran at **00:00:01 UTC on 1 November**, wrote "Completed weekly log rotation" into both the shared and Unit_1 log directories, created the `-0` archive generation (`cp -p` preserves the pre-rotation timestamps observed on those files) and truncated the live logs, which then received the 01:15 run entries normally. **The pilot root has no rotation arrangement and did not rotate**; its logs, including `unit2-daily-cron.txt`, grow without bound. This confirms the open pilot log-retention item in section 14.4.
+
+### 16.4 Observations and position after the addendum
+
+- Unit_2's week gate stood at **3/7 days** (29-31 October) after the 1 November run. If every day through 4 November remains complete, the first eligible weekly product is expected from the **5 November 01:30** run. This is conditional, not a calendar guarantee.
+- The pilot's day plot logged `PlotDataDayACM0.gp ... No valid data points found in file` on every run while still rendering the image; with no neutron data present in either root, the empty neutron series is the most likely cause. Recheck after NMDB recovers; if the warning persists, investigate separately.
+- Unchanged gates: the NMDB-inclusive sub-120-second timing test, Unit_2 month/90-day history, live ACM renumbering, three-unit acceptance and consolidation remain open exactly as stated in sections 13 and 14.

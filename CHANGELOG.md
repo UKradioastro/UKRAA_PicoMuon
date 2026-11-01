@@ -86,3 +86,6 @@ This project uses calendar versioning in the format `YYYY.MM.patch`.
 - Corrected systemd path quoting and validate the rendered collector unit before installation.
 - Daily processing now runs as a single locked pipeline at 01:15 local time; until Phase 2 replaces the legacy processing implementation, runtimes can remain long.
 - Updated the installation instructions for non-`pi` users.
+
+### Documentation
+- Record in the two-unit report (section 16) the first successful Unit_1 and Unit_2 scheduled daily runs on 31 October and 1 November 2026, the 1 November production-root weekly log rotation, unchanged collector PIDs with zero restarts, and the NMDB outage persisting as the sole nightly failure. The download-inclusive timing gate and Unit_2 period history remain open; the pilot root still lacks a log-rotation arrangement.
