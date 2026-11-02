@@ -1169,6 +1169,12 @@ python3 scripts/GetDataNeutron.py --date 2026-10-21
 The download is written only if the NEST response identifies the requested day
 and covers at least 23 hours. A partial response (such as a recent day whose
 archive has not caught up) fails without replacing an existing neutron file.
+NEST's whitespace-separated column heading is removed before saving; the output
+contains only the standard CSV header and readings. Reading timestamps are
+checked for the requested date, minute resolution and duplicates. Missing
+minutes within an otherwise day-spanning response are reported and left absent,
+not interpolated. Download again with the corrected script to replace files
+created by the earlier temporary downloader that retained the NEST heading.
 After the missing days are available, use `reprocessData.sh --from DATE --to DATE
 --plot` for each applicable detector installation to rebuild daily/hourly
 products and refresh plots. Named-detector installations also require

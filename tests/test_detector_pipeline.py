@@ -251,6 +251,7 @@ class DetectorPipelineTests(unittest.TestCase):
             b"#     START TIME: 2026-10-19 00:00:00 UTC\n"
             b"#       END TIME: 2026-10-19 23:59:00 UTC\n"
             b"2026-10-19 00:00:00;1010.59;90.8;98.202;98.388\n"
+            b"2026-10-19 23:59:00;1010.59;90.8;98.202;98.388\n"
         )
         opener = MagicMock()
         opener.open.return_value = response

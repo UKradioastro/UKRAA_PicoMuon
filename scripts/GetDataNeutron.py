@@ -1,5 +1,6 @@
 import argparse
 import configparser
+import csv
 import datetime as dt
 from io import BytesIO
 import os
@@ -14,6 +15,7 @@ import nest
 PROCESS_NAME = "GetDataNeutron.py"
 DOWNLOAD_TIMEOUT_SECONDS = 30
 NEST_ORIGIN = "https://nest.nmdb.eu"
+NEST_COLUMNS = ("start_date_time", "RPRESS", "RUNCORR", "RCORR_P", "RCORR_E")
 
 
 def load_nmdb_credentials(base_path):
@@ -54,6 +56,34 @@ def validate_response_window(payload, target):
         raise ValueError(f"NMDB response does not cover the full requested day ({start} to {end})")
 
 
+def prepare_neutron_rows(payload: bytes, target: dt.date) -> bytes:
+    lines = []
+    timestamps = set()
+    for line in payload.decode("utf-8-sig").splitlines():
+        if not line.strip() or line.lstrip().startswith("#"):
+            continue
+        if not lines and tuple(line.split()) == NEST_COLUMNS:
+            continue
+        row = next(csv.reader([line], delimiter=";"))
+        if len(row) != 5:
+            raise ValueError("Expected five columns in each NMDB reading")
+        timestamp = dt.datetime.strptime(row[0].strip(), "%Y-%m-%d %H:%M:%S")
+        if timestamp.date() != target or timestamp.second != 0:
+            raise ValueError(f"NMDB returned an unexpected minute: {timestamp}")
+        if timestamp in timestamps:
+            raise ValueError(f"NMDB returned a duplicate minute: {timestamp}")
+        timestamps.add(timestamp)
+        lines.append(line)
+    if not timestamps:
+        raise ValueError(f"NMDB returned no neutron readings for {target}")
+    if max(timestamps) - min(timestamps) < dt.timedelta(hours=23):
+        raise ValueError("NMDB readings do not cover the full requested day")
+    missing = 1440 - len(timestamps)
+    if missing:
+        log_message(PROCESS_NAME, f"WARNING - NMDB data for {target}: {missing}/1440 minutes missing; gaps retained")
+    return ("\n".join(lines) + "\n").encode("utf-8")
+
+
 def download_neutron_data(base_path, target):
     username, password = load_nmdb_credentials(base_path)
     start = dt.datetime.combine(target, dt.time.min)
@@ -70,7 +100,8 @@ def download_neutron_data(base_path, target):
     validate_response_window(payload, target)
 
     names = ["start_date_time", *data]
-    df = pd.read_table(BytesIO(payload), sep=";", comment="#", header=None, names=names)
+    rows = prepare_neutron_rows(payload, target)
+    df = pd.read_table(BytesIO(rows), sep=";", header=None, names=names)
     if df.empty:
         raise ValueError(f"NMDB returned no neutron readings for {target}")
 

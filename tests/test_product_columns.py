@@ -11,7 +11,10 @@ from urllib.error import URLError
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
 
-from GetDataNeutron import download_neutron_data, load_nmdb_credentials, main as neutron_download_main
+from GetDataNeutron import (
+    download_neutron_data, load_nmdb_credentials, main as neutron_download_main,
+    prepare_neutron_rows,
+)
 from picomuon_common import RAW_HEADER, build_neutron_path, build_processed_day_path
 from picomuon_metadata import RawEventWriter
 from picomuon_neutrons import NEUTRON_COLUMNS, load_neutrons, write_neutron_header
@@ -273,6 +276,7 @@ class ProductColumnTests(unittest.TestCase):
         payload = (
             b"#     START TIME: 2026-10-17 00:00:00 UTC\n"
             b"#       END TIME: 2026-10-17 23:59:00 UTC\n"
+            b"  start_date_time    RPRESS RUNCORR RCORR_P RCORR_E\n"
             b"2026-10-17 00:00:00;1010.59;90.8;98.202;98.388\n"
             b"2026-10-17 23:59:00;1031.10;77.6;97.786;97.972\n"
         )
@@ -312,6 +316,51 @@ class ProductColumnTests(unittest.TestCase):
                 self.assertRaisesRegex(ValueError, "does not cover the full requested day"):
             download_neutron_data(self.base, self.day)
         self.assertEqual(path.read_text(), "previous complete data")
+
+    def test_nmdb_missing_minute_is_reported_without_inventing_a_reading(self):
+        lines = ["  start_date_time    RPRESS RUNCORR RCORR_P RCORR_E"]
+        for minute in range(1440):
+            if minute != 120:
+                lines.append(f"{self.day} {minute // 60:02d}:{minute % 60:02d}:00;1010;90;98;99")
+        with patch("sys.stdout", new_callable=io.StringIO) as log:
+            result = prepare_neutron_rows("\n".join(lines).encode(), self.day)
+        self.assertEqual(len(result.splitlines()), 1439)
+        self.assertNotIn(b"02:00:00", result)
+        self.assertIn("1/1440 minutes missing", log.getvalue())
+
+    def test_nmdb_headerless_response_keeps_all_1440_minutes(self):
+        payload = "\n".join(
+            f"{self.day} {minute // 60:02d}:{minute % 60:02d}:00;1010;90;98;99"
+            for minute in range(1440)
+        ).encode()
+        with patch("sys.stdout", new_callable=io.StringIO) as log:
+            result = prepare_neutron_rows(payload, self.day)
+        self.assertEqual(len(result.splitlines()), 1440)
+        self.assertEqual(log.getvalue(), "")
+
+    def test_invalid_nmdb_rows_do_not_replace_saved_file(self):
+        self.write_nmdb_credentials()
+        path = build_neutron_path(self.base, self.day)
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text("previous data")
+        prefix = (
+            b"# START TIME: 2026-10-17 00:00:00 UTC\n"
+            b"# END TIME: 2026-10-17 23:59:00 UTC\n"
+            b"2026-10-17 00:00:00;1010;90;98;99\n"
+        )
+        for row in (
+            b"unexpected header\n",
+            b"2026-10-18 00:00:00;1010;90;98;99\n",
+            b"2026-10-17 00:00:01;1010;90;98;99\n",
+            b"2026-10-17 00:00:00;1010;90;98;99\n",
+        ):
+            with self.subTest(row=row):
+                opener = MagicMock()
+                opener.open.return_value = io.BytesIO(prefix + row)
+                with patch("GetDataNeutron.build_opener", return_value=opener), \
+                        self.assertRaises(ValueError):
+                    download_neutron_data(self.base, self.day)
+                self.assertEqual(path.read_text(), "previous data")
 
     def test_nmdb_network_failure_is_logged_without_credentials_or_output(self):
         self.write_nmdb_credentials()
