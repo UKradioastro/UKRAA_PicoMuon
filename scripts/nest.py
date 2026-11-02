@@ -28,6 +28,8 @@ tables = {"e": "corr_for_efficiency",
           "u": "uncorrected",
           "p": "pressure_mbar"}
 
+NEST_URL = "https://nest.nmdb.eu/draw_graph.php?wget=1"
+
 # --------------------------------------------------------------------------
 def dates(dt):
     Y = dt.year
@@ -61,7 +63,7 @@ def multi(station, table, data, start, end):
 
     """
     
-    value = "https://www.nmdb.eu/nest/draw_graph.php?wget=1"
+    value = NEST_URL
 
     # use a copy of the list as the list is modified by using pop
     stations = station.copy()
@@ -111,7 +113,7 @@ def single(station, table, data, start, end):
     NEST string
     """
 
-    value = "https://www.nmdb.eu/nest/draw_graph.php?wget=1"
+    value = NEST_URL
     value += "&stations[]=%s" %(station.upper())
     value += "&output=ascii"
     if table in ["revori", "ori", "1h"]:

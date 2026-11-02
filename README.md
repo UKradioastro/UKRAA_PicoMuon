@@ -1144,6 +1144,36 @@ DateTime,Pressure_hPa,Uncorrected,PressureCorrected,EfficiencyCorrected
 
 Readers accept both headered and older headerless neutron files. The weather attribution/header is unchanged. Plot orchestration selects neutron column 12 for new day/period files and column 7 for historical files, so existing products can still be viewed before reprocessing.
 
+#### Temporary authenticated NMDB access
+
+For temporary NEST access, create `config/NMDB.ini` with the credentials supplied
+by NMDB:
+
+```ini
+[NMDB]
+User_name = your-user-name
+Password = your-password
+```
+
+This file is ignored by Git. On the Raspberry Pi, restrict it to the installation
+owner with `chmod 600 config/NMDB.ini`; do not put credentials in the request URL,
+shell command, or logs. The neutron downloader uses HTTP Basic authentication
+against `https://nest.nmdb.eu/`.
+
+Fetch one completed UTC day without running the processing pipeline:
+
+```bash
+python3 scripts/GetDataNeutron.py --date 2026-10-21
+```
+
+The download is written only if the NEST response identifies the requested day
+and covers at least 23 hours. A partial response (such as a recent day whose
+archive has not caught up) fails without replacing an existing neutron file.
+After the missing days are available, use `reprocessData.sh --from DATE --to DATE
+--plot` for each applicable detector installation to rebuild daily/hourly
+products and refresh plots. Named-detector installations also require
+`--detector LABEL`.
+
 [Back to Contents](#contents)
 
 ---

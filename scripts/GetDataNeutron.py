@@ -1,99 +1,109 @@
+import argparse
+import configparser
 import datetime as dt
-import pandas as pd
+from io import BytesIO
 import os
-import socket
-import sys
+import pandas as pd
 from urllib.error import URLError
+from urllib.request import HTTPBasicAuthHandler, HTTPPasswordMgrWithDefaultRealm, build_opener
+
 from picomuon_common import get_base_path, get_target_date, log_error, log_message
 from picomuon_neutrons import write_neutron_header
-
-# local library that generates the html strings to download NEST data
 import nest
 
 PROCESS_NAME = "GetDataNeutron.py"
-# Applies to each connect/read made by pandas' urlopen; without it an unreachable
-# NMDB blocks the nightly run for over two minutes before the OS gives up.
 DOWNLOAD_TIMEOUT_SECONDS = 30
-socket.setdefaulttimeout(DOWNLOAD_TIMEOUT_SECONDS)
+NEST_ORIGIN = "https://nest.nmdb.eu"
 
-# get yesterday variable
-yesterday = get_target_date()
-base_path = get_base_path()
 
-# print message to log file to say started
-log_message(PROCESS_NAME, f"Started neutron data scraping for {yesterday.strftime('%Y-%m-%d')}")
+def load_nmdb_credentials(base_path):
+    path = base_path / "config" / "NMDB.ini"
+    if not path.is_file():
+        raise FileNotFoundError(f"NMDB credentials file not found: {path}")
+    if os.name == "posix" and path.stat().st_mode & 0o077:
+        raise PermissionError(f"NMDB credentials file must be private; run chmod 600 {path}")
 
-# year
-yesterdayYear = yesterday.year
+    parser = configparser.ConfigParser(interpolation=None)
+    try:
+        with path.open(encoding="utf-8-sig") as source:
+            parser.read_file(source)
+        username = parser.get("NMDB", "User_name").strip()
+        password = parser.get("NMDB", "Password")
+    except configparser.Error as exc:
+        raise ValueError(f"Invalid NMDB credentials in {path} ({type(exc).__name__})") from exc
+    if not username or not password:
+        raise ValueError(f"NMDB username and password must be non-empty in {path}")
+    return username, password
 
-#month
-yesterdayMonth=yesterday.month
 
-# day
-yesterdayDay = yesterday.day
+def validate_response_window(payload, target):
+    query_times = {}
+    for line in payload.decode("utf-8-sig", errors="replace").splitlines():
+        for label in ("START TIME:", "END TIME:"):
+            if label in line:
+                value = line.partition(label)[2].split("UTC", 1)[0].strip()
+                query_times[label] = dt.datetime.strptime(value, "%Y-%m-%d %H:%M:%S")
 
-# create path to save data
-path = str(base_path / 'data/neutrons') + '/'\
-       + yesterday.strftime('%Y')\
-       + '/'\
-       + yesterday.strftime('%Y-%m')
+    if set(query_times) != {"START TIME:", "END TIME:"}:
+        raise ValueError("NMDB response is missing its query time range")
+    start = query_times["START TIME:"]
+    end = query_times["END TIME:"]
+    if start.date() != target or end.date() != target:
+        raise ValueError(f"NMDB returned a different date than requested ({target})")
+    if end - start < dt.timedelta(hours=23):
+        raise ValueError(f"NMDB response does not cover the full requested day ({start} to {end})")
 
-# Check if the specific path exists or not
-pathExist = os.path.exists(path)
-if not pathExist:
-    # Create a new directory because it does not exist
-    os.makedirs(path)
-    log_message(PROCESS_NAME, "New directory created")
 
-# create file for yesterdays data
-outfile = str(base_path / 'data/neutrons') + '/'\
-          + yesterday.strftime('%Y')\
-          + '/'\
-          + yesterday.strftime('%Y-%m')\
-          + '/'\
-          + yesterday.strftime('%Y-%m-%d')\
-          + '.txt'
+def download_neutron_data(base_path, target):
+    username, password = load_nmdb_credentials(base_path)
+    start = dt.datetime.combine(target, dt.time.min)
+    end = dt.datetime.combine(target, dt.time(23, 59, 59))
+    station = "oulu"
+    data = ["p", "u", "c", "e"]
+    download = nest.single(station, "revori", data, start, end)
 
-# Start date/time for data to be extraction - should be start of day yesterday, i.e. 00:00:00
-start   = dt.datetime(yesterdayYear, yesterdayMonth, yesterdayDay, 0, 0, 0)
+    password_manager = HTTPPasswordMgrWithDefaultRealm()
+    password_manager.add_password(None, NEST_ORIGIN, username, password)
+    opener = build_opener(HTTPBasicAuthHandler(password_manager))
+    with opener.open(download, timeout=DOWNLOAD_TIMEOUT_SECONDS) as response:
+        payload = response.read()
+    validate_response_window(payload, target)
 
-# End date/time for data to be extracted - should be end of day yesterday, i.e. 23:59:59
-end     = dt.datetime(yesterdayYear, yesterdayMonth, yesterdayDay, 23, 59, 59)
+    names = ["start_date_time", *data]
+    df = pd.read_table(BytesIO(payload), sep=";", comment="#", header=None, names=names)
+    if df.empty:
+        raise ValueError(f"NMDB returned no neutron readings for {target}")
 
-table   = "revori"  # virtual table with merge original and revised data
+    output = base_path / "data" / "neutrons" / target.strftime("%Y") / target.strftime("%Y-%m") / f"{target}.txt"
+    output.parent.mkdir(parents=True, exist_ok=True)
+    temporary = output.with_suffix(".txt.tmp")
+    try:
+        with temporary.open("w", encoding="utf-8", newline="") as handle:
+            write_neutron_header(handle, station, download)
+            df.to_csv(handle, sep=",", index=False, header=False)
+        os.replace(temporary, output)
+    finally:
+        if temporary.exists():
+            temporary.unlink()
+    log_message(PROCESS_NAME, f"Completed neutron data download for {target} ({len(df)} rows)")
+    return output
 
-station = "oulu"  # station short name as used in NMDB
 
-data    = ["p", "u", "c", "e"]  # download pressure, uncorrected, corrected (for pressure) and efficiency corrected data
+def main():
+    parser = argparse.ArgumentParser(description="Download one completed UTC day of OULU neutron data.")
+    parser.add_argument("--date", type=dt.date.fromisoformat, help="UTC date to fetch; defaults to the pipeline target date")
+    args = parser.parse_args()
+    target = args.date or get_target_date()
+    base_path = get_base_path()
+    log_message(PROCESS_NAME, f"Started neutron data download for {target}")
+    try:
+        download_neutron_data(base_path, target)
+    except (URLError, OSError, ValueError, configparser.Error) as exc:
+        reason = exc.reason if isinstance(exc, URLError) else exc
+        log_error(PROCESS_NAME, f"FAILED - NMDB download for {target}: {reason}")
+        return 1
+    return 0
 
-# Create download string to access NMDB NEST data files
-download = nest.single(station, table, data, start, end)
 
-names = data.copy()  # keep the original columns, work only with a copy
-
-names.insert(0, "start_date_time") # add header for first column
-
-# create panda dataframe; nothing is written unless the download succeeds
-try:
-    df = pd.read_table(download, sep=";", comment="#", header=0, names=names)
-except (URLError, OSError, ValueError) as exc:
-    reason = exc.reason if isinstance(exc, URLError) else exc
-    log_error(PROCESS_NAME, f"FAILED - NMDB download for {yesterday.strftime('%Y-%m-%d')}: {reason}")
-    sys.exit(1)
-
-# Save panda dataframe to csv file
-temporary = outfile + ".tmp"
-try:
-    with open(temporary, "w", encoding="utf-8", newline="") as output:
-        write_neutron_header(output, station, download)
-        df.to_csv(output, sep=",", index=False, header=False)
-    os.replace(temporary, outfile)
-finally:
-    if os.path.exists(temporary):
-        os.unlink(temporary)
-
-# =============================================================================
-# Message to log file at end of program
-
-# print message to log file to say completed
-log_message(PROCESS_NAME, f"Completed neutron data scraping for {yesterday.strftime('%Y-%m-%d')}")
+if __name__ == "__main__":
+    raise SystemExit(main())

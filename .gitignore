@@ -2,6 +2,7 @@
 .tmp_*/
 examples/
 /config/user.ini
+/config/NMDB.ini
 
 # Python bytecode and cache files
 __pycache__/

@@ -240,12 +240,28 @@ class DetectorPipelineTests(unittest.TestCase):
     def test_neutron_download_uses_pipeline_target_not_current_yesterday(self):
         self.addCleanup(socket.setdefaulttimeout, socket.getdefaulttimeout())
         pandas = MagicMock()
+        pandas.read_table.return_value.empty = False
         nest = MagicMock()
         nest.single.return_value = "https://example.invalid/test"
+        credentials = self.base / "config" / "NMDB.ini"
+        credentials.write_text("[NMDB]\nUser_name = test-user\nPassword = test-password\n")
+        if os.name == "posix":
+            credentials.chmod(0o600)
+        response = io.BytesIO(
+            b"#     START TIME: 2026-10-19 00:00:00 UTC\n"
+            b"#       END TIME: 2026-10-19 23:59:00 UTC\n"
+            b"2026-10-19 00:00:00;1010.59;90.8;98.202;98.388\n"
+        )
+        opener = MagicMock()
+        opener.open.return_value = response
         with patch.dict(sys.modules, {"pandas": pandas, "nest": nest}), \
                 patch.dict(os.environ, {"PICOMUON_TARGET_DATE": str(TARGET)}), \
-                redirect_stdout(io.StringIO()):
+                patch.object(sys, "argv", ["GetDataNeutron.py"]), \
+                patch("urllib.request.build_opener", return_value=opener), \
+                redirect_stdout(io.StringIO()), \
+                self.assertRaises(SystemExit) as completed:
             runpy.run_path(str(REPO / "scripts" / "GetDataNeutron.py"), run_name="__main__")
+        self.assertEqual(completed.exception.code, 0)
         arguments = nest.single.call_args.args
         self.assertEqual(arguments[3], datetime(2026, 10, 19))
         self.assertEqual(arguments[4], datetime(2026, 10, 19, 23, 59, 59))
