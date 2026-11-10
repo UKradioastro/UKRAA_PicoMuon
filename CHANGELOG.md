@@ -8,6 +8,7 @@ This project uses calendar versioning in the format `YYYY.MM.patch`.
 ## [Unreleased]
 
 ### Fixed
+- Allow other units' explicitly labelled collectors to run during Unit_1 reboot acceptance checks. `VerifyUnit1Reboot.py` previously required Unit_1's collector to be the only `GetDataRaw` process on the host, which wrongly failed its baseline under live two-unit operation. Exactly one `--detector Unit_1` collector matching the service MainPID is still required, and unlabelled collector processes are still rejected.
 - Reduce repeated metadata conversion and set updates during daily processing by reusing prepared detector/settings columns and skipping unchanged per-bin metadata. Mixed settings/names, historical-setting assumptions and product schemas are preserved; Raspberry Pi timing acceptance remains separate.
 - Correct the bottom-detector ADC plot title, which incorrectly said "top detector", for both single and named detector outputs. Existing images need replotting to show the corrected title.
 - Stop an unreachable NMDB server from stalling the nightly run. `GetDataNeutron.py` now gives each connection and read 30 seconds. On failure it logs a single `FAILED - NMDB download for DAY: reason` line instead of a traceback, writes no neutron file and exits 1, so the run still reports the failure. On 26 October the NMDB request hung for 2 min 14 s, which took the daily chain to 3 min 06 s.

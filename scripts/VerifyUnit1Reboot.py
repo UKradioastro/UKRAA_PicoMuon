@@ -130,8 +130,16 @@ class RebootCheck:
                 "Unit_1 USB identity mismatch.")
         require(self.host.holders(staging.DEVICE) == {pid}, "Unit_1 serial port is not owned only by the collector.")
         processes = self.host.run("ps", "-eo", "pid=,args=", "--width", "500").decode().splitlines()
-        collectors = [line.split()[0] for line in processes if "GetDataRaw" in line]
-        require(collectors == [str(pid)], f"Unexpected collector processes: {collectors}")
+        collectors = [line.split() for line in processes if "GetDataRaw" in line]
+        labels = {}
+        for fields in collectors:
+            arguments = fields[1:]
+            labels[fields[0]] = next(
+                (arguments[index + 1] for index, token in enumerate(arguments[:-1]) if token == "--detector"), None)
+        owned = [process for process, label in labels.items() if label == LABEL]
+        require(owned == [str(pid)], f"Unexpected {LABEL} collector processes: {owned}")
+        strays = [process for process, label in labels.items() if label is None]
+        require(not strays, f"Unlabelled collector processes may capture {LABEL}: {strays}")
         cron = self.host.run("sudo", "-n", "crontab", "-l")
         require(cron.splitlines().count(trial.DAILY) == 1 and trial.HOLD not in cron,
                 "Daily processing cron entry is missing or held.")

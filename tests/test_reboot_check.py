@@ -30,6 +30,7 @@ class FakeHost:
         self.old_state = ("disabled", "inactive", "0")
         self.cron = CRON
         self.synced = b"yes\n"
+        self.extra_collectors = ["1490 /usr/bin/python3 GetDataRaw.py --detector Unit_2"]
         self.commands = []
 
     def run(self, *command, allowed=(0,), timeout=60):
@@ -46,7 +47,10 @@ class FakeHost:
         if command[0] == "udevadm":
             return f"ID_SERIAL={staging.IDENTITY}\nID_SERIAL_SHORT={staging.SHORT_ID}\n".encode()
         if command[0] == "ps":
-            return f"  1 /sbin/init\n{self.pid} /usr/bin/python3 GetDataRaw.py --detector Unit_1\n".encode()
+            lines = ["  1 /sbin/init",
+                     f"{self.pid} /usr/bin/python3 GetDataRaw.py --detector Unit_1",
+                     *self.extra_collectors]
+            return ("\n".join(lines) + "\n").encode()
         if command[:2] == ("sudo", "-n"):
             return self.cron
         if command[0] == "timedatectl":
@@ -141,6 +145,16 @@ class RebootCheckTests(unittest.TestCase):
                                  for word in command), command)
             if command[0] == "sudo":
                 self.assertEqual(command, ("sudo", "-n", "crontab", "-l"))
+
+    def test_duplicate_unit1_collector_is_rejected(self):
+        self.host.extra_collectors.append("813 /usr/bin/python3 GetDataRaw.py --detector Unit_1")
+        with self.assertRaisesRegex(RuntimeError, "Unexpected Unit_1 collector"):
+            self.baseline()
+
+    def test_unlabelled_collector_is_rejected(self):
+        self.host.extra_collectors.append("814 /usr/bin/python3 GetDataRaw.py")
+        with self.assertRaisesRegex(RuntimeError, "Unlabelled collector"):
+            self.baseline()
 
     def test_successful_reboot_is_accepted(self):
         before = self.baseline()
