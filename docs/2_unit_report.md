@@ -1,9 +1,9 @@
 # Two-plus detectors on one Raspberry Pi: implementation and test report
 
 **Project:** UKRAA PicoMuon  
-**Report date:** 30 October 2026; addendum added 1 November 2026  
-**Evidence cut-off:** 30 October 2026, 12:11 UTC; addendum evidence to 1 November 2026, about 11:12 UTC  
-**Status:** Two collectors running; separate scheduled daily processing verified on 31 October and 1 November (section 16); final multi-detector deployment acceptance remains open.
+**Report date:** 30 October 2026; addenda added 1 and 10 November 2026  
+**Evidence cut-off:** 30 October 2026, 12:11 UTC; addendum evidence to 10 November 2026, about 11:40 UTC  
+**Status:** Two collectors running; scheduled daily processing, weekly log rotation in both roots, NMDB downloads, Unit_2 weekly and Unit_1 month products all verified (sections 16-17); final multi-detector deployment acceptance remains open.
 
 ## 1. Executive summary
 
@@ -22,7 +22,7 @@ The principal results are:
 - The verified two-file optimization was deployed to both live installations after backup, fault-injection tests, native Linux rehearsal and separate approval. Neither collector was restarted.
 - Unit_2's 29 October daily products were seeded and checked. Its incorrect pilot weather coordinates were corrected with approval. A separate **01:30 host-local** daily job now explicitly selects Unit_2, leaving Unit_1's existing **01:15** job unchanged.
 
-**Still pending:** a successful fresh download-inclusive two-unit timing test (NMDB remained unreachable through 1 November), sufficient genuine period history, live ACM-renumbering acceptance, three-unit acceptance and any final consolidation/full-installer acceptance. The first actual Unit_2 scheduled runs succeeded on 31 October and 1 November (section 16). Passing software and continuity tests does not establish detector efficiency, calibration or scientific accuracy.
+**Still pending:** Unit_2 month acceptance (history gate expected around 26 November), both units' 90-day acceptance, live ACM-renumbering acceptance, detailed reboot acceptance under `VerifyUnit1Reboot.py`, three-unit acceptance and any final consolidation/full-installer acceptance. The first Unit_2 scheduled runs, both weekly log rotations, authenticated NMDB downloads, the first Unit_2 weekly and Unit_1 month products and an 88-second download-inclusive combined nightly runtime are recorded in sections 16-17. Passing software and continuity tests does not establish detector efficiency, calibration or scientific accuracy.
 
 ## 2. Scope, evidence and acceptance rules
 
@@ -395,16 +395,16 @@ The old status file was dated **October 20**, with old raw files for October 19/
 |---|---|
 | Named configuration, collector and processing isolation | Implemented; automated and selected live tests passed |
 | Unit_1 named adoption and processing restoration | Recorded committed/verified; original data protected |
-| Unit_1 detailed reboot acceptance | Baseline inspected; complete retained result not established in this report |
+| Unit_1 detailed reboot acceptance | Baseline inspected; complete retained result not established. A deliberate 3 November reboot saw both collectors auto-start cleanly (section 17.3), but the detailed `VerifyUnit1Reboot.py` acceptance was not run |
 | Unit_1 + Unit_2 live capture and Unit_2 reset isolation | Passed for observed windows |
 | Genuine two-unit completed-day input validation | Passed for October 29 |
 | Daily and eligible weekly numeric parity | Passed |
 | Separate plot/page validation | Passed for exercised outputs; separate live ADC-title deployment outstanding |
 | Optimization output equivalence and offline timing | Passed for stated workload |
 | Guarded live optimization installation | Applied and verified in both roots |
-| Unit_2 seed and separate schedule installation | Verified; scheduled execution passed on 31 October and 1 November (section 16) |
-| Successful downloads plus combined runtime under 120 seconds | Not passed; NMDB outage (persisting through 1 November) and earlier 130.895-second result |
-| Unit_2 full-week / month / 90-day acceptance | Pending genuine eligible history; week gate at 3/7 days after the 1 November run (section 16) |
+| Unit_2 seed and separate schedule installation | Verified; scheduled execution passed nightly since 31 October (sections 16-17) |
+| Successful downloads plus combined runtime under 120 seconds | Met by live scheduled-run evidence on 10 November: fresh download-inclusive nightly runs of 45 s (Unit_1) plus 43 s (Unit_2), 88 s combined (section 17.4). The originally specified single isolated run was not separately performed |
+| Unit_2 full-week / month / 90-day acceptance | Week passed 5 November (section 17.2); month pending history (expected about 26 November); 90-day pending for both units |
 | Live swapped ACM enumeration / three active named collectors | Not established by the current two-unit tests |
 | Consolidated all-unit production rollout/full installer | Not accepted; requires a separate plan and approval |
 
@@ -543,10 +543,61 @@ Unit_1 kept PID **1614** (active since 26 October) and Unit_2 PID **216305** (si
 
 ### 16.3 Sunday log rotation
 
-The production root's weekly rotation ran at **00:00:01 UTC on 1 November**, wrote "Completed weekly log rotation" into both the shared and Unit_1 log directories, created the `-0` archive generation (`cp -p` preserves the pre-rotation timestamps observed on those files) and truncated the live logs, which then received the 01:15 run entries normally. **The pilot root has no rotation arrangement and did not rotate**; its logs, including `unit2-daily-cron.txt`, grow without bound. This confirms the open pilot log-retention item in section 14.4.
+The production root's weekly rotation ran at **00:00:01 UTC on 1 November**, wrote "Completed weekly log rotation" into both the shared and Unit_1 log directories, created the `-0` archive generation (`cp -p` preserves the pre-rotation timestamps observed on those files) and truncated the live logs, which then received the 01:15 run entries normally. **The pilot root has no rotation arrangement and did not rotate**; its logs, including `unit2-daily-cron.txt`, grow without bound. This confirms the open pilot log-retention item in section 14.4. (A pilot rotation arrangement was installed later on 1 November and first executed on 8 November; see section 17.5.)
 
 ### 16.4 Observations and position after the addendum
 
 - Unit_2's week gate stood at **3/7 days** (29-31 October) after the 1 November run. If every day through 4 November remains complete, the first eligible weekly product is expected from the **5 November 01:30** run. This is conditional, not a calendar guarantee.
 - The pilot's day plot logged `PlotDataDayACM0.gp ... No valid data points found in file` on every run while still rendering the image; with no neutron data present in either root, the empty neutron series is the most likely cause. Recheck after NMDB recovers; if the warning persists, investigate separately.
 - Unchanged gates: the NMDB-inclusive sub-120-second timing test, Unit_2 month/90-day history, live ACM renumbering, three-unit acceptance and consolidation remain open exactly as stated in sections 13 and 14.
+
+## 17. Addendum: second week of operation, 2-10 November
+
+Added 10 November 2026. Evidence: operator-pasted terminal output collected about 11:07-11:40 UTC on 10 November, comprising the week's shared/per-detector logs (live and rotated generations) from both roots, Unit_2 week and Unit_1 month product listings, daily summaries, systemd service properties, raw-file listings, status snapshots, the 9-10 November cron journal, live-file SHA-256 hashes and the 8 November backfill output. The 2 November NMDB downloader change is a tracked repository change (changelog/README); this section records its live deployment and observed behaviour.
+
+### 17.1 Authenticated NMDB downloader deployment and recovery timeline
+
+With NMDB's public interface still failing, the operator obtained NMDB credentials and on **2 November** deployed the repository's updated [GetDataNeutron.py](../scripts/GetDataNeutron.py) and [nest.py](../scripts/nest.py) to **both** live roots (production 15:11, pilot 16:01 UTC), each with a private `config/NMDB.ini` (**0600, pi**, correctly absent from the repository). On 10 November both roots' live copies hashed byte-identical to the repository files:
+
+```text
+GetDataNeutron.py 192faaa9a82d61cb3f028391d2a0fe22b42b344ebbc4f4672f7839a0312901e5
+nest.py           3e87c1a848bf0c57eedc5193c16e752bf0a3f8140a7a9e8f5834a611d7fd283b
+```
+
+(`GetDataNeutron.py` matches the repository's raw CRLF bytes; Python is indifferent to the line endings.) This supersedes the older pilot downloader and closes the section 12 register entry about the unbounded pilot NMDB wait.
+
+Observed downloads, identical in both roots:
+
+- **1-2 November:** public scraping still timed out; fail-closed one-line failures preserved.
+- **3-8 November:** authenticated downloads succeeded nightly (1,440 rows each), before public access returned.
+- **9 November:** both roots failed with "NMDB response does not cover the full requested day (… to 02:02)" - NMDB's own data was still backfilling after its repair. The validation correctly refused the partial day, preserved the nonzero exit and wrote no neutron file.
+- **10 November:** nightly downloads succeeded. The operator reports public (unauthenticated) NMDB access returned about 9 November, observed from a separate system; the credentials are no longer strictly necessary but remain in use. The current downloader requires `NMDB.ini`; retiring the credentials needs a reviewed change, not just file deletion.
+
+The recurring pilot day-plot warning (`No valid data points found`) appeared **only** on nights without neutron data (through 2 November, and again on 9 November) and vanished on every night with real neutron data. This confirms the section 16.4 hypothesis - the empty neutron overlay - and requires no code change.
+
+### 17.2 First Unit_2 weekly and Unit_1 month products
+
+- **Unit_2 week:** the 5 November 01:30 run completed the first weekly product, window 29 October-4 November, exactly as projected in section 14.3. Weekly products and published week plots have been produced nightly since.
+- **Unit_1 month:** the 7 November 01:15 run crossed the 28/31 history gate (window 7 October-6 November) and produced the first month product; nightly since. The 90-day gate stood at 31/90 for Unit_1 and 4/90 for Unit_2 on 10 November.
+- Unit_2's month gate requires 28/31 days; with complete days from 29 October its first month product is expected about **26 November**, conditional on continued complete days.
+- Every completed day 1-9 November recorded 24/24 hours and 100% coverage for both units.
+
+### 17.3 Deliberate 3 November reboot
+
+The operator rebooted the Pi on **3 November at about 11:02 GMT** after a Raspberry Pi OS package upgrade. Both collectors auto-started at **11:02:13** (PIDs 1489 and 1490, NRestarts=0) and have run undisturbed since - the first live evidence that both named collectors' boot enablement works together. Unit_2 recorded **missing_events=174** on 3 November, correctly preserved as a genuine gap; Unit_1 recorded none. No `VerifyUnit1Reboot.py` baseline/verify evidence was captured, so the detailed reboot-acceptance gate remains open; this observation does not substitute for it.
+
+### 17.4 Download-inclusive runtime
+
+On 10 November, with fresh (non-preseeded) NMDB and weather downloads succeeding in both roots, the cron journal records Unit_1's complete nightly job at **45 seconds** (01:15:01-01:15:46) and Unit_2's at **43 seconds** (01:30:01-01:30:44): **88 seconds combined**, well under the 120-second target, with zero pipeline failures. Each run performed its own downloads of genuine full-day data. The originally specified single isolated acceptance run was not separately performed; these live scheduled results are recorded as the operative timing evidence. The pilot's former ~2 minute 15 second NMDB timeout is gone with the downloader replacement.
+
+### 17.5 Second production and first pilot log rotation, 8 November
+
+Production's rotation ran at 00:00:01 UTC and shifted generations correctly (`-0` 7 November, `-1` 31 October, `-2` 24 October). The pilot arrangement installed on 1 November (a second entry in `/etc/cron.d/picomuon-unit2`, Sunday **00:10 host-local**, user pi, using the pilot's own cron lock) executed for the first time at **00:10:01 UTC on 8 November**: "Completed weekly log rotation" was written in both the pilot shared and Unit_2 log directories, `-0` generations were created with preserved pre-rotation timestamps, and the re-seeded live logs received that night's runs normally. Neither collector was disturbed. The rotation preflight (script parity with production, ownership scan, scratch-tree rehearsal) and the sudoedit-unchanged first apply attempt on 1 November are retained in the operator's terminal records; `unit2-daily-cron.txt` remained zero bytes, confirming it needs no rotation.
+
+### 17.6 8 November neutron gap backfill
+
+On 10 November (11:31-11:39 UTC) the operator ran one manual `ProcessDetectors.py --date 2026-11-08` per root - production under sudo (matching the nightly job's root invocation; the pi user cannot open production's root-owned cron lock), the pilot as pi. Both downloaded the now-complete 8 November data (1,440 rows), reprocessed the day, regenerated the affected period products, replotted and republished with **0 failures**. The 8 November event totals were unchanged in both summaries (**208,042/192,457/20,654** for Unit_1; **200,217/213,219/20,806** for Unit_2) - only the neutron column and plots changed. Two benign artifacts: a bracketed-paste escape sequence caused one cleanly rejected argparse failure before the successful production run, and the production neutron file was created root-owned (0644) because the sudo run bypassed the nightly chain's owner drop; ownership normalization to pi was advised. Public `/var/www/html` pages refresh at the next nightly publication.
+
+### 17.7 Position after this addendum
+
+Open gates: Unit_2 month (about 26 November) and both units' 90-day history; the detailed reboot acceptance; live ACM-renumbering; three-unit acceptance; consolidation/full-installer acceptance; the separate live ADC-title deployment check; and a reviewed plan for retiring the NMDB credentials once public access is confirmed stable.
