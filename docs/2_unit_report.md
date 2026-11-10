@@ -2,8 +2,8 @@
 
 **Project:** UKRAA PicoMuon  
 **Report date:** 30 October 2026; addenda added 1 and 10 November 2026  
-**Evidence cut-off:** 30 October 2026, 12:11 UTC; addendum evidence to 10 November 2026, about 11:40 UTC  
-**Status:** Two collectors running; scheduled daily processing, weekly log rotation in both roots, NMDB downloads, Unit_2 weekly and Unit_1 month products all verified (sections 16-17); final multi-detector deployment acceptance remains open.
+**Evidence cut-off:** 30 October 2026, 12:11 UTC; addendum evidence to 10 November 2026, about 12:56 UTC  
+**Status:** Two collectors running; scheduled daily processing, weekly log rotation in both roots, NMDB downloads, Unit_2 weekly and Unit_1 month products, detailed reboot acceptance and live swapped ACM enumeration all verified (sections 16-18); final multi-detector deployment acceptance remains open.
 
 ## 1. Executive summary
 
@@ -22,7 +22,7 @@ The principal results are:
 - The verified two-file optimization was deployed to both live installations after backup, fault-injection tests, native Linux rehearsal and separate approval. Neither collector was restarted.
 - Unit_2's 29 October daily products were seeded and checked. Its incorrect pilot weather coordinates were corrected with approval. A separate **01:30 host-local** daily job now explicitly selects Unit_2, leaving Unit_1's existing **01:15** job unchanged.
 
-**Still pending:** Unit_2 month acceptance (history gate expected around 26 November), both units' 90-day acceptance, live ACM-renumbering acceptance, detailed reboot acceptance under `VerifyUnit1Reboot.py`, three-unit acceptance and any final consolidation/full-installer acceptance. The first Unit_2 scheduled runs, both weekly log rotations, authenticated NMDB downloads, the first Unit_2 weekly and Unit_1 month products and an 88-second download-inclusive combined nightly runtime are recorded in sections 16-17. Passing software and continuity tests does not establish detector efficiency, calibration or scientific accuracy.
+**Still pending:** Unit_2 month acceptance (history gate expected around 26 November), both units' 90-day acceptance, three-unit acceptance and any final consolidation/full-installer acceptance. The first Unit_2 scheduled runs, both weekly log rotations, authenticated NMDB downloads, the first Unit_2 weekly and Unit_1 month products, an 88-second download-inclusive combined nightly runtime, the verified reboot acceptance and live swapped ACM enumeration are recorded in sections 16-18. Passing software and continuity tests does not establish detector efficiency, calibration or scientific accuracy.
 
 ## 2. Scope, evidence and acceptance rules
 
@@ -395,7 +395,7 @@ The old status file was dated **October 20**, with old raw files for October 19/
 |---|---|
 | Named configuration, collector and processing isolation | Implemented; automated and selected live tests passed |
 | Unit_1 named adoption and processing restoration | Recorded committed/verified; original data protected |
-| Unit_1 detailed reboot acceptance | Baseline inspected; complete retained result not established. A deliberate 3 November reboot saw both collectors auto-start cleanly (section 17.3), but the detailed `VerifyUnit1Reboot.py` acceptance was not run |
+| Unit_1 detailed reboot acceptance | Passed 10 November: `REBOOT_ACCEPTED`, first post-boot event 6.5 s, collection gap 17.8 s (section 18.2) |
 | Unit_1 + Unit_2 live capture and Unit_2 reset isolation | Passed for observed windows |
 | Genuine two-unit completed-day input validation | Passed for October 29 |
 | Daily and eligible weekly numeric parity | Passed |
@@ -405,7 +405,7 @@ The old status file was dated **October 20**, with old raw files for October 19/
 | Unit_2 seed and separate schedule installation | Verified; scheduled execution passed nightly since 31 October (sections 16-17) |
 | Successful downloads plus combined runtime under 120 seconds | Met by live scheduled-run evidence on 10 November: fresh download-inclusive nightly runs of 45 s (Unit_1) plus 43 s (Unit_2), 88 s combined (section 17.4). The originally specified single isolated run was not separately performed |
 | Unit_2 full-week / month / 90-day acceptance | Week passed 5 November (section 17.2); month pending history (expected about 26 November); 90-day pending for both units |
-| Live swapped ACM enumeration / three active named collectors | Not established by the current two-unit tests |
+| Live swapped ACM enumeration / three active named collectors | Live renumbering passed 10 November with a three-way ACM rotation and automatic dual recovery (section 18.3); three simultaneously active named collectors remain open pending Unit_3 activation |
 | Consolidated all-unit production rollout/full installer | Not accepted; requires a separate plan and approval |
 
 ## 14. Next steps to complete deployment
@@ -600,4 +600,41 @@ On 10 November (11:31-11:39 UTC) the operator ran one manual `ProcessDetectors.p
 
 ### 17.7 Position after this addendum
 
-Open gates: Unit_2 month (about 26 November) and both units' 90-day history; the detailed reboot acceptance; live ACM-renumbering; three-unit acceptance; consolidation/full-installer acceptance; the separate live ADC-title deployment check; and a reviewed plan for retiring the NMDB credentials once public access is confirmed stable.
+Open gates: Unit_2 month (about 26 November) and both units' 90-day history; the detailed reboot acceptance; live ACM-renumbering; three-unit acceptance; consolidation/full-installer acceptance; the separate live ADC-title deployment check; and a reviewed plan for retiring the NMDB credentials once public access is confirmed stable. (The reboot and ACM-renumbering gates were closed later the same day; see section 18.)
+
+## 18. Addendum: reboot acceptance and live ACM renumbering, 10 November
+
+Added 10 November 2026. One attended session, about 12:05-12:56 UTC, closed the two live gates that required operator presence: the detailed Unit_1 reboot acceptance and live swapped ACM enumeration. Evidence: operator-pasted preflight, verifier baseline/verify output (evidence directories `unit1-reboot-check.qt_5q7do` for the recorded defect and `unit1-reboot-check.gt4cyebx` for the accepted run), manual Unit_2 snapshots, and pre/post enumeration state with logs. No configuration, service, cron or data changes were made; the session's only data cost was two short, honestly recorded collection gaps.
+
+### 18.1 Verifier defect found and fixed before the reboot
+
+The first baseline attempt failed closed: `Unexpected collector processes: ['1489', '1490']`. [VerifyUnit1Reboot.py](../scripts/VerifyUnit1Reboot.py), written on 26 October under single-collector operation, required Unit_1's collector to be the only `GetDataRaw` process on the host - impossible under live two-unit operation. A reviewed repository fix now parses each collector's `--detector` label: exactly one Unit_1 collector matching the service MainPID is still required, unlabelled collector processes are still rejected, and other units' explicitly labelled collectors are permitted. [Regression tests](../tests/test_reboot_check.py) run every scenario with a concurrent Unit_2 collector present and add duplicate-collector and unlabelled-collector rejections. The updated file (SHA-256 `d2c43ea91e47bdfaf20003c600e3780c3ad8e87781348ad98dd457a91fd062f0`) was uploaded and hash-verified before reuse; the failed attempt's evidence directory was preserved.
+
+### 18.2 Detailed reboot acceptance - passed
+
+Preflight confirmed the verifier trio hash-matched the repository, the old service disabled, both collectors active with zero restarts, Unit_3 inactive and NTP synchronised. The baseline recorded PID 1489; after `sudo reboot`, verification returned **`REBOOT_ACCEPTED`**: new boot ID, collector PID 1489 to 1292, NRestarts=0, **first post-boot event 6.5 seconds after boot** (limit 180), **total collection gap 17.8 seconds**, 1,683 events since boot, pre-reboot raw bytes hash-verified append-only, no new rejected rows, no fatal errors, root crontab unchanged, and the collector started after the clock was set.
+
+Manual Unit_2 equivalents also passed: new PID 1293 with NRestarts=0, connected through its by-id path one second after service start, correct `Unit-2` identity, raw file grown (21,038,899 to 21,279,932 bytes across the reboot), rejected file empty, fresh status. Unit_3 remained inactive/disabled throughout. This closes the reboot-acceptance gate left open since 26 October; together with the incidental 3 November reboot it is the second clean dual-collector boot recovery.
+
+### 18.3 Live swapped ACM enumeration - passed
+
+With both collectors running (PIDs 1292/1293), the operator unplugged both detectors' USB cables at about 12:41:50, waited, and replugged Unit_2 first, then Unit_1. The bus re-enumerated completely, producing a **three-way ACM rotation** - every device ended on a number previously held by a different unit:
+
+| Device | Before | After | udev serial verified |
+|---|---|---|---|
+| Unit_2 | ttyACM1 | ttyACM0 | E660D4A0A7571639 |
+| Unit_3 | ttyACM2 | ttyACM1 | E66358986351AF2C |
+| Unit_1 | ttyACM0 | ttyACM2 | E660D4A0A7598522 |
+
+Results against the pass criteria:
+
+- Both collectors reconnected automatically through their stable by-id paths - Unit_2 at 12:42:51 (gap about 60 seconds), Unit_1 at 12:43:26 (gap about 95 seconds) - on unchanged PIDs with NRestarts=0, after the expected identity-check retry/backoff pattern during the unplugged window.
+- No cross-capture: udev serials, status detector names and raw-row name/settings columns all stayed unit-correct; both rejected files remained empty; no `refusing possible cable swap` or tracebacks.
+- Resilience bonus: at 12:43:19, the instant Unit_1 was replugged, Unit_2's open connection took a transient bus error and its collector recovered in 2 seconds on the same PID.
+- Unit_3, untouched and inactive, renumbered with the bus; nothing attempted to open it.
+
+The renumbering half of the section 13 enumeration gate is closed. The remaining half - three simultaneously active named collectors - belongs to Unit_3 activation.
+
+### 18.4 Position after this addendum
+
+Open gates: Unit_2 month (about 26 November) and both units' 90-day history; three active named collectors, Unit_3 activation and three-unit acceptance; consolidation/full-installer acceptance; the separate live ADC-title deployment check; and the reviewed NMDB credential retirement (repository change complete; live deployment pending).
