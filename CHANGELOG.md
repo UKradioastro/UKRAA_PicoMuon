@@ -63,6 +63,7 @@ This project uses calendar versioning in the format `YYYY.MM.patch`.
 - Dynamic installation-root lookup for the legacy processing and plot scripts.
 
 ### Changed
+- Make `config/NMDB.ini` optional: the neutron downloader now uses anonymous public NEST access when no credentials file is installed, and logs when stored credentials are in use. Credential privacy (0600) and non-interpolating parsing are still enforced when the file exists; deleting it retires an NMDB account without any further change. Response-window validation, timeout and fail-closed behaviour are unchanged.
 - Correct daily missing-event QC to compare independent T/B/C counters within each run segment; retain genuine large positive gaps. Sum the shared elapsed clock once across mixed event types, clear all baselines at reset/name/gap boundaries, and split exposure across UTC hours without changing event counts or CSV schemas. Regenerate derived daily files to correct older QC values; raw data and collectors are unchanged.
 - Group temporary CPM/ADC/frequency plots in `temp/yesterday/` and day/week/month plots in `temp/periods/`. Plotting creates the folders automatically; publishing uses both groups while preserving existing flat web image URLs and ignoring obsolete flat temporary PNGs.
 - Raw collectors no longer emit JSON metadata comments or embed observation details. ADC/CPM/day/hour/all period products now include detector name and four settings as CSV columns; day/period and hourly products include `neutrons,station`, retaining hourly pressure.

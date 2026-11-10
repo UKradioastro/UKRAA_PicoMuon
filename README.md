@@ -1144,10 +1144,11 @@ DateTime,Pressure_hPa,Uncorrected,PressureCorrected,EfficiencyCorrected
 
 Readers accept both headered and older headerless neutron files. The weather attribution/header is unchanged. Plot orchestration selects neutron column 12 for new day/period files and column 7 for historical files, so existing products can still be viewed before reprocessing.
 
-#### Temporary authenticated NMDB access
+#### Optional authenticated NMDB access
 
-For temporary NEST access, create `config/NMDB.ini` with the credentials supplied
-by NMDB:
+The neutron downloader uses anonymous public NEST access by default. If NMDB's
+public interface is unavailable and NMDB has supplied account credentials,
+create `config/NMDB.ini`:
 
 ```ini
 [NMDB]
@@ -1157,8 +1158,10 @@ Password = your-password
 
 This file is ignored by Git. On the Raspberry Pi, restrict it to the installation
 owner with `chmod 600 config/NMDB.ini`; do not put credentials in the request URL,
-shell command, or logs. The neutron downloader uses HTTP Basic authentication
-against `https://nest.nmdb.eu/`.
+shell command, or logs. When the file is present the neutron downloader uses HTTP
+Basic authentication against `https://nest.nmdb.eu/` and logs that stored
+credentials are in use; deleting the file returns the downloader to anonymous
+access on the next run.
 
 Fetch one completed UTC day without running the processing pipeline:
 

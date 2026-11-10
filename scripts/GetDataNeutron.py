@@ -19,9 +19,10 @@ NEST_COLUMNS = ("start_date_time", "RPRESS", "RUNCORR", "RCORR_P", "RCORR_E")
 
 
 def load_nmdb_credentials(base_path):
+    """Return (username, password) from config/NMDB.ini, or None when no credentials are installed."""
     path = base_path / "config" / "NMDB.ini"
     if not path.is_file():
-        raise FileNotFoundError(f"NMDB credentials file not found: {path}")
+        return None
     if os.name == "posix" and path.stat().st_mode & 0o077:
         raise PermissionError(f"NMDB credentials file must be private; run chmod 600 {path}")
 
@@ -85,16 +86,20 @@ def prepare_neutron_rows(payload: bytes, target: dt.date) -> bytes:
 
 
 def download_neutron_data(base_path, target):
-    username, password = load_nmdb_credentials(base_path)
+    credentials = load_nmdb_credentials(base_path)
     start = dt.datetime.combine(target, dt.time.min)
     end = dt.datetime.combine(target, dt.time(23, 59, 59))
     station = "oulu"
     data = ["p", "u", "c", "e"]
     download = nest.single(station, "revori", data, start, end)
 
-    password_manager = HTTPPasswordMgrWithDefaultRealm()
-    password_manager.add_password(None, NEST_ORIGIN, username, password)
-    opener = build_opener(HTTPBasicAuthHandler(password_manager))
+    if credentials:
+        log_message(PROCESS_NAME, "Using stored NMDB credentials from config/NMDB.ini")
+        password_manager = HTTPPasswordMgrWithDefaultRealm()
+        password_manager.add_password(None, NEST_ORIGIN, *credentials)
+        opener = build_opener(HTTPBasicAuthHandler(password_manager))
+    else:
+        opener = build_opener()
     with opener.open(download, timeout=DOWNLOAD_TIMEOUT_SECONDS) as response:
         payload = response.read()
     validate_response_window(payload, target)

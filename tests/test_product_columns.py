@@ -271,6 +271,26 @@ class ProductColumnTests(unittest.TestCase):
         self.write_nmdb_credentials()
         self.assertEqual(load_nmdb_credentials(self.base), ("test-user", "test%password"))
 
+    def test_nmdb_credentials_absent_returns_none(self):
+        self.assertIsNone(load_nmdb_credentials(self.base))
+
+    def test_neutron_scraper_downloads_anonymously_without_credentials(self):
+        payload = (
+            b"#     START TIME: 2026-10-17 00:00:00 UTC\n"
+            b"#       END TIME: 2026-10-17 23:59:00 UTC\n"
+            b"2026-10-17 00:00:00;1010.59;90.8;98.202;98.388\n"
+            b"2026-10-17 23:59:00;1031.10;77.6;97.786;97.972\n"
+        )
+        opener = MagicMock()
+        opener.open.return_value = io.BytesIO(payload)
+        with patch("GetDataNeutron.build_opener", return_value=opener) as build, \
+                patch("sys.stdout", new_callable=io.StringIO) as log:
+            written = download_neutron_data(self.base, self.day)
+        build.assert_called_once_with()
+        self.assertEqual(opener.open.call_args.kwargs["timeout"], 30)
+        self.assertEqual(written, build_neutron_path(self.base, self.day))
+        self.assertNotIn("credentials", log.getvalue())
+
     def test_neutron_scraper_authenticates_and_preserves_first_dataframe_row(self):
         self.write_nmdb_credentials()
         payload = (
@@ -282,9 +302,11 @@ class ProductColumnTests(unittest.TestCase):
         )
         opener = MagicMock()
         opener.open.return_value = io.BytesIO(payload)
-        with patch("GetDataNeutron.build_opener", return_value=opener), \
-                patch("sys.stdout", new_callable=io.StringIO):
+        with patch("GetDataNeutron.build_opener", return_value=opener) as build, \
+                patch("sys.stdout", new_callable=io.StringIO) as log:
             written = download_neutron_data(self.base, self.day)
+        self.assertEqual(len(build.call_args.args), 1)
+        self.assertIn("Using stored NMDB credentials", log.getvalue())
         path = build_neutron_path(self.base, self.day)
         self.assertEqual(written, path)
         opener.open.assert_called_once()
