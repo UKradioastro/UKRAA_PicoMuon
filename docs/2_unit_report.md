@@ -1,9 +1,9 @@
 # Two-plus detectors on one Raspberry Pi: implementation and test report
 
 **Project:** UKRAA PicoMuon  
-**Report date:** 30 October 2026; addenda added 1 and 10 November 2026  
-**Evidence cut-off:** 30 October 2026, 12:11 UTC; addendum evidence to 10 November 2026, about 12:56 UTC  
-**Status:** Two collectors running; scheduled daily processing, weekly log rotation in both roots, NMDB downloads, Unit_2 weekly and Unit_1 month products, detailed reboot acceptance and live swapped ACM enumeration all verified (sections 16-18); final multi-detector deployment acceptance remains open.
+**Report date:** 30 October 2026; addenda added 1, 10 and 14 November 2026  
+**Evidence cut-off:** 30 October 2026, 12:11 UTC; addendum evidence to 14 November 2026, about 16:12 UTC  
+**Status:** Three named collectors running on one Raspberry Pi; scheduled daily processing for all three, weekly log rotation in both roots, NMDB downloads, Unit_2 weekly and Unit_1 month products, detailed reboot acceptance, live swapped ACM enumeration and first three-unit scheduled acceptance all verified (sections 16-19); consolidation remains open.
 
 ## 1. Executive summary
 
@@ -22,7 +22,7 @@ The principal results are:
 - The verified two-file optimization was deployed to both live installations after backup, fault-injection tests, native Linux rehearsal and separate approval. Neither collector was restarted.
 - Unit_2's 29 October daily products were seeded and checked. Its incorrect pilot weather coordinates were corrected with approval. A separate **01:30 host-local** daily job now explicitly selects Unit_2, leaving Unit_1's existing **01:15** job unchanged.
 
-**Still pending:** Unit_2 month acceptance (history gate expected around 26 November), both units' 90-day acceptance, three-unit acceptance and any final consolidation/full-installer acceptance. The first Unit_2 scheduled runs, both weekly log rotations, authenticated NMDB downloads, the first Unit_2 weekly and Unit_1 month products, an 88-second download-inclusive combined nightly runtime, the verified reboot acceptance and live swapped ACM enumeration are recorded in sections 16-18. Passing software and continuity tests does not establish detector efficiency, calibration or scientific accuracy.
+**Still pending:** Unit_2 month acceptance (history gate expected around 26 November), Unit_3 week/month history (about 18 November and 9 December), all units' 90-day acceptance, live deployment of the credential-optional NMDB downloader, and any final consolidation/full-installer acceptance. The first Unit_2 scheduled runs, both weekly log rotations, authenticated NMDB downloads, the first Unit_2 weekly and Unit_1 month products, the verified reboot acceptance, live swapped ACM enumeration, Unit_3 activation and the first three-unit scheduled acceptance (122 seconds combined against the agreed 180-second target) are recorded in sections 16-19. Passing software and continuity tests does not establish detector efficiency, calibration or scientific accuracy.
 
 ## 2. Scope, evidence and acceptance rules
 
@@ -405,7 +405,7 @@ The old status file was dated **October 20**, with old raw files for October 19/
 | Unit_2 seed and separate schedule installation | Verified; scheduled execution passed nightly since 31 October (sections 16-17) |
 | Successful downloads plus combined runtime under 120 seconds | Met by live scheduled-run evidence on 10 November: fresh download-inclusive nightly runs of 45 s (Unit_1) plus 43 s (Unit_2), 88 s combined (section 17.4). The originally specified single isolated run was not separately performed |
 | Unit_2 full-week / month / 90-day acceptance | Week passed 5 November (section 17.2); month pending history (expected about 26 November); 90-day pending for both units |
-| Live swapped ACM enumeration / three active named collectors | Live renumbering passed 10 November with a three-way ACM rotation and automatic dual recovery (section 18.3); three simultaneously active named collectors remain open pending Unit_3 activation |
+| Live swapped ACM enumeration / three active named collectors | Both passed: live renumbering on 10 November with a three-way ACM rotation and automatic dual recovery (section 18.3); three simultaneously active named collectors with scheduled three-unit acceptance on 12 November (section 19) |
 | Consolidated all-unit production rollout/full installer | Not accepted; requires a separate plan and approval |
 
 ## 14. Next steps to complete deployment
@@ -637,4 +637,42 @@ The renumbering half of the section 13 enumeration gate is closed. The remaining
 
 ### 18.4 Position after this addendum
 
-Open gates: Unit_2 month (about 26 November) and both units' 90-day history; three active named collectors, Unit_3 activation and three-unit acceptance; consolidation/full-installer acceptance; the separate live ADC-title deployment check; and the reviewed NMDB credential retirement (repository change complete; live deployment pending).
+Open gates: Unit_2 month (about 26 November) and both units' 90-day history; three active named collectors, Unit_3 activation and three-unit acceptance; consolidation/full-installer acceptance; the separate live ADC-title deployment check; and the reviewed NMDB credential retirement (repository change complete; live deployment pending). (Unit_3 was activated later the same day and the three-unit gates closed on 12 November; see section 19.)
+
+## 19. Addendum: Unit_3 activation and first three-unit scheduled acceptance, 10-14 November
+
+Added 14 November 2026. Evidence: operator-pasted output from the activation session (10 November, about 13:36-13:54 UTC) and the follow-up review (14 November, about 16:12 UTC), comprising the activation preflight, service startup and reset-test records, the installed `/etc/cron.d/picomuon-unit3` content, the 12 November cron journal, Unit_3's per-detector logs and daily summary, dated published-page listings, all three units' summaries and service properties, and the pilot error log.
+
+### 19.1 Activation session, 10 November
+
+The approved decisions were: schedule slot **01:45 host-local**; Unit_3's job uses `--skip-downloads`, relying on the pilot root's inputs fetched by Unit_2's 01:30 job (operator principle: one NMDB download per Pi per night, to be fully realised at consolidation); a combined **under-180-second** three-job timing target; and a physical Unit_3 reset test during activation.
+
+Preflight verified the by-id path and udev serial (`E66358986351AF2C`), a free port, the pilot mapping keyed on the by-id path, `[legacy:Unit_3]` matching the operator-confirmed **200/100 top, 200/100 bottom** before any start (the 28 October Unit_2 lesson applied preventively), the rendered pilot-root ExecStart, ample disk, and the undisturbed Unit_1/Unit_2 baseline (PIDs 1292/1293).
+
+`PicoMuon@Unit_3.service` was enabled and started explicitly (never the installer's general activation flag) at **13:38:59 UTC**: connected through its by-id path in one second, rolled `data/raw/Unit_3/.../2026-11-10.txt`, identified `Unit-3`, and recorded rows ending `...,Unit-3,200,100,200,100` with an empty rejected file. Unit_1/Unit_2 PIDs and restart counts were unchanged throughout.
+
+**Reset isolation with three open ports:** the operator reset Unit_3 at about 13:48 UTC. Its collector logged the serial error at 13:48:03, backed off 2 seconds and reconnected at **13:48:10 on the same PID 8856** - a roughly 7-10 second gap - while Unit_1 and Unit_2 continued undisturbed. This extends the 28 October two-unit reset-isolation result to three simultaneously active collectors.
+
+A new `/etc/cron.d/picomuon-unit3` (root:root 0644) was then installed and content-verified, mirroring the proven Unit_2 entry with explicit `--detector Unit_3 --skip-downloads` and its own scheduler sink. The Sunday pilot rotation covers `logfiles/detectors/Unit_3/` automatically. Unit_3's historical 19-20 October raw files remain historical and are not merged into the new stream.
+
+### 19.2 First three-unit scheduled night, 12 November - passed
+
+The 11 November 01:45 run was expected to process Unit_3's partial first day honestly; the acceptance evidence is the 12 November night, Unit_3's first complete-day run, with all three jobs firing:
+
+| Job | Cron session | Duration |
+|---|---|---|
+| Unit_1, 01:15, download-inclusive | 01:15:01-01:15:46 | 45 s |
+| Unit_2, 01:30, download-inclusive | 01:30:01-01:30:43 | 42 s |
+| Unit_3, 01:45, stored inputs | 01:45:01-01:45:36 | 35 s |
+
+**Combined: 122 seconds, within the agreed 180-second target**, with that night's NMDB/weather downloads succeeding. Unit_3's first complete day (11 November) recorded **181,274 T / 180,747 B / 21,383 C events, 24/24 hours, missing_events=0**, with ten plots published to the dated `WWW/detectors/Unit_3/2026-11-11` directory. Unit_3's distinct count signature (T approximately equal to B) incidentally corroborates stream separation from the other units.
+
+### 19.3 Continued nightly operation, 13-14 November
+
+Unit_3 produced complete daily products for 12 and 13 November (24/24 hours, zero missing events each day) with nightly publication; its week gate stood at 4/7 on the 14 November run. Unit_1 and Unit_2 summaries continued their established pattern, unaffected by the activation. All three collectors retained their PIDs (1292, 1293, 8856 - the last spanning its reset test) with NRestarts=0.
+
+**14 November NMDB lag recurrence:** the 01:30 download for 13 November failed closed exactly as on 9 November - NMDB's archive covered only to 01:30 of the requested day, indicating roughly 24-hour archive latency at request time. No neutron file was written; Unit_3's stored-input run was consistently without neutron data. A manual backfill for 13 November (the section 17.6 procedure) is available once NMDB catches up. Two occurrences in two weeks were judged insufficient to justify schedule shifts or retry logic yet; recurrence should be monitored.
+
+### 19.4 Position after this addendum
+
+Closed: three simultaneously active named collectors, three-unit reset isolation, scheduled three-unit throughput within target, and Unit_3's independent raw/status/log/product/publication namespaces. Open: Unit_3 week (about 18 November) and month (about 9 December) history; Unit_2 month (about 26 November); all units' 90-day history; the 13 November neutron backfill; live deployment of the credential-optional NMDB downloader and credential retirement; the live ADC-title check; and consolidation into one production root with a single shared nightly download, which remains the final gate requiring its own plan and approval.
